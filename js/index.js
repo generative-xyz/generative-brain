@@ -9,18 +9,15 @@ let brain;
 let input_image;
 let output_prediction;
 
-function getTraits() {
-  const traits = {
-    agingSpeed: 'Year',
-    birthDate: new Date('1970/01/01'),
-  };
-  console.log(traits);
-  return traits;  
-}
 
 function setup() {
   const traits = getTraits();
   brain = new Brain(traits);
+
+  for(let year = 2000; year <= 2100; ++year) {
+    const date = new Date(year, 0, 1);
+    brain.updateAge(date);
+  }
 
   // Remove loading class from body
   document.body.classList.remove("loading");
@@ -32,8 +29,6 @@ function setup() {
 }
 
 function draw() {
-  brain.updateAge(new Date());
-
   background(220);
 
   if (input_image) {

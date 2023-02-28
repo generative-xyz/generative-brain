@@ -97,6 +97,7 @@ class tfake {
     return res;
   }
 
+  // Choose m_on neurons and set their activation to 0
   static turnoff_neuron(a, m_on, seed) {
     randomSeed(seed);
     const order = [];
@@ -104,8 +105,6 @@ class tfake {
       order.push(i);
     }
     shuffle(order);
-
-    console.log(order);
 
     const res = a.copy();
     for(let i = 0; i < res.n; ++i) {
@@ -176,10 +175,6 @@ class MultilayerPerceptron {
       neurons[ind] -= 1;
     }
 
-    console.log(t);
-    console.log(this.totalNeurons);
-    console.log(neurons);
-
     this.activeNeurons = neurons;
   }
 
@@ -194,15 +189,12 @@ class MultilayerPerceptron {
   forward(x, iteration) {
     for (const layer of this.preprocessLayers) {
       x = layer.forward(x);
-      // console.log(x);
     }
     for (const [i, layer] of this.hiddenLayers.entries()) {
       x = layer.forward(x);
       x = tfake.turnoff_neuron(x, this.activeNeurons[i], (iteration + 1) * 100 + i);
-      console.log(x);
     }
     x = this.outputLayer.forward(x);
-    console.log(x);
     return tfake.softmax(x);
   }
 }
@@ -251,9 +243,6 @@ function loadModel(modelObj, weights) {
       const b_tensor = new Tensor(b_array, 1, nxt_dim[0]);
       const activation = getActivation(info.config.activation);
 
-      // console.log(w_tensor);
-      // console.log(b_tensor);
-
       hiddenLayers.push(new DenseLayer(nxt_dim[0], activation, w_tensor, b_tensor));
 
       dim = nxt_dim;
@@ -265,6 +254,7 @@ function loadModel(modelObj, weights) {
   return new MultilayerPerceptron(preprocessLayers, hiddenLayers, outputLayer);
 }
 
+// Copied from https://gist.github.com/sketchpunk/f5fa58a56dcfe6168a9328e7c32a4fd4
 function base64ToFloatArray(base64) {
   // Base64 string converted to a char array
   const blob	= window.atob(base64);

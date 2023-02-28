@@ -1,16 +1,15 @@
-const AgingSpeed = [
-  ['Year', 365.0 / 365.0],
-  ['Month', 365.0 / 30],
-  ['Week', 365.0 / 7],
-];
-
 /*
-Cycle of 50 years:
+Cycle of 60 years:
 - [0, 25): Growing
 - [25, 50): Stable
-- [50, 57): Decaying
-- [57, 60): Dead
+- [50, 58): Decaying
+- [58, 60): Dead
 */
+
+const GROW_END = 25;
+const STABLE_END = 50;
+const DECAY_END = 58;
+const CYCLE_END = 60;
 
 // Shape: 1 - (1 - px)^n = py
 function getGrowthFunc(px, py) {
@@ -19,13 +18,8 @@ function getGrowthFunc(px, py) {
   // n = log_{1 - px} (1 - py)
   // n = ln(1 - py) / ln(1 - px)
   const n = Math.log(1 - py) / Math.log(1 - px);
-  console.log("n:", n);
   return x => 1 - Math.pow(1 - x, n);
 }
-
-const GROW_END = 25;
-const STABLE_END = 50;
-const CYCLE_END = 60;
 
 class Brain {
   constructor(traits) {
@@ -35,8 +29,12 @@ class Brain {
   
     this.iteration = 0;
     this.stage = 0;
-    this.birthDate = traits.birthDate;
-    this.speed = AgingSpeed.filter(e => e[0] == traits.agingSpeed)[0][1];
+    this.birthDate = BirthDate.filter(e => e[0] == traits.birthDate)[0][2];
+    this.speed = AgingSpeed.filter(e => e[0] == traits.agingSpeed)[0][2];
+
+    console.log(this.birthDate);
+    console.log(this.speed);
+
     this.growthFunc = getGrowthFunc(0.4, 0.8);
   }
 
@@ -55,10 +53,12 @@ class Brain {
     } else if (cycleTime < STABLE_END) {
       growth = 1;
       this.stage = 1;
-    } else if (cycleTime < CYCLE_END) {
-      let x = map(cycleTime, STABLE_END, CYCLE_END, 0, 1);
-      growth = map(x, 0, 1, 1, 0);
+    } else if (cycleTime < DECAY_END) {
+      growth = map(cycleTime, STABLE_END, DECAY_END, 1, 0);
       this.stage = 2;
+    } else if (cycleTime < CYCLE_END) {
+      growth = 0;
+      this.stage = 3;
     }
 
     this.model.updateNeurons(growth);
