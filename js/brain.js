@@ -28,12 +28,12 @@ class Brain {
     this.model = loadModel(modelObj, weights);
   
     this.iteration = 0;
-    this.stage = 0;
-    this.birthDate = BirthDate.filter(e => e[0] == traits.birthDate)[0][2];
-    this.speed = AgingSpeed.filter(e => e[0] == traits.agingSpeed)[0][2];
+    this.stage = 0;    
+    this.birthDate = new Date(parseInt(traits.birthYear), 0, 1);
+    this.growSpeed = GrowthRate.filter(e => e[0] == traits.growthRate)[0][2];
 
     console.log(this.birthDate);
-    console.log(this.speed);
+    console.log(this.growSpeed);
 
     this.growthFunc = getGrowthFunc(0.4, 0.8);
   }
@@ -41,7 +41,7 @@ class Brain {
   updateAge(time) {
     const deltaTimestamp = time.getTime() - this.birthDate.getTime();
     const deltaYear = deltaTimestamp / (1000 * 60 * 60 * 24 * 365);
-    const age = deltaYear * this.speed;
+    const age = deltaYear * this.growSpeed;
     this.iteration = Math.floor(age / CYCLE_END);        
     const cycleTime = age - this.iteration * CYCLE_END;
 
