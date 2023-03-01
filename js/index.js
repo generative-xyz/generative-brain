@@ -9,15 +9,18 @@ let brain;
 let input_image;
 let output_prediction;
 
-
 function setup() {
+  setupRandom();
+  
   const traits = getTraits();
   brain = new Brain(traits);
 
-  for(let year = 2000; year <= 2100; ++year) {
-    const date = new Date(year, 0, 1);
-    brain.updateAge(date);
-  }
+  console.log(brain.getBrainStatus());
+
+  // for(let year = 2000; year <= 2100; ++year) {
+  //   const date = new Date(year, 0, 1);
+  //   brain.updateAge(date);
+  // }
 
   // Remove loading class from body
   document.body.classList.remove("loading");
@@ -26,6 +29,13 @@ function setup() {
   fileInput.addEventListener("change", () => getImage(brain));  
 
   createCanvas(400, 400);
+}
+
+setupRandom = () => {
+  let blockhash = Date.now();
+
+  randomSeed(blockhash);
+  noiseSeed(blockhash);
 }
 
 function draw() {
