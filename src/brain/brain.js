@@ -2,13 +2,13 @@
 Cycle of 60 years:
 - [0, 25): Growing
 - [25, 50): Stable
-- [50, 58): Decaying
-- [58, 60): Dead
+- [50, 59.9): Decaying
+- [59.9, 60): Dead
 */
 
 const GROW_END = 25;
 const STABLE_END = 50;
-const DECAY_END = 58;
+const DECAY_END = 59.9;
 const CYCLE_END = 60;
 
 // Shape: 1 - (1 - px)^n = py
@@ -30,10 +30,10 @@ class Brain {
     this.iteration = 0;
     this.stage = 0;    
     this.birthDate = new Date(parseInt(traits.birthYear), 0, 1);
-    this.growSpeed = GrowthRate.filter(e => e[0] == traits.growthRate)[0][2];
+    this.growSpeed = GrowthPeriod.filter(e => e[0] == traits.growthPeriod)[0][2];
 
-    console.log(this.birthDate);
-    console.log(this.growSpeed);
+    // console.log(this.birthDate);
+    // console.log(this.growSpeed);
 
     this.growthFunc = getGrowthFunc(0.4, 0.8);
   }
@@ -45,11 +45,13 @@ class Brain {
     this.iteration = Math.floor(age / CYCLE_END);        
     const cycleTime = age - this.iteration * CYCLE_END;
 
+    console.log("cycleTime:",cycleTime);
+
     let growth = 0;
     if (cycleTime < GROW_END) {
       let x = map(cycleTime, 0, GROW_END, 0, 1);
       growth = this.growthFunc(x);
-      this.stage = 0;
+      this.stage = 1;
     } else if (cycleTime < STABLE_END) {
       growth = 1;
       this.stage = 1;
@@ -78,10 +80,6 @@ class Brain {
     const result_tensor = this.model.forward(img_tensor, this.iteration);
     const result = result_tensor.mat[0];
    
-    const classes = ['cryptoadz', 'cryptopunks', 'moonbirds', 'nouns'];
-  
-    const predictions = zip([result, classes]);
-    
-    return predictions;
+    return result;
   }  
 }

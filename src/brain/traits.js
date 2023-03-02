@@ -1,6 +1,6 @@
 const trainingTraitsRaw = '{"structure_gen": "Reflection", "n_layers": 7, "max_nodes": 16, "activation_func": "LeakyReLU", "epoch_num": 5}';
 
-const GrowthRate = [
+const GrowthPeriod = [
   ['Year', 1, 365.0 / 365.0],
   ['Month', 1, 365.0 / 30],
   ['Week', 1, 365.0 / 7],
@@ -41,10 +41,10 @@ const NodeStroke = [
 ];
 
 const Pattern = [
-  ['plain', 1],
-  ['ruled', 1],
-  ['dotted', 1],
-  ['squared', 1],
+  ['Plain', 1],
+  ['Ruled', 1],
+  ['Dotted', 1],
+  ['Squared', 1],
 ];
 
 const HardwareAcceleration = [
@@ -80,7 +80,7 @@ function getTraits() {
   const trainingTraits = JSON.parse(trainingTraitsRaw);
 
   // Life traits
-  const growthRate = getRandomItem(GrowthRate);
+  const growthPeriod = getRandomItem(GrowthPeriod);
   const birthYear = getRandomItem(BirthYear);
 
   const traits = {
@@ -90,7 +90,7 @@ function getTraits() {
     hardwareAcceleration,
     nodeType,
     backgroundColor,
-    growthRate,
+    growthPeriod,
     birthYear,
     ...trainingTraits,
   };
