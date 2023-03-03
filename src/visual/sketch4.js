@@ -109,6 +109,7 @@ function setupRandom() {
 
 function setupModel() {  
   traits = getTraits();
+  reportTraits(traits);
   brain = new Brain(traits);
 }
 

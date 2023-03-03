@@ -4,7 +4,7 @@ const GrowthPeriod = [
   ['Year', 1, 365.0 / 365.0],
   ['Month', 1, 365.0 / 30],
   ['Week', 1, 365.0 / 7],
-  ['Daily', 1, 365.0 / 365.0],
+  ['Daily', 1, 365.0 / 1],
 ];
 
 const BirthYear = [
@@ -29,15 +29,15 @@ const BirthYear = [
 ];
 
 const LineStroke = [
+  ['0.25pt', 1, 0.25],
+  ['0.5pt', 1, 0.5],
   ['0.75pt', 1, 0.75],
-  ['1.25pt', 1, 1.25],
-  ['2pt', 1, 2],
 ];
 
 const NodeStroke = [
+  ['0.25pt', 1, 0.25],
+  ['0.5pt', 1, 0.5],
   ['0.75pt', 1, 0.75],
-  ['2pt', 1, 2],
-  ['4pt', 1, 4],
 ];
 
 const Pattern = [
@@ -97,5 +97,23 @@ function getTraits() {
 
   console.log(traits);
 
-  return traits;  
+  return traits;
+}
+
+function reportTraits(traits) {
+  window.$generativeTraits = {
+    "Network architecture": traits.structure_gen,
+    "Hidden layers": traits.n_layers,
+    "Max neurons per layer": traits.max_nodes,
+    "Activation function": traits.activation_func,
+    "Training epochs": traits.epoch_num,
+    "Line stroke": traits.lineStroke,
+    "Node stroke": traits.nodeStroke,
+    "Paper": traits.pattern,
+    "Hardware acceleration (animation speed)": traits.hardwareAcceleration,
+    "Dataset (neuron color)": traits.nodeType,
+    "ML framework (background)": traits.backgroundColor,
+    "Growth speed": traits.growthPeriod,
+    "Birth year": traits.birthYear,
+  }
 }
