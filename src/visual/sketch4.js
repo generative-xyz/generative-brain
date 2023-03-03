@@ -77,9 +77,12 @@ let brain;
 let output_prediction;
 let wrapInput = null;
 let fileInput =  null;
-let oldFile = null
+let oldFile = null;
 
-function setup() {
+let isModelLoaded = false;
+let stats;
+
+async function setup() {
   let w = windowHeight; 
   let h = windowHeight;
   createCanvas(w,h);
@@ -95,22 +98,34 @@ function setup() {
   moonCanvas = new moonDraw(1000,1000,paperColor,strokeColor);
   nounCanvas = new nounDraw(1000,1000,paperColor,strokeColor);
   // window.addEventListener('dblclick', doubleClicked);
+
   setupRandom();
-  setupModel();
+  await setupModel();
   setupSketch();
   installCustomUploadIfle();
+}
+
+async function setupModel() {
+  traits = getTraits();
+  reportTraits(traits);
+
+  const blockId = await getLatestBlock();
+  stats = await getBlockStats(blockId);
+
+  console.log(stats);
+
+  const date = new Date(stats.time * 1000);
+
+  brain = new Brain(traits);
+  brain.updateAge(date);
+
+  isModelLoaded = true;  
 }
 
 function setupRandom() {
   seed = parseInt(modelSeed);
   randomSeed(seed);
   noiseSeed(seed);
-}
-
-function setupModel() {  
-  traits = getTraits();
-  reportTraits(traits);
-  brain = new Brain(traits);
 }
 
 function initialize() {
@@ -264,7 +279,6 @@ function setupSketch() {
   inputNodes = 3;
   classNum = 4;
   
-  brain.updateAge(new Date());
   const brainStatus = brain.getBrainStatus();
   console.log(brainStatus);
 
@@ -369,6 +383,10 @@ function setupSketch() {
 }
 
 function draw() {
+  if (!isModelLoaded) {
+    return;
+  }
+
   background(paperColor);
   
   animLineCanvas.background(255);
