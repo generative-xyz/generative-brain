@@ -5,3 +5,27 @@ html, body {
 canvas {
   display: block;
 }
+
+#upload{
+  --width: 150px;
+  --height: 150px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  zIndex: 9;
+}  
+
+.upload_inner{
+  position: relative;
+}
+
+#upload input{
+  opacity:1;
+  width: var(--width);
+  height: var(--height);
+  border: 1px solid blue;
+  position: relative;
+  opacity: 0;
+}

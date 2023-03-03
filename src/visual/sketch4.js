@@ -7,7 +7,6 @@ let border;  // screen padding
 let maxR;
 let inputImg;
 let img;
-let drewInputWindow = false;
 let drewResultWindow = false;
 let drewInfoWindow = false;
 let drewAnim = true;
@@ -28,8 +27,8 @@ let nodesFinal = [];  // array of amount of nodes for each layer when final
 let nodesPresent = [];  // array of amount of nodes for each layer at the moment
 let state; let liveState = [' ','Growing','Decay','Dead']  // 1-growing, 2-decay, 3-dead
 let shape; let activationFunction = [' ','Sigmoid','ReLU','LeakyReLU','Tanh'];  // 1-ellipse, 2-square, 3-diamond, 4-triangle
-let shapeStroke;  // 0.75, 2, 4
-let lineStroke;  // 0.75, 1.25, 2
+let shapeStroke;  // 0.25, 0.5, 0.75
+let lineStroke;  // 0.25, 0.5, 0.75
 let nodeSize;
 let classNum;  // number of classes will be classified
 let inputNum;  // number of input nodes
@@ -76,6 +75,9 @@ let isIdleMode;
 let traits;
 let brain;
 let output_prediction;
+let wrapInput = null;
+let fileInput =  null;
+let oldFile = null
 
 function setup() {
   let w = windowHeight; 
@@ -92,10 +94,11 @@ function setup() {
   punkCanvas = new punkDraw(1000,1000,paperColor,strokeColor);
   moonCanvas = new moonDraw(1000,1000,paperColor,strokeColor);
   nounCanvas = new nounDraw(1000,1000,paperColor,strokeColor);
-  window.addEventListener('dblclick', doubleClicked);
+  // window.addEventListener('dblclick', doubleClicked);
   setupRandom();
   setupModel();
   setupSketch();
+  installCustomUploadIfle();
 }
 
 function setupRandom() {
@@ -109,21 +112,55 @@ function setupModel() {
   brain = new Brain(traits);
 }
 
-function doubleClicked() {
-  if (!isIdleMode) return;
-  isIdleMode = false;
-  drewInputWindow = true;
-  img = null;
-  inputImg = createFileInput(handleFile);
-  inputImg.position(width/2-75*maxR,height/2-10*maxR);
-  if (paperBG == 1) {
-    inputImg.style('color','black');
-  } else {inputImg.style('color','white')}
-  processButton = createButton('Process');
-  processButton.position(width/2-155*maxR,height/2+35*maxR);
-  processButton.size(150*maxR,40*maxR);
-  processButton.style('opacity','0');
-  processButton.mouseClicked(() => {
+function initialize() {
+    document.body.onfocus = checkIt;
+    console.log('initializing');
+}
+      
+// Define a function to check if
+// the user failed to upload file
+function checkIt() {
+    // Check if the number of files
+    // is not zero   
+     const [file] = fileInput.files 
+       console.log('ok', fileInput.files )
+      if (file) {
+        img = null
+        wrapInput.style.display = 'none'
+        handleFile(URL.createObjectURL(file));
+        oldFile = file;
+      }  else{
+        wrapInput.style.display = 'block'
+      }
+    document.body.onfocus = null;
+    console.log('checked');
+}  
+
+function installCustomUploadIfle(){ 
+  wrapInput = document.querySelector('#upload');
+  fileInput = document.querySelector('#inputUpload');
+  
+  wrapInput.addEventListener('dblclick', ()=>{
+    fileInput.click();
+    initialize();
+  } )
+  
+  fileInput.addEventListener('change', ()=>{
+    
+    const [file] = fileInput.files 
+
+    if (file) {
+      img = null
+      wrapInput.style.display = 'none'
+     handleFile(URL.createObjectURL(file));
+      oldFile = file;
+    }  else{
+        wrapInput.style.display = 'block'
+    }
+  })
+}
+
+function customDoubleClicked() {
     if (img == null) return;
     frameCount = 0;
     isProcessPhase = true;
@@ -131,26 +168,20 @@ function doubleClicked() {
     animationLoopCount = 0;
     drewLineAnim = true;
     progress = border;
-  });
-  closeButton = createButton('Close');
-  closeButton.position(width/2+5*maxR,height/2+35*maxR);
-  closeButton.size(150*maxR,40*maxR);
-  closeButton.style('opacity','0');
-  closeButton.mouseClicked(() => {
-    closeWindow();
-    isIdleMode = true;
-  });
-}
 
-function closeWindow() {
-  drewInputWindow = false;
-  inputImg.hide();
-  processButton.hide();
-  closeButton.hide();
+    loadImage(img.elt.src, q5img => {
+      const graphic = createGraphics(28, 28);
+      graphic.image(q5img, 0, 0, 28, 28);
+      graphic.loadPixels();
+  
+      const data = graphic.pixels.filter((_, i) => i%4 != 3); 
+      const predictions = brain.classifyImage(data);
+      percentage = predictions.map(x => Math.round(x * 100));  
+    });
+
 }
 
 function processPhase() {
-  closeWindow();
   progress += (width-border*2-xsize/2)/(15*2*layerNum);
   animLineCanvas.fill(paperColor);
   animLineCanvas.noStroke();
@@ -197,10 +228,8 @@ function tryAgain() {
   drewResultWindow = false;
   tryButton.hide();
   closeResultButton.hide();
-  drewInputWindow = true;
-  inputImg.show();
-  processButton.show();
-  closeButton.show();
+  fileInput.click();
+  initialize();
 }
 
 function closeResult() {
@@ -209,6 +238,8 @@ function closeResult() {
   setupSketch();
   tryButton.hide();
   closeResultButton.hide();
+  wrapInput.style.display = 'block';
+  img = null;
 }
 
 function keyTyped() {
@@ -219,19 +250,10 @@ function keyTyped() {
   }
 }
 
-function handleFile(file) {
-  if (file.type === 'image') {
-    img = createImg(file.data,'');
+function handleFile(fileSrc) {
+    img = createImg(fileSrc,'');
     img.hide();
-
-    const graphic = createGraphics(28, 28);
-    graphic.image(img.elt, 0, 0, 28, 28);
-    graphic.loadPixels();
-
-    const data = graphic.pixels.filter((_, i) => i%4 != 3);
-    const predictions = brain.classifyImage(data);
-    percentage = predictions.map(x => Math.round(x * 100));
-  } else{img = null}
+    customDoubleClicked();
 }
 
 function setupSketch() {
@@ -259,7 +281,7 @@ function setupSketch() {
   birthYear = traits.birthYear;
   growPeriod = traits.growthPeriod;
   epochs = traits.epoch_num;
-
+  
   border = 50*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
@@ -271,16 +293,7 @@ function setupSketch() {
   colorPalette = dataSet.indexOf(traits.nodeType);
   pattern = paper.indexOf(traits.pattern);
 
-  state = 1 
-  // shape = 4 
-  // shapeStroke = 3.6953125 
-  // lineStroke = 1.84765625 
-  // drawSpeed = 3 
-  // paperBG = 3 
-  // colorPallete = 1 
-  // pattern = 0
-
-  console.log(nodesFinal, nodesPresent, state, shape, shapeStroke, lineStroke, drawSpeed, paperBG, colorPalette, pattern);
+  drawSpeed = 3; 
   
   if (paperBG == 1) {
     paperColor = 'white';
@@ -363,7 +376,7 @@ function draw() {
   animCanvas.background(255);
   animCanvas.rectMode(CENTER);
   eraseCanvas(animCanvas);
-  animCanvas.strokeWeight(shapeStroke*3/2);
+  animCanvas.strokeWeight(shapeStroke*4);
   
   popupCanvas.background(255);
   popupCanvas.rectMode(CENTER);
@@ -379,7 +392,7 @@ function draw() {
   eraseCanvas(infoCanvas);
   infoCanvas.textAlign(LEFT);
   infoCanvas.stroke(strokeColor);
-  infoCanvas.strokeWeight(4*maxR);
+  infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
   
   nodeCanvas.background(255);
@@ -387,7 +400,7 @@ function draw() {
   eraseCanvas(nodeCanvas);
   nodeCanvas.stroke(strokeColor);
   nodeCanvas.strokeWeight(shapeStroke);
-
+  
   lineCanvas.background(255);
   eraseCanvas(lineCanvas);
   lineCanvas.stroke(strokeColor);
@@ -398,7 +411,7 @@ function draw() {
   patternCanvas.stroke(strokeColor);
   patternCanvas.strokeWeight(0.2*maxR);
   createPattern(pattern);
-  
+    
   // draw neural nodes
   for (let i=0; i<currentNode; i++) {
     let node = nodeSet[i];
@@ -447,10 +460,6 @@ function draw() {
   image(patternCanvas,0,0);
   image(nodeCanvas,0,0);
   if (drewAnim) image(animCanvas,0,0);
-  if (drewInputWindow) {
-    drawInputWindow();
-    image(popupCanvas,0,0);
-  }
   if (drewResultWindow) {
     drawResultWindow();
     image(popupCanvas,0,0);
@@ -671,76 +680,49 @@ function createPattern(pattern) {
   }
 }
 
-function drawInputWindow() {
-  popupCanvas.rect(width/2,height/2,600*maxR,200*maxR,25*maxR);
-
-  popupCanvas.strokeWeight(2*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+30*maxR && mouseY<height/2+75*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
-    popupCanvas.fill(strokeColor);
-  }
-  popupCanvas.rect(width/2-80*maxR,height/2+55*maxR,150*maxR,40*maxR,5*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+30*maxR && mouseY<height/2+75*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
-    popupCanvas.fill(strokeColor);
-  }
-  popupCanvas.rect(width/2+80*maxR,height/2+55*maxR,150*maxR,40*maxR,5*maxR);
-  
-  popupCanvas.textSize(32*maxR);
-  popupCanvas.fill(strokeColor);
-  popupCanvas.noStroke();
-  popupCanvas.text('CHOOSE A FILE TO CLASSIFY',width/2,height/2-40*maxR);
-  popupCanvas.textSize(20*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+30*maxR && mouseY<height/2+75*maxR) {
-    popupCanvas.fill(strokeColor);
-  } else {
-    popupCanvas.fill(paperColor);
-  }
-  popupCanvas.text('PROCESS',width/2-80*maxR,height/2+62*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+30*maxR && mouseY<height/2+75*maxR) {
-    popupCanvas.fill(strokeColor);
-  } else {
-    popupCanvas.fill(paperColor);
-  }
-  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+62*maxR);
-}
-
 function drawResultWindow() {
-  popupCanvas.rect(width/2,height/2,800*maxR,700*maxR,25*maxR);
+  popupCanvas.noStroke();
+  popupCanvas.fill(0,0,0,75);
+  popupCanvas.rect(width/2,height/2,width,height);
+  popupCanvas.stroke(strokeColor);
+  popupCanvas.fill(paperColor);
+  popupCanvas.rect(width/2,height/2,700*maxR,700*maxR,25*maxR);
   popupCanvas.rect(width/2,height/2-(310+15/2-215/2)*maxR,215*maxR)
   popupCanvas.image(img.elt,width/2-100*maxR,height/2-310*maxR,200*maxR,200*maxR);
   
-  popupCanvas.strokeWeight(2*maxR);
+  popupCanvas.strokeWeight(0.75*maxR);
   if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
     popupCanvas.fill(strokeColor);
+  } else {
+    popupCanvas.fill(paperColor);
   }
   popupCanvas.rect(width/2-80*maxR,height/2+300*maxR,150*maxR,40*maxR,5*maxR);
   if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
     popupCanvas.fill(strokeColor);
+  } else {
+    popupCanvas.fill(paperColor);
   }
   popupCanvas.rect(width/2+80*maxR,height/2+300*maxR,150*maxR,40*maxR,5*maxR);
   
   popupCanvas.noStroke();
   popupCanvas.fill(strokeColor);
   popupCanvas.textSize(32*maxR);
-  popupCanvas.text('YOUR IMAGE COULD BELONG TO...',width/2,height/2-45*maxR);
+  if (max(...percentage) >= 90) {
+    popupCanvas.text('YOUR IMAGE DEFINITELY BELONG TO...',width/2,height/2-45*maxR);
+  } else if (max(...percentage) >= 60 && max(...percentage) < 90) {
+    popupCanvas.text('YOUR IMAGE LIKELY BELONG TO...',width/2,height/2-45*maxR);
+  } else {popupCanvas.text('YOUR IMAGE COULD BELONG TO...',width/2,height/2-45*maxR)}
   popupCanvas.textSize(20*maxR);
   if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(strokeColor);
-  } else {
     popupCanvas.fill(paperColor);
+  } else {
+    popupCanvas.fill(strokeColor);
   }
   popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+307*maxR);
   if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(strokeColor);
-  } else {
     popupCanvas.fill(paperColor);
+  } else {
+    popupCanvas.fill(strokeColor);
   }
   popupCanvas.text('CLOSE',width/2+80*maxR,height/2+307*maxR);
   
@@ -755,45 +737,45 @@ function drawResultWindow() {
   } else if (percentage[2] == max(...percentage)) {
     s3 = 200; text3 = 22; style3 = BOLD; fill3 = strokeColor;
   } else {s4 = 200; text4 = 22; style4 = BOLD; fill4 = strokeColor}
-  let gap = (800-75*2-s1-s2-s3-s4)/3;
+  let gap = (700-35*2-s1-s2-s3-s4)/3;
   
   popupCanvas.stroke(strokeColor);
   popupCanvas.strokeWeight(0.75*maxR);
   // draw toad result
   popupCanvas.fill(fill1);
-  popupCanvas.rect(width/2+(800/2-75-s4-s3-s2-gap*3-s1/2)*maxR,height/2+240/2*maxR,s1*maxR,s1*maxR,10*maxR);
-  popupCanvas.image(toadCanvas.graphic,width/2+(800/2-75-s4-s3-s2-gap*3-s1)*maxR,height/2+(240/2-s1/2)*maxR,s1*maxR,s1*maxR);
+  popupCanvas.rect(width/2+(700/2-35-s4-s3-s2-gap*3-s1/2)*maxR,height/2+240/2*maxR,s1*maxR,s1*maxR,10*maxR);
+  popupCanvas.image(toadCanvas.graphic,width/2+(700/2-35-s4-s3-s2-gap*3-s1)*maxR,height/2+(240/2-s1/2)*maxR,s1*maxR,s1*maxR);
   // draw punk result
   popupCanvas.fill(fill2);
-  popupCanvas.rect(width/2+(800/2-75-s4-s3-gap*2-s2/2)*maxR,height/2+240/2*maxR,s2*maxR,s2*maxR,10*maxR);
-  popupCanvas.image(punkCanvas.graphic,width/2+(800/2-75-s4-s3-gap*2-s2)*maxR,height/2+(240/2-s2/2)*maxR,s2*maxR,s2*maxR);
+  popupCanvas.rect(width/2+(700/2-35-s4-s3-gap*2-s2/2)*maxR,height/2+240/2*maxR,s2*maxR,s2*maxR,10*maxR);
+  popupCanvas.image(punkCanvas.graphic,width/2+(700/2-35-s4-s3-gap*2-s2)*maxR,height/2+(240/2-s2/2)*maxR,s2*maxR,s2*maxR);
   // draw moon result
   popupCanvas.fill(fill3);
-  popupCanvas.rect(width/2+(800/2-75-s4-gap-s3/2)*maxR,height/2+240/2*maxR,s3*maxR,s3*maxR,10*maxR);
-  popupCanvas.image(moonCanvas.graphic,width/2+(800/2-75-s4-gap-s3)*maxR,height/2+(240/2-s3/2)*maxR,s3*maxR,s3*maxR);    
+  popupCanvas.rect(width/2+(700/2-35-s4-gap-s3/2)*maxR,height/2+240/2*maxR,s3*maxR,s3*maxR,10*maxR);
+  popupCanvas.image(moonCanvas.graphic,width/2+(700/2-35-s4-gap-s3)*maxR,height/2+(240/2-s3/2)*maxR,s3*maxR,s3*maxR);    
   // draw noun result
   popupCanvas.fill(fill4);
-  popupCanvas.rect(width/2+(800/2-75-s4/2)*maxR,height/2+240/2*maxR,s4*maxR,s4*maxR,10*maxR);
-  popupCanvas.image(nounCanvas.graphic,width/2+(800/2-75-s4)*maxR,height/2+(240/2-s4/2)*maxR,s4*maxR,s4*maxR);
+  popupCanvas.rect(width/2+(700/2-35-s4/2)*maxR,height/2+240/2*maxR,s4*maxR,s4*maxR,10*maxR);
+  popupCanvas.image(nounCanvas.graphic,width/2+(700/2-35-s4)*maxR,height/2+(240/2-s4/2)*maxR,s4*maxR,s4*maxR);
   // draw text
   popupCanvas.fill(strokeColor);
   popupCanvas.noStroke();
   popupCanvas.textSize(text1*maxR);
   popupCanvas.textStyle(style1);
-  popupCanvas.text('CRYPTOADZ',width/2+(800/2-75-s4-s3-s2-gap*3-s1/2)*maxR,height/2+(240/2-s1/2-text1/2)*maxR);
-  popupCanvas.text(percentage[0]+'%',width/2+(800/2-75-s4-s3-s2-gap*3-s1/2)*maxR,height/2+(240/2+s1/2+text1*4/3)*maxR);
+  popupCanvas.text('CRYPTOADZ',width/2+(700/2-35-s4-s3-s2-gap*3-s1/2)*maxR,height/2+(240/2-s1/2-text1/2)*maxR);
+  popupCanvas.text(percentage[0]+'%',width/2+(700/2-35-s4-s3-s2-gap*3-s1/2)*maxR,height/2+(240/2+s1/2+text1*4/3)*maxR);
   popupCanvas.textSize(text2*maxR);
   popupCanvas.textStyle(style2);
-  popupCanvas.text('CRYPTOPUNKS',width/2+(800/2-75-s4-s3-gap*2-s2/2)*maxR,height/2+(240/2-s2/2-text2/2)*maxR);
-  popupCanvas.text(percentage[1]+'%',width/2+(800/2-75-s4-s3-gap*2-s2/2)*maxR,height/2+(240/2+s2/2+text2*4/3)*maxR);
+  popupCanvas.text('CRYPTOPUNKS',width/2+(700/2-35-s4-s3-gap*2-s2/2)*maxR,height/2+(240/2-s2/2-text2/2)*maxR);
+  popupCanvas.text(percentage[1]+'%',width/2+(700/2-35-s4-s3-gap*2-s2/2)*maxR,height/2+(240/2+s2/2+text2*4/3)*maxR);
   popupCanvas.textSize(text3*maxR);
   popupCanvas.textStyle(style3);
-  popupCanvas.text('MOONBIRDS',width/2+(800/2-75-s4-gap-s3/2)*maxR,height/2+(240/2-s3/2-text3/2)*maxR);
-  popupCanvas.text(percentage[2]+'%',width/2+(800/2-75-s4-gap-s3/2)*maxR,height/2+(240/2+s3/2+text3*4/3)*maxR);
+  popupCanvas.text('MOONBIRDS',width/2+(700/2-35-s4-gap-s3/2)*maxR,height/2+(240/2-s3/2-text3/2)*maxR);
+  popupCanvas.text(percentage[2]+'%',width/2+(700/2-35-s4-gap-s3/2)*maxR,height/2+(240/2+s3/2+text3*4/3)*maxR);
   popupCanvas.textSize(text4*maxR);
   popupCanvas.textStyle(style4);
-  popupCanvas.text('NOUNS',width/2+(800/2-75-s4/2)*maxR,height/2+(240/2-s4/2-text4/2)*maxR);
-  popupCanvas.text(percentage[3]+'%',width/2+(800/2-75-s4/2)*maxR,height/2+(240/2+s4/2+text4*4/3)*maxR);
+  popupCanvas.text('NOUNS',width/2+(700/2-35-s4/2)*maxR,height/2+(240/2-s4/2-text4/2)*maxR);
+  popupCanvas.text(percentage[3]+'%',width/2+(700/2-35-s4/2)*maxR,height/2+(240/2+s4/2+text4*4/3)*maxR);
 }
 
 function drawInfoWindow() {

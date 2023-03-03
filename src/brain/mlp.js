@@ -179,11 +179,11 @@ class MultilayerPerceptron {
   }
 
   getTotalNeurons() {
-    return this.totalNeurons;
+    return this.totalNeurons.slice();
   }
 
   getActiveNeurons() {
-    return this.activeNeurons;
+    return this.activeNeurons.slice();
   }
 
   forward(x, iteration) {

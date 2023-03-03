@@ -45,7 +45,7 @@ class Brain {
     this.iteration = Math.floor(age / CYCLE_END);        
     const cycleTime = age - this.iteration * CYCLE_END;
 
-    console.log("cycleTime:",cycleTime);
+    console.log("cycleTime:", cycleTime);
 
     let growth = 0;
     if (cycleTime < GROW_END) {
