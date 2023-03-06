@@ -23,9 +23,12 @@ async function setupModel() {
   traits = getTraits(___default_inscription.training_traits);
   reportTraits(traits);
 
+  const blockEndpoint = getBlocksApiEndpoint();
+  const inscriptionEndpoint = getModelInscriptionEndpoint();
+
   const [stats, inscription] = await Promise.all([
-    getLatestBlockStats(),
-    getModelInscription(),
+    getLatestBlockStats(blockEndpoint),
+    getModelInscription(inscriptionEndpoint),
   ]);
 
   const date = new Date(stats.time * 1000);

@@ -1,4 +1,4 @@
-async function sendBtcRequest(method, params) {
+async function sendBtcRequest(endpoint, method, params) {
   const paramsStr = `[${params.join(sep=',')}]`;
   
   const options = {
@@ -8,7 +8,7 @@ async function sendBtcRequest(method, params) {
   };
   
   try {
-    const response = await fetch('https://ancient-crimson-rain.btc.discover.quiknode.pro/c268fb026303ae8443f785200f2ea4b82f0082dd', options);
+    const response = await fetch(endpoint, options);
     const data = await response.json();
     return data.result;
   } catch (err) {
@@ -17,29 +17,40 @@ async function sendBtcRequest(method, params) {
   }
 }
 
-async function getLatestBlock() {
-  return sendBtcRequest('getblockcount', []);
+async function getLatestBlockStats(endpoint) {
+  const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
+  return await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
 }
 
-async function getBlockStats(blockId) {
-  return sendBtcRequest('getblockstats', [blockId]);
+function setBlocksApiEndpoint(endpoint) {
+  localStorage.blocksApiEndpoint = endpoint;
 }
 
-async function getLatestBlockStats() {
-  const blockId = await sendBtcRequest('getblockcount', []);
-  return await sendBtcRequest('getblockstats', [blockId]);
+function getBlocksApiEndpoint() {
+  return localStorage.blocksApiEndpoint || 'https://ancient-crimson-rain.btc.discover.quiknode.pro/c268fb026303ae8443f785200f2ea4b82f0082dd';
 }
 
-async function getModelInscription() {
-  return ___sample_inscription;
-  // try {
-  //   const response = await fetch('https://ordinals.com/content/a4408db1e9763a3ef6355e0236ff3105db37736959d3af9e3f83eaa88c2db4bei0');
-  //   const data = await response.json();
-  //   return data;
-  // } catch (err) {
-  //   console.error(err);
-  //   return null;
-  // }  
+function setModelInscriptionEndpoint(endpoint) {
+  localStorage.modelInscriptionEndpoint = endpoint;
+}
+
+function getModelInscriptionEndpoint() {
+  return localStorage.modelInscriptionEndpoint;
+}
+
+async function getModelInscription(endpoint) {
+  if (endpoint == null) {
+    return ___sample_inscription;
+  }
+
+  try {
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }  
 }
 
 const ___sample_inscription = {    
