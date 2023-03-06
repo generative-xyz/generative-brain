@@ -217,9 +217,11 @@ function loadModel(layersConfig, weights) {
 
   let dim = null;
   let p = 0;
+  let inputDim = [];
   for(const info of layersConfig.config.layers) {
     if (info.class_name == "InputLayer") {
       dim = info.config.batch_input_shape.slice(1);
+      inputDim = dim;
     } else if (info.class_name == "Rescaling") {
       preprocessLayers.push(new RescaleLayer(info.config.scale, info.config.offset))
     } else if (info.class_name == "Flatten") {
@@ -247,7 +249,9 @@ function loadModel(layersConfig, weights) {
 
   const outputLayer = hiddenLayers.pop();
 
-  return new MultilayerPerceptron(preprocessLayers, hiddenLayers, outputLayer);
+  const model = new MultilayerPerceptron(preprocessLayers, hiddenLayers, outputLayer);
+
+  return { model, inputDim };
 }
 
 // Copied from https://gist.github.com/sketchpunk/f5fa58a56dcfe6168a9328e7c32a4fd4

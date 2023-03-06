@@ -10,6 +10,7 @@ let isModelLoaded;
 let input_image;
 let output_prediction;
 let classes_name;
+let inputDim;
 
 function setup() {
   setupRandom();
@@ -27,15 +28,14 @@ async function setupModel() {
     getModelInscription(),
   ]);
 
-  console.log(inscription);
-
   const date = new Date(stats.time * 1000);
-
-  console.log(date);
 
   brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64);
   brain.updateAge(date);
 
+  const brainStatus = brain.getBrainStatus();
+
+  inputDim = brainStatus.inputDim;
   classes_name = inscription.classes_name;
 
   // When user uploads a new image, display the new image on the webpage
@@ -107,14 +107,15 @@ function getImage(brain) {
 
     loadImage(dataUrl, img => {
       input_image = img;
-
-      const graphic = createGraphics(28, 28);
-      graphic.image(img, 0, 0, 28, 28);
+      
+      const [w_img, h_img, c_img] = inputDim;
+      const graphic = createGraphics(w_img, h_img);
+      graphic.image(img, 0, 0, w_img, h_img);
       graphic.loadPixels();
 
       const data = graphic.pixels.filter((_, i) => i%4 != 3);
       const result = brain.classifyImage(data);
-      output_prediction = formatResult(result);
+      output_prediction = formatResult(result);      
     });
   };
 

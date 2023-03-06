@@ -24,7 +24,9 @@ function getGrowthFunc(px, py) {
 class Brain {
   constructor(traits, layersConfig, weights_b64) {
     const weights = base64ToFloatArray(weights_b64);
-    this.model = loadModel(layersConfig, weights);
+    const { model, inputDim } = loadModel(layersConfig, weights);
+    this.model = model;
+    this.inputDim = inputDim;
   
     this.iteration = 0;
     this.stage = 0;    
@@ -67,6 +69,7 @@ class Brain {
       totalNeurons: this.model.getTotalNeurons(),
       activeNeurons: this.model.getActiveNeurons(),
       stage: this.stage,
+      inputDim: this.inputDim,
     };
   }
   
