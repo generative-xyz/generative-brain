@@ -1,5 +1,3 @@
-const trainingTraitsRaw = '{"structure_gen": "Reflection", "n_layers": 7, "max_nodes": 16, "activation_func": "LeakyReLU", "epoch_num": 5}';
-
 const GrowthPeriod = [
   ['Year', 1, 365.0 / 365.0],
   ['Month', 1, 365.0 / 30],
@@ -67,32 +65,31 @@ const BackgroundColor = [
   ['Caffe', 1],  
 ];
 
-function getTraits() {
-  // Display traits
+function getTraits(trainingTraits) {
+  // Visual traits
   const lineStroke = getRandomItem(LineStroke);
   const nodeStroke = getRandomItem(NodeStroke);
   const pattern = getRandomItem(Pattern);
   const hardwareAcceleration = getRandomItem(HardwareAcceleration);
   const nodeType = getRandomItem(NodeType);
   const backgroundColor = getRandomItem(BackgroundColor);
-
-  // Training traits
-  const trainingTraits = JSON.parse(trainingTraitsRaw);
-
-  // Life traits
-  const growthPeriod = getRandomItem(GrowthPeriod);
-  const birthYear = getRandomItem(BirthYear);
+  // const growthPeriod = getRandomItem(GrowthPeriod);
+  // const birthYear = getRandomItem(BirthYear);
+  const growthPeriod = 'Year';
+  const birthYear = '1997';
 
   const traits = {
-    lineStroke,
-    nodeStroke,
-    pattern,
-    hardwareAcceleration,
-    nodeType,
-    backgroundColor,
-    growthPeriod,
-    birthYear,
-    ...trainingTraits,
+    visual: {
+      lineStroke,
+      nodeStroke,
+      pattern,
+      hardwareAcceleration,
+      nodeType,
+      backgroundColor,
+      growthPeriod,
+      birthYear,  
+    },
+    training: trainingTraits,
   };
 
   console.log(traits);
@@ -102,18 +99,18 @@ function getTraits() {
 
 function reportTraits(traits) {
   window.$generativeTraits = {
-    "Network architecture": traits.structure_gen,
-    "Hidden layers": traits.n_layers,
-    "Max neurons per layer": traits.max_nodes,
-    "Activation function": traits.activation_func,
-    "Training epochs": traits.epoch_num,
-    "Line stroke": traits.lineStroke,
-    "Node stroke": traits.nodeStroke,
-    "Paper": traits.pattern,
-    "Hardware acceleration (animation speed)": traits.hardwareAcceleration,
-    "Dataset (neuron color)": traits.nodeType,
-    "ML framework (background)": traits.backgroundColor,
-    "Growth speed": traits.growthPeriod,
-    "Birth year": traits.birthYear,
+    "Network architecture": traits.training.structure_gen,
+    "Hidden layers": traits.training.n_layers,
+    "Max neurons per layer": traits.training.max_nodes,
+    "Activation function": traits.training.activation_func,
+    "Training epochs": traits.training.epoch_num,
+    "Line stroke": traits.visual.lineStroke,
+    "Node stroke": traits.visual.nodeStroke,
+    "Paper": traits.visual.pattern,
+    "Hardware acceleration (animation speed)": traits.visual.hardwareAcceleration,
+    "Dataset (neuron color)": traits.visual.nodeType,
+    "ML framework (background)": traits.visual.backgroundColor,
+    "Growth speed": traits.visual.growthPeriod,
+    "Birth year": traits.visual.birthYear,
   }
 }

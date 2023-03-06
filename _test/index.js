@@ -6,29 +6,42 @@ new Q5("global"); //initialize q5
 // the rest just looks like a regular p5.js sketch:
 
 let brain;
+let isModelLoaded;
 let input_image;
 let output_prediction;
+let classes_name;
 
 function setup() {
   setupRandom();
-  
-  const traits = getTraits();
-  brain = new Brain(traits);
+  setupModel();
 
-  console.log(brain.getBrainStatus());
+  createCanvas(400, 400);
+}
 
-  // for(let year = 2000; year <= 2100; ++year) {
-  //   const date = new Date(year, 0, 1);
-  //   brain.updateAge(date);
-  // }
+async function setupModel() {
+  traits = getTraits(___default_inscription.training_traits);
+  reportTraits(traits);
 
-  // Remove loading class from body
-  document.body.classList.remove("loading");
+  const [stats, inscription] = await Promise.all([
+    getLatestBlockStats(),
+    getModelInscription(),
+  ]);
+
+  console.log(inscription);
+
+  const date = new Date(stats.time * 1000);
+
+  console.log(date);
+
+  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64);
+  brain.updateAge(date);
+
+  classes_name = inscription.classes_name;
 
   // When user uploads a new image, display the new image on the webpage
   fileInput.addEventListener("change", () => getImage(brain));  
 
-  createCanvas(400, 400);
+  isModelLoaded = true; 
 }
 
 setupRandom = () => {
@@ -40,6 +53,15 @@ setupRandom = () => {
 
 function draw() {
   background(220);
+
+  if (!isModelLoaded) {
+    push();
+    textAlign(CENTER);
+    textSize(16);
+    text("Loading model...", 200, 200);
+    pop();
+    return;
+  }
 
   if (input_image) {
     image(input_image, 0, 0, 200, 200);    
@@ -59,10 +81,11 @@ function draw() {
 };
 
 function formatResult(result) {
-  const classes = ['cryptoadz', 'cryptopunks', 'moonbirds', 'nouns'];
-  const predictions = zip([result, classes]);
+  const predictions = zip([result, classes_name]);
 
-  const sorted_predictions = predictions.sort((a, b) => a[0] > b[0]);
+  const sorted_predictions = predictions.sort((a, b) => a[0] > b[0] ? -1 : 1);
+  console.log(predictions);
+  console.log(sorted_predictions);
   return sorted_predictions.map(e => `${e[1]}: ${(e[0] * 100).toFixed(2)}%`).join('\n');
 }
 

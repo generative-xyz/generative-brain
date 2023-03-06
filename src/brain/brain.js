@@ -22,18 +22,14 @@ function getGrowthFunc(px, py) {
 }
 
 class Brain {
-  constructor(traits) {
-    const modelObj = JSON.parse(modelRaw);
-    const weights = base64ToFloatArray(weightsRaw);
-    this.model = loadModel(modelObj, weights);
+  constructor(traits, layersConfig, weights_b64) {
+    const weights = base64ToFloatArray(weights_b64);
+    this.model = loadModel(layersConfig, weights);
   
     this.iteration = 0;
     this.stage = 0;    
     this.birthDate = new Date(parseInt(traits.birthYear), 0, 1);
     this.growSpeed = GrowthPeriod.filter(e => e[0] == traits.growthPeriod)[0][2];
-
-    // console.log(this.birthDate);
-    // console.log(this.growSpeed);
 
     this.growthFunc = getGrowthFunc(0.4, 0.8);
   }
