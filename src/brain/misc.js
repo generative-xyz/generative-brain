@@ -2,6 +2,10 @@ function zip(rows) {
   return rows[0].map((_, i) => rows.map(row => row[i]));
 }
 
+function clone(items) {
+  return items.map(item => Array.isArray(item) ? clone(item) : item);
+}
+
 // The maximum is exclusive and the minimum is inclusive
 function getRandomInt(min, max) {
   return floor(random(min, max)); 

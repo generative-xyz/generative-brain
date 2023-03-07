@@ -61,13 +61,13 @@ class Brain {
       this.stage = 3;
     }
 
-    this.model.updateNeurons(growth);
+    this.model.updateNeurons(growth, this.iteration);
   }
 
   getBrainStatus() {
     return {
       totalNeurons: this.model.getTotalNeurons(),
-      activeNeurons: this.model.getActiveNeurons(),
+      neuronsLife: this.model.getNeuronsLife(),
       stage: this.stage,
       inputDim: this.inputDim,
     };
@@ -76,7 +76,7 @@ class Brain {
   classifyImage(pixels) {
     const img_tensor = new Tensor(pixels, 1, pixels.length);
   
-    const result_tensor = this.model.forward(img_tensor, this.iteration);
+    const result_tensor = this.model.forward(img_tensor);
     const result = result_tensor.mat[0];
    
     return result;

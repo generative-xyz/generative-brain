@@ -22,44 +22,45 @@ class Tensor {
 
 // The "Tensorfake" library
 class tfake {
-  static __apply(a, f) {
-    const res = a.copy();
-    for(let i = 0; i < res.n; ++i) {
-      for(let j = 0; j < res.m; ++j) {
-        res.mat[i][j] = f(res.mat[i][j]);
-      }
-    }
-    return res;
-  }
-
   static __linear = (x) => x;
   static __relu = (x) => Math.max(x, 0);
   static __leaky_relu = (x) => x > 0 ? x : x * 0.2;
   static __sigmoid = (x) => 1 / (1 + Math.exp(-x));
   static __tanh = (x) => Math.tanh(x);
 
-  static mul(a, k) {
+  static __apply_unary_op(a, op) {
     const res = a.copy();
     for(let i = 0; i < res.n; ++i) {
       for(let j = 0; j < res.m; ++j) {
-        res.mat[i][j] *= k;
+        res.mat[i][j] = op(res.mat[i][j]);
+      }
+    }
+    return res;
+  }
+  
+  static __add = (a, b) => a + b;
+  static __mul = (a, b) => a * b;
+
+  static __apply_binary_op = (a, b, op) => {
+    if (typeof b !== 'object') {
+      b = new Tensor([b], 1, 1);
+    }
+
+    const res = a.copy();
+    for(let i = 0; i < res.n; ++i) {
+      for(let j = 0; j < res.m; ++j) {
+        res.mat[i][j] = op(res.mat[i][j], b.mat[i%b.n][j%b.m]);
       }
     }
     return res;
   }
 
+  static mul(a, b) {
+    return tfake.__apply_binary_op(a, b, tfake.__mul);
+  }
+
   static add(a, b) {
-    if (typeof b !== 'object') {
-      b = new Tensor([b], 1, 1);
-    }
-    const res = a.copy();
-    for(let i = 0; i < res.n; ++i) {
-      for(let j = 0; j < res.m; ++j) {
-        // Broadcasting
-        res.mat[i][j] += b.mat[i%b.n][j%b.m];
-      }
-    }
-    return res;
+    return tfake.__apply_binary_op(a, b, tfake.__add);
   }
 
   static matMul(a, b) {
@@ -74,11 +75,11 @@ class tfake {
     return res;
   }
 
-  static linear = (a) => tfake.__apply(a, tfake.__linear);
-  static relu = (a) => tfake.__apply(a, tfake.__relu);
-  static leaky_relu = (a) => tfake.__apply(a, tfake.__leaky_relu);
-  static sigmoid = (a) => tfake.__apply(a, tfake.__sigmoid);
-  static tanh = (a) => tfake.__apply(a, tfake.__tanh);
+  static linear = (a) => tfake.__apply_unary_op(a, tfake.__linear);
+  static relu = (a) => tfake.__apply_unary_op(a, tfake.__relu);
+  static leaky_relu = (a) => tfake.__apply_unary_op(a, tfake.__leaky_relu);
+  static sigmoid = (a) => tfake.__apply_unary_op(a, tfake.__sigmoid);
+  static tanh = (a) => tfake.__apply_unary_op(a, tfake.__tanh);
 
   static softmax(a) {
     const res = a.copy();
@@ -88,24 +89,6 @@ class tfake {
     for(let i = 0; i < a.n; ++i) {
       for(let j = 0; j < a.m; ++j) {
         res.mat[i][j] /= sum_e;
-      }
-    }
-    return res;
-  }
-
-  // Choose m_on neurons and set their activation to 0
-  static turnoff_neuron(a, m_on, seed) {
-    randomSeed(seed);
-    const order = [];
-    for(let i = 0; i < a.m; ++i) {
-      order.push(i);
-    }
-    shuffle(order);
-
-    const res = a.copy();
-    for(let i = 0; i < res.n; ++i) {
-      for(let j = m_on; j < res.m; ++j) {
-        res.mat[i][order[j]] = 0.0;
       }
     }
     return res;
@@ -153,42 +136,57 @@ class MultilayerPerceptron {
     this.outputLayer = outputLayer;
 
     this.totalNeurons = this.hiddenLayers.map(e => e.out_dim);
-    this.activeNeurons = this.totalNeurons.slice();
   }
 
-  updateNeurons(t) {
-    const neurons = this.totalNeurons.slice();
+  updateNeurons(t, iteration) {
+    const neurons = clone(this.totalNeurons);
     const sumNeurons = neurons.reduce((a, b) => a + b);
 
-    const sumActiveNeurons = Math.floor(t * sumNeurons);
-    const oldActiveNeurons = this.activeNeurons.reduce((a, b) => a + b);
-    if (sumActiveNeurons == oldActiveNeurons) return;
-        
-    const sumInactiveNeurons = sumNeurons - sumActiveNeurons;
+    console.log("updateNeurons:", t, iteration);
+
+    const sumInactiveNeurons = sumNeurons * (1 - t);
     for(let iter = 0; iter < sumInactiveNeurons; ++iter) {
       const ratio = neurons.map((x, i) => (x-1) / this.totalNeurons[i]);
       const ind = ratio.map((x, i) => [x, i]).reduce((r, a) => (a[0] > r[0] ? a : r))[1];
-      neurons[ind] -= 1;
+      neurons[ind] -= Math.min(sumInactiveNeurons - iter, 1);
     }
 
-    this.activeNeurons = neurons;
+    this.neuronsLife = [];
+    for(let i = 0; i < neurons.length; ++i) {
+      const seed = (iteration + 1) * 100 + i;
+      randomSeed(seed);
+      
+      const order = [];
+      for(let j = 0; j < this.totalNeurons[i]; ++j) {
+        order.push(j);
+      }
+      shuffle(order);
+  
+      const life = Array(this.totalNeurons[i]).fill(0);
+      for(let j = 0; j < neurons[i]; ++j) {
+        life[order[j]] = Math.min(neurons[i] - j, 1);
+      }
+      this.neuronsLife.push(life);
+    }
   }
 
   getTotalNeurons() {
-    return this.totalNeurons.slice();
+    return clone(this.totalNeurons);
   }
 
-  getActiveNeurons() {
-    return this.activeNeurons.slice();
+  getNeuronsLife() {
+    return clone(this.neuronsLife);
   }
 
-  forward(x, iteration) {
+  forward(x) {
     for (const layer of this.preprocessLayers) {
       x = layer.forward(x);
     }
     for (const [i, layer] of this.hiddenLayers.entries()) {
       x = layer.forward(x);
-      x = tfake.turnoff_neuron(x, this.activeNeurons[i], (iteration + 1) * 100 + i);
+      const life = new Tensor(this.neuronsLife[i], 1, x.m);
+      x = tfake.mul(x, life);
+      // console.log(x);
     }
     x = this.outputLayer.forward(x);
     return tfake.softmax(x);

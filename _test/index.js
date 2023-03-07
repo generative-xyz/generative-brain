@@ -37,6 +37,7 @@ async function setupModel() {
   brain.updateAge(date);
 
   const brainStatus = brain.getBrainStatus();
+  console.log(brainStatus);
 
   inputDim = brainStatus.inputDim;
   classes_name = inscription.classes_name;
@@ -87,8 +88,6 @@ function formatResult(result) {
   const predictions = zip([result, classes_name]);
 
   const sorted_predictions = predictions.sort((a, b) => a[0] > b[0] ? -1 : 1);
-  console.log(predictions);
-  console.log(sorted_predictions);
   return sorted_predictions.map(e => `${e[1]}: ${(e[0] * 100).toFixed(2)}%`).join('\n');
 }
 
