@@ -1,33 +1,13 @@
-async function sendBtcRequest(endpoint, method, params) {
-  const paramsStr = `[${params.join(sep=',')}]`;
-  
-  const options = {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: `{"jsonrpc":"2.0","id":1,"method":"${method}","params":${paramsStr}}`
-  };
-  
-  try {
-    const response = await fetch(endpoint, options);
-    const data = await response.json();
-    return data.result;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
+// Local storage
 
-async function getLatestBlockStats(endpoint) {
-  const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
-  return await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
-}
+const DEFAULT_BTC_ENDPOINT = 'https://ancient-crimson-rain.btc.discover.quiknode.pro/c268fb026303ae8443f785200f2ea4b82f0082dd';
 
 function setBlocksApiEndpoint(endpoint) {
   localStorage.blocksApiEndpoint = endpoint;
 }
 
 function getBlocksApiEndpoint() {
-  return localStorage.blocksApiEndpoint || 'https://ancient-crimson-rain.btc.discover.quiknode.pro/c268fb026303ae8443f785200f2ea4b82f0082dd';
+  return localStorage.blocksApiEndpoint || DEFAULT_BTC_ENDPOINT;
 }
 
 function setModelInscriptionEndpoint(endpoint) {
@@ -38,19 +18,51 @@ function getModelInscriptionEndpoint() {
   return localStorage.modelInscriptionEndpoint;
 }
 
-async function getModelInscription(endpoint) {
-  if (endpoint == null) {
-    return ___sample_inscription;
-  }
+// Remote API
 
+async function fetchData(endpoint, options) {
   try {
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint, options);
     const data = await response.json();
     return data;
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return null;
-  }  
+  }
+}
+
+async function sendBtcRequest(endpoint, method, params) {
+  const paramsStr = `[${params.join(sep=',')}]`;
+  
+  const options = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: `{"jsonrpc":"2.0","id":1,"method":"${method}","params":${paramsStr}}`
+  };
+  
+  let data = await fetchData(endpoint, options);
+  data = data || await fetchData(DEFAULT_BTC_ENDPOINT, options);
+  return data?.result;
+}
+
+async function getLatestBlockStats(endpoint) {
+  const defaultStats = {
+    avgfee: 10,
+    time: Date.now() / 1000,
+  };
+  const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
+  if (blockId == null) {
+    return defaultStats;
+  } 
+  let stats = await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
+  return stats || defaultStats;
+}
+
+async function getModelInscription(endpoint) {
+  if (endpoint == null) {
+    return ___default_inscription;
+  }
+  return (await fetchData(endpoint, {})) || ___default_inscription;
 }
 
 const ___sample_inscription = {    
