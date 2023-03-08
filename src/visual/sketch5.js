@@ -16,7 +16,7 @@ let progress;
 let animationLoopCount;
 let processingSpeed;
 let satFee,activeAmount,sparkRate;
-let percentage;
+let percentage,finishedNum,finishedText;
 
 let xsize,ysize,nodeSize;
 let layerNum,maxNodes,compareArray,realMaxNodes,realCompareArray;
@@ -45,6 +45,7 @@ let activationFunction = [' ','Sigmoid','ReLU','LeakyReLU','Tanh'];  // 1-ellips
 let acceleration = [' ','Basic','Standard','Advanced'];  // 1-basic, 2-standard, 3-advance
 let shapeName = [' ','Round','Square','Diamond','Shuriken'];
 let fillName = [' ','Solid','Outline','X-RAY'];
+let example = ['CryptoPunks','Cryptoadz','Moonbids','BAYC','Nouns','Gazers','Fidenza','Acequia','Timechain','Satoshi','Squiggle','Terraforms','Finiliar','bitGANS','0xAI','Garden','Dragons','SMOLSKULL','contrapuntos','hollow','Toccata','Solace'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -141,13 +142,35 @@ function checkIt() {
      }, 100)
 }  
 
+function isNeuronsConnected(nodesArray) {
+  for(let i = 0; i < nodesArray.length; ++i) {
+    let count = 0;
+    for(let j = 0; j < nodesArray[i].length; ++j) {
+      if (nodesArray[i][j] > 0) ++count;
+    }
+    if (count == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function showDisconnectedWarning() {
+  console.log("The network is fucking ded");
+}
+
 function installCustomUploadIfle(){ 
   wrapInput = document.querySelector('#upload');
   fileInput = document.querySelector('#inputUpload');
   
   wrapInput.addEventListener('dblclick', ()=>{
-    fileInput.click();
-    initialize();
+    if (isNeuronsConnected(nodesArray)) {
+      fileInput.click();
+      initialize();      
+    }
+    else {
+      showDisconnectedWarning();
+    }
   } )
   
   fileInput.addEventListener('change', ()=>{
@@ -188,28 +211,8 @@ function customDoubleClicked() {
 
 function processPhase() {
   progress += (width-border*2-xsize/2)/(processingSpeed*2*layerNum);
-  // lineCanvas.rect(progress,0,width,height);
-  let segment = 6;
   setEraseMode(lineCanvas);
-  lineCanvas.beginShape();
-  lineCanvas.vertex(progress,0)
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*1);
-  lineCanvas.curveVertex(progress,height/segment*2);
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*3);
-  lineCanvas.curveVertex(progress,height/segment*4);
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*5);
-  lineCanvas.curveVertex(progress,height/segment*6);
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*7);
-  lineCanvas.curveVertex(progress,height/segment*8);
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*9);
-  lineCanvas.curveVertex(progress,height/segment*10);
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*11);
-  lineCanvas.curveVertex(progress,height/segment*12);
-  lineCanvas.curveVertex(progress+25*maxR,height/segment*13);
-  lineCanvas.curveVertex(progress,height);
-  lineCanvas.vertex(width,height);
-  lineCanvas.vertex(width,0);
-  lineCanvas.endShape(CLOSE);
+  lineCanvas.rect(progress,0,width,height);
   setNoEraseMode(lineCanvas);
 
   if (frameCount >= sparkRate && drewAnim == true) {
@@ -236,18 +239,17 @@ function processPhase() {
       }
     }
   }
-
 }
 
 function resultWindow() {
   drewResultWindow = true;
   tryButton = createButton('Try Again');
-  tryButton.position(width/2-155*maxR,height/2+280*maxR);
+  tryButton.position(width/2-155*maxR,height/2+165*maxR);
   tryButton.size(150*maxR,40*maxR);
   tryButton.style('opacity','0');
   tryButton.mouseClicked(tryAgain);
   closeResultButton = createButton('Close');
-  closeResultButton.position(width/2+5*maxR,height/2+280*maxR);
+  closeResultButton.position(width/2+5*maxR,height/2+165*maxR);
   closeResultButton.size(150*maxR,40*maxR);
   closeResultButton.style('opacity','0');
   closeResultButton.mouseClicked(closeResult);
@@ -413,11 +415,11 @@ function setupSketch() {
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3
                   ['#949494','#231f20','#231f20'],                                                  // 4
-                  ['#0a141d','#043c3d','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#043c3d'],  // 5
-                  ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 6
-                  ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 7
-                  ['#1e2834','#566e58','#CC7A41','#566e58','#CC7A41'],                          // 8
-                  ['#2e3e4f','#8aa8af','#ce5055','#328195','#e1cfc9'],                          // 9
+                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5  
+                  ['#0a141d','#043c3d','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#043c3d'],  // 6
+                  ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 7
+                  ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 8
+                  ['#1e2834','#566e58','#CC7A41','#566e58','#CC7A41'],                          // 9
                   ['#453a46','#57d4e4','#57d4e4','#f17b6e','#57d4e4'],                          // 10
                   ['#cccab5','#53afae','#53afae','#343243','#53afae'],                          // 11
                   ['#f177b4','#63f9fe','#f8bbda','#63f9fe','#f8bbda'],                          // 12
@@ -425,7 +427,7 @@ function setupSketch() {
                   ['#6D2B2D','#C74146','#C33B41','#CE2C31','#C33B41'],                          // 14  
                   ['#E7E7E7','#a6d4ec','#2c83c6','#c33726'],                                      // 15
                   ['#53afae','#1f4b5a','#afd39f','#f1e8d1','#afd39f'],                          // 16
-                  ['#010101','#ffffff','#69c7d0','#ec1f52','#ffffff'],                          // 17
+                  ['#010101','#25f4ee','#25f4ee','#fe2c56','#ffffff'],                          // 17
                   ['#B5CEDA','#00457c','#00457c','#0079c0','#012269'],                          // 18
                   ['#fbfaff','#8b31ce','#f04bb1','#fac373','#82cef0'],                          // 19
                   ['#34333e','#191820','#f6b941','#ca4b17'],                                      // 20
@@ -500,7 +502,7 @@ function draw() {
   popupCanvas.textAlign(CENTER);
   popupCanvas.textStyle(BOLD);
   popupCanvas.stroke(patternColor);
-  popupCanvas.strokeWeight(4*maxR);
+  popupCanvas.strokeWeight(8*maxR);
   popupCanvas.fill(paperColor);
   
   infoCanvas.background(255);
@@ -735,57 +737,55 @@ function createPattern(pattern) {
 }
 
 function drawResultWindow() {
-  popupCanvas.blendMode(MULTIPLY);
+  popupCanvas.textFont('Trebuchet MS');
   popupCanvas.noStroke();
   popupCanvas.fill(0,0,0,75);
   popupCanvas.rect(width/2,height/2,width,height);
-  popupCanvas.blendMode(BLEND);
   popupCanvas.stroke(patternColor);
   popupCanvas.fill(paperColor);
-  popupCanvas.rect(width/2,height/2,700*maxR,400*maxR,25*maxR);
-  popupCanvas.rect(width/2,height/2-(310+15/2-215/2)*maxR,215*maxR)
-  popupCanvas.image(img.elt,width/2-100*maxR,height/2-310*maxR,200*maxR,200*maxR);
+  popupCanvas.rect(width/2,height/2,700*maxR,300*maxR,25*maxR);
+  popupCanvas.strokeWeight(6*maxR);
+  popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR)
+  popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
   
-  popupCanvas.strokeWeight(0.75*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(patternColor);
-  } else {
+  popupCanvas.strokeWeight(1*maxR);
+  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
     popupCanvas.fill(paperColor);
-  }
-  popupCanvas.rect(width/2-80*maxR,height/2+300*maxR,150*maxR,40*maxR,5*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(patternColor);
   } else {
-    popupCanvas.fill(paperColor);
+    popupCanvas.fill(patternColor);
   }
-  popupCanvas.rect(width/2+80*maxR,height/2+300*maxR,150*maxR,40*maxR,5*maxR);
+  popupCanvas.rect(width/2-80*maxR,height/2+185*maxR,150*maxR,40*maxR,5*maxR);
+  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
+    popupCanvas.fill(paperColor);
+  } else {
+    popupCanvas.fill(patternColor);
+  }
+  popupCanvas.rect(width/2+80*maxR,height/2+185*maxR,150*maxR,40*maxR,5*maxR);
   
   popupCanvas.noStroke();
-  popupCanvas.fill(patternColor);
-  popupCanvas.textSize(20*maxR);
-  popupCanvas.text('YOUR IMAGE',width/2-215*maxR,height/2);
-  popupCanvas.text('BELONG TO...',width/2+218*maxR,height/2);
-  popupCanvas.textSize(80*maxR);
-  popupCanvas.text(percentage+'%',width/2,height/2);
-  popupCanvas.textSize(60*maxR);
-  popupCanvas.text('COLLECTION NAME',width/2,height/2+100*maxR);
+  popupCanvas.fill(startColor);
+  popupCanvas.textSize(100*maxR);
+  popupCanvas.text(percentage+'%',width/2+130*maxR,height/2-10*maxR);
+  popupCanvas.textSize(75*maxR);
+  popupCanvas.text('"FIDENZA"',width/2+130*maxR,height/2+85*maxR);
 
   popupCanvas.textSize(20*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
+  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
     popupCanvas.fill(patternColor);
-  }
-  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+307*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+275*maxR && mouseY<height/2+320*maxR) {
-    popupCanvas.fill(paperColor);
   } else {
-    popupCanvas.fill(patternColor);
+    popupCanvas.fill(paperColor);
   }
-  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+307*maxR);
+  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+192*maxR);
+  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
+    popupCanvas.fill(patternColor);
+  } else {
+    popupCanvas.fill(paperColor);
+  }
+  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+192*maxR);
 }
 
 function drawInfoWindow() {
+  infoCanvas.textFont('Tahoma');
   infoCanvas.stroke(patternColor);
   infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
@@ -843,7 +843,6 @@ function getGradientColors(startColor, endColor, colorStops, numSteps) {
   let segmentSteps = numSteps / (colorStops.length + 1);
   let start = color(startColor);
   let end = color(endColor);
-
   gradientColors.push(start);
   for (let i = 0; i < colorStops.length; i++) {
     let colorStop = color(colorStops[i]);
