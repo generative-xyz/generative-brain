@@ -69,6 +69,8 @@ let stats;
 let traits;
 let brain;
 let output_prediction;
+let particleSystem;
+let deadCanvas;
 
 async function setup() {
   let w = windowHeight; 
@@ -79,6 +81,7 @@ async function setup() {
   patternCanvas = createGraphics(w,h);
   popupCanvas = createGraphics(w,h);
   infoCanvas = createGraphics(w,h);
+  deadCanvas = createGraphics(w,h);
   setupRandom();
   await setupModel();
   setupSketch();
@@ -481,6 +484,17 @@ function setupSketch() {
   for (let i=0; i<layerNum-1; i++) {
     lineSet.push(i);
   }
+
+  const wall = {
+    xLeft: 10,
+    xRight: width - 10,
+    yTop: 10,
+    yBottom: height - 10,
+  }
+
+  const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
+  console.log(scaledTotalNeurons);
+  particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall);
 }
 
 function draw() {
@@ -493,8 +507,17 @@ function draw() {
     pop();
     return;
   }
-  
+
   background(paperColor);
+
+  if (state == 4) {
+    eraseCanvas(deadCanvas);
+    particleSystem.update();
+    particleSystem.draw(deadCanvas, paperColor, shape, fillMode);
+    image(deadCanvas, 0, 0);
+    return;
+  }
+  
 
   popupCanvas.background(255);
   popupCanvas.rectMode(CENTER);

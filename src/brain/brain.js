@@ -8,7 +8,7 @@ Cycle of 60 years:
 
 const GROW_END = 25;
 const STABLE_END = 50;
-const DECAY_END = 59.9;
+const DECAY_END = 59;
 const CYCLE_END = 60;
 
 // Shape: 1 - (1 - px)^n = py
@@ -52,13 +52,13 @@ class Brain {
       this.stage = 1;
     } else if (cycleTime < STABLE_END) {
       growth = 1;
-      this.stage = 1;
+      this.stage = 2;
     } else if (cycleTime < DECAY_END) {
       growth = map(cycleTime, STABLE_END, DECAY_END, 1, 0);
-      this.stage = 2;
+      this.stage = 3;
     } else if (cycleTime < CYCLE_END) {
       growth = 0;
-      this.stage = 3;
+      this.stage = 4;
     }
 
     this.model.updateNeurons(growth, this.iteration);
