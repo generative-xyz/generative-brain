@@ -70,13 +70,14 @@ function getTraits(trainingTraits) {
   const lineStroke = getRandomItem(LineStroke);
   const nodeStroke = getRandomItem(NodeStroke);
   const pattern = getRandomItem(Pattern);
-  const hardwareAcceleration = getRandomItem(HardwareAcceleration);
+  // const hardwareAcceleration = getRandomItem(HardwareAcceleration);
   const nodeType = getRandomItem(NodeType);
   const backgroundColor = getRandomItem(BackgroundColor);
   // const growthPeriod = getRandomItem(GrowthPeriod);
   // const birthYear = getRandomItem(BirthYear);
+  const hardwareAcceleration = 'Standard';
   const growthPeriod = 'Year';
-  const birthYear = '1997';
+  const birthYear = '2020';
 
   const traits = {
     visual: {

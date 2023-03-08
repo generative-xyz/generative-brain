@@ -301,6 +301,17 @@ function eraseCanvas(canvas) {
   canvas.pop();
 }
 
+function setEraseMode(canvas) {
+  canvas.push();
+  canvas.fill(255, 255, 255, 255);
+  canvas.blendMode(REMOVE);
+}
+
+function setNoEraseMode(canvas) {
+  canvas.blendMode(BLEND);
+  canvas.pop();
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   addEventListener('mousemove', (e) => {
     window.mouseX = e.pageX;
