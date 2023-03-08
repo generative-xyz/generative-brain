@@ -3,7 +3,7 @@
 const DEFAULT_BTC_ENDPOINT = 'https://ancient-crimson-rain.btc.discover.quiknode.pro/c268fb026303ae8443f785200f2ea4b82f0082dd';
 
 function setBlocksApiEndpoint(endpoint) {
-  if (endpoint == null) {
+  if (endpoint == null || endpoint == '') {
     localStorage.removeItem('blocksApiEndpoint');
   } else {
     localStorage.blocksApiEndpoint = endpoint;
@@ -15,7 +15,7 @@ function getBlocksApiEndpoint() {
 }
 
 function setModelInscriptionEndpoint(endpoint) {
-  if (endpoint == null) {
+  if (endpoint == null || endpoint == '') {
     localStorage.removeItem('modelInscriptionEndpoint');
   } else {
     localStorage.modelInscriptionEndpoint = endpoint;
