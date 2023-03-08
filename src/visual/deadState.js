@@ -144,8 +144,8 @@ class ParticleSystem {
   reflectNode(node) {
     const {xLeft, yTop, xRight, yBottom} = this.wall;
     const {p, v} = node;
-    if (p.x < xLeft || p.x > xRight) v.x = -v.x;
-    if (p.y < yTop || p.y > yBottom) v.y = -v.y;
+    if ((p.x < xLeft && v.x < 0) || (p.x > xRight && v.x > 0)) v.x = -v.x;
+    if ((p.y < yTop && v.y < 0) || (p.y > yBottom && v.y > 0)) v.y = -v.y;
   }
 
   reflectLine(line) {
@@ -153,8 +153,8 @@ class ParticleSystem {
     const [p1, p2] = line.getEndpoints();
     const v = line.v;
     
-    if (min(p1.x, p2.x) < xLeft || max(p1.x, p2.x) > xRight) v.x = -v.x;
-    if (min(p1.y, p2.y) < yTop || max(p1.y, p2.y) > yBottom) v.y = -v.y;
+    if ((min(p1.x, p2.x) < xLeft && v.x < 0) || (max(p1.x, p2.x) > xRight && v.x > 0)) v.x = -v.x;
+    if ((min(p1.y, p2.y) < yTop && v.y < 0) || (max(p1.y, p2.y) > yBottom && v.y > 0)) v.y = -v.y;
   }
   
   update() {
