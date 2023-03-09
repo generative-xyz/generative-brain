@@ -598,9 +598,7 @@ function draw() {
   if (state == 4) {
     drawDeadAnimation();
     image(deadCanvas, 0, 0);  
-    return;
-  }  
-
+  } else {
   // draw neural nodes
   for (let i=0; i<currentNode; i++) {
     let node = nodeSet[i];
@@ -665,10 +663,13 @@ function draw() {
   }
   image(lineCanvas,0,0);
   image(nodeCanvas,0,0);
+
   if (drewResultWindow) {
     drawResultWindow();
     image(popupCanvas,0,0);
   }
+  }
+
   if (drewInfoWindow) {
     drawInfoWindow();
     image(infoCanvas,0,0);
