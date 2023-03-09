@@ -25,7 +25,7 @@ let state;
 let shape; 
 let shapeStroke,lineStroke,strokeRatio;
 let classNum,classArray,inputNum,inputArray;
-let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas;
+let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas;
 let nodeColor,strokeColor;
 let strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
@@ -56,6 +56,7 @@ let speedAcce;
 let frameCount = 0;
 let drewInputLine = false;
 let drewOutputLine = false;
+let drewWarningScreen = false;
 
 let isIdleMode;
 let wrapInput = null;
@@ -82,7 +83,11 @@ async function setup() {
   popupCanvas = createGraphics(w,h);
   infoCanvas = createGraphics(w,h);
   deadCanvas = createGraphics(w,h);
+  loadingCanvas = createGraphics(w,h);
+  warningCanvas = createGraphics(w,h);
   setupRandom();
+  setupTraits();
+  setupColor();
   await setupModel();
   setupSketch();
   installCustomUploadIfle();
@@ -90,10 +95,18 @@ async function setup() {
   setupFinished = true; 
 }
 
-async function setupModel() {
+function setupRandom() {
+  seed = parseInt(modelSeed);
+  randomSeed(seed);
+  noiseSeed(seed);
+}
+
+function setupTraits() {
   traits = getTraits(___default_inscription.training_traits);
   reportTraits(traits);
+}
 
+async function setupModel() {
   const blockEndpoint = getBlocksApiEndpoint();
   const inscriptionEndpoint = getModelInscriptionEndpoint();
 
@@ -112,12 +125,6 @@ async function setupModel() {
   // TODO: Change default traits to inscription training traits
 
   classes_name = inscription.classes_name;
-}
-
-function setupRandom() {
-  seed = parseInt(modelSeed);
-  randomSeed(seed);
-  noiseSeed(seed);
 }
 
 function initialize() {
@@ -145,21 +152,48 @@ function checkIt() {
      }, 100)
 }  
 
-function isNeuronsConnected(nodesArray) {
-  for(let i = 0; i < nodesArray.length; ++i) {
-    let count = 0;
-    for(let j = 0; j < nodesArray[i].length; ++j) {
-      if (nodesArray[i][j] > 0) ++count;
-    }
-    if (count == 0) {
-      return false;
+function setupColor() {
+  paletteType = getRandomInt(1,29);
+  colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
+                  ['#231f20','#ffffff','#ffffff'],                                                  // 2
+                  ['#104da8','#ffffff','#ffffff'],                                                  // 3
+                  ['#949494','#231f20','#231f20'],                                                  // 4
+                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5  
+                  ['#0a141d','#043c3d','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#043c3d'],  // 6
+                  ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 7
+                  ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 8
+                  ['#1e2834','#566e58','#CC7A41','#566e58','#CC7A41'],                          // 9
+                  ['#453a46','#57d4e4','#57d4e4','#f17b6e','#57d4e4'],                          // 10
+                  ['#cccab5','#53afae','#53afae','#343243','#53afae'],                          // 11
+                  ['#f177b4','#63f9fe','#f8bbda','#63f9fe','#f8bbda'],                          // 12
+                  ['#f6b941','#41332d','#634233','#41332d','#634233'],                          // 13
+                  ['#6D2B2D','#C74146','#C33B41','#CE2C31','#C33B41'],                          // 14  
+                  ['#E7E7E7','#a6d4ec','#2c83c6','#c33726'],                                      // 15
+                  ['#53afae','#1f4b5a','#afd39f','#f1e8d1','#afd39f'],                          // 16
+                  ['#010101','#25f4ee','#25f4ee','#fe2c56','#ffffff'],                          // 17
+                  ['#B5CEDA','#00457c','#00457c','#0079c0','#012269'],                          // 18
+                  ['#fbfaff','#8b31ce','#f04bb1','#fac373','#82cef0'],                          // 19
+                  ['#34333e','#191820','#f6b941','#ca4b17'],                                      // 20
+                  ['#476930','#c8b88a','#86b049','#c8b88a','#FFFDC7'],                          // 21   
+                  ['#704f38','#52392f','#ceb371','#dd866e','#e9ccaf'],                          // 22
+                  ['#3d1460','#df678c','#df678c'],                                                  // 23
+                  ['#e8a39c','#080a52','#080a52'],                                                  // 24
+                  ['#ffc6cc','#ffffff','#cc313d'],                                                  // 25
+                  ['#ec642a','#ffff8b','#ffff8b'],                                                  // 26
+                  ['#1c1c1a','#ce4980','#ce4980'],                                                  // 27
+                  ['#8dc63f','#078513','#078513']];                                                 // 28  
+                // paperColor,patternColor,startColor,colorStops,endColor
+
+  for(let i = 0; i < colorPalette.length; ++i) {
+    for(let j = 0; j < colorPalette[i].length; ++j) {
+      colorPalette[i][j] = hexToRgb(colorPalette[i][j]);
     }
   }
-  return true;
-}
 
-function showDisconnectedWarning() {
-  console.log("The network is fucking ded");
+  colorStops = [];
+  paperColor = colorPalette[paletteType-1][0];
+  patternColor = colorPalette[paletteType-1][1];
+  nodeDecayColor = strokeDecayColor = paperColor;
 }
 
 function installCustomUploadIfle(){ 
@@ -172,7 +206,7 @@ function installCustomUploadIfle(){
       initialize();      
     }
     else {
-      showDisconnectedWarning();
+      drewWarningScreen = true;
     }
   } )
   
@@ -189,6 +223,40 @@ function installCustomUploadIfle(){
         wrapInput.style.display = 'block'
     }
   })
+}
+
+function isNeuronsConnected(nodesArray) {
+  for(let i = 0; i < nodesArray.length; ++i) {
+    let count = 0;
+    for(let j = 0; j < nodesArray[i].length; ++j) {
+      if (nodesArray[i][j] > 0) ++count;
+    }
+    if (count == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function drawLoadingScreen() {
+  loadingCanvas.textFont('Tahoma');
+  loadingCanvas.stroke(patternColor);
+  loadingCanvas.strokeWeight(2*maxR);
+  loadingCanvas.fill(patternColor);
+  loadingCanvas.textSize(48);
+  loadingCanvas.text('LOADING...', width/2, height/2);
+}
+
+function drawDisconnectedWarning() {
+  warningCanvas.textFont('Tahoma');
+  warningCanvas.stroke(patternColor);
+  warningCanvas.strokeWeight(2*maxR);
+  warningCanvas.fill(paperColor);
+  warningCanvas.rect(width/2, height/2, 400, 200);
+
+  warningCanvas.fill(patternColor);
+  warningCanvas.textSize(24);
+  warningCanvas.text('Your network is disconnected', width/2, height/2, width, 100);
 }
 
 function customDoubleClicked() {
@@ -411,49 +479,6 @@ function setupSketch() {
   lineStroke = map(strokeRatio,1700,58000,0.75,4)*maxR;
   strokeOpacity = 0.7;
 
-  console.log(stats.avgfeerate, satFee, sparkRate);
-
-  paletteType = getRandomInt(1,29);
-  colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
-                  ['#231f20','#ffffff','#ffffff'],                                                  // 2
-                  ['#104da8','#ffffff','#ffffff'],                                                  // 3
-                  ['#949494','#231f20','#231f20'],                                                  // 4
-                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5  
-                  ['#0a141d','#043c3d','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#043c3d'],  // 6
-                  ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 7
-                  ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 8
-                  ['#1e2834','#566e58','#CC7A41','#566e58','#CC7A41'],                          // 9
-                  ['#453a46','#57d4e4','#57d4e4','#f17b6e','#57d4e4'],                          // 10
-                  ['#cccab5','#53afae','#53afae','#343243','#53afae'],                          // 11
-                  ['#f177b4','#63f9fe','#f8bbda','#63f9fe','#f8bbda'],                          // 12
-                  ['#f6b941','#41332d','#634233','#41332d','#634233'],                          // 13
-                  ['#6D2B2D','#C74146','#C33B41','#CE2C31','#C33B41'],                          // 14  
-                  ['#E7E7E7','#a6d4ec','#2c83c6','#c33726'],                                      // 15
-                  ['#53afae','#1f4b5a','#afd39f','#f1e8d1','#afd39f'],                          // 16
-                  ['#010101','#25f4ee','#25f4ee','#fe2c56','#ffffff'],                          // 17
-                  ['#B5CEDA','#00457c','#00457c','#0079c0','#012269'],                          // 18
-                  ['#fbfaff','#8b31ce','#f04bb1','#fac373','#82cef0'],                          // 19
-                  ['#34333e','#191820','#f6b941','#ca4b17'],                                      // 20
-                  ['#476930','#c8b88a','#86b049','#c8b88a','#FFFDC7'],                          // 21   
-                  ['#704f38','#52392f','#ceb371','#dd866e','#e9ccaf'],                          // 22
-                  ['#3d1460','#df678c','#df678c'],                                                  // 23
-                  ['#e8a39c','#080a52','#080a52'],                                                  // 24
-                  ['#ffc6cc','#ffffff','#cc313d'],                                                  // 25
-                  ['#ec642a','#ffff8b','#ffff8b'],                                                  // 26
-                  ['#1c1c1a','#ce4980','#ce4980'],                                                  // 27
-                  ['#8dc63f','#078513','#078513']];                                                 // 28  
-                // paperColor,patternColor,startColor,colorStops,endColor
-
-  for(let i = 0; i < colorPalette.length; ++i) {
-    for(let j = 0; j < colorPalette[i].length; ++j) {
-      colorPalette[i][j] = hexToRgb(colorPalette[i][j]);
-    }
-  }
-
-  colorStops = [];
-  paperColor = colorPalette[paletteType-1][0];
-  patternColor = colorPalette[paletteType-1][1];
-  nodeDecayColor = strokeDecayColor = paperColor;
   startColor = colorPalette[paletteType-1][2];
   endColor = colorPalette[paletteType-1][colorPalette[paletteType-1].length-1];
   for (let i=3; i<colorPalette[paletteType-1].length-1; i++) {
@@ -497,27 +522,14 @@ function setupSketch() {
   particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall);
 }
 
+function drawDeadAnimation() {
+  eraseCanvas(deadCanvas);
+  particleSystem.update();
+  particleSystem.draw(deadCanvas, paperColor, shape, fillMode);
+}
+
 function draw() {
-  if (!setupFinished) {
-    push();
-    background(255);
-    textAlign(CENTER);
-    textSize(16);
-    text("Loading model...", 200, 200);
-    pop();
-    return;
-  }
-
   background(paperColor);
-
-  if (state == 4) {
-    eraseCanvas(deadCanvas);
-    particleSystem.update();
-    particleSystem.draw(deadCanvas, paperColor, shape, fillMode);
-    image(deadCanvas, 0, 0);
-    return;
-  }
-  
 
   popupCanvas.background(255);
   popupCanvas.rectMode(CENTER);
@@ -554,7 +566,37 @@ function draw() {
   patternCanvas.rect(width-border/16,height/2,border/8,height);
   patternCanvas.rect(width/2,border/16,width,border/8);
   patternCanvas.rect(width/2,height-border/16,width,border/8);
-    
+
+  warningCanvas.background(255);
+  warningCanvas.rectMode(CENTER);
+  eraseCanvas(warningCanvas);
+  warningCanvas.textAlign(CENTER);
+  warningCanvas.textStyle(BOLD);
+  warningCanvas.stroke(patternColor);
+  warningCanvas.strokeWeight(8*maxR);
+  warningCanvas.fill(paperColor);
+  
+  loadingCanvas.background(255);
+  loadingCanvas.rectMode(CENTER);
+  eraseCanvas(loadingCanvas);
+  loadingCanvas.textAlign(CENTER);
+  loadingCanvas.textStyle(BOLD);
+  loadingCanvas.stroke(patternColor);
+  loadingCanvas.strokeWeight(8*maxR);
+  loadingCanvas.fill(paperColor);
+
+  if (!setupFinished) {
+    drawLoadingScreen();
+    image(loadingCanvas, 0, 0);
+    return;
+  }
+
+  if (state == 4) {
+    drawDeadAnimation();
+    image(deadCanvas, 0, 0);  
+    return;
+  }  
+
   // draw neural nodes
   for (let i=0; i<currentNode; i++) {
     let node = nodeSet[i];
@@ -626,6 +668,10 @@ function draw() {
   if (drewInfoWindow) {
     drawInfoWindow();
     image(infoCanvas,0,0);
+  }
+  if (drewWarningScreen) {
+    drawDisconnectedWarning();
+    image(warningCanvas,0,0);
   }
     
   frameCount++; 
