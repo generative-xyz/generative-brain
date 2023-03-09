@@ -93,7 +93,7 @@ function getTraits(trainingTraits) {
   // const birthYear = getRandomItem(BirthYear);
   const hardwareAcceleration = 'Standard';
   const growthPeriod = 'Year';
-  const birthYear = '2000';
+  const birthYear = '1964';
 
   const traits = {
     visual: {

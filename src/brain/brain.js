@@ -50,15 +50,19 @@ class Brain {
       let x = map(cycleTime, 0, GROW_END, 0, 1);
       growth = this.growthFunc(x);
       this.stage = 1;
+      this.stageRatio = map(cycleTime, 0, GROW_END, 0, 1);
     } else if (cycleTime < STABLE_END) {
       growth = 1;
       this.stage = 2;
+      this.stageRatio = map(cycleTime, GROW_END, STABLE_END, 0, 1);
     } else if (cycleTime < DECAY_END) {
       growth = map(cycleTime, STABLE_END, DECAY_END, 1, 0);
       this.stage = 3;
+      this.stageRatio = map(cycleTime, STABLE_END, DECAY_END, 0, 1);
     } else if (cycleTime < CYCLE_END) {
       growth = 0;
       this.stage = 4;
+      this.stageRatio = map(cycleTime, DECAY_END, CYCLE_END, 0, 1);
     }
 
     this.model.updateNeurons(growth, this.iteration);
@@ -70,6 +74,7 @@ class Brain {
       neuronsLife: this.model.getNeuronsLife(),
       stage: this.stage,
       inputDim: this.inputDim,
+      stageRatio: this.stageRatio,
     };
   }
   

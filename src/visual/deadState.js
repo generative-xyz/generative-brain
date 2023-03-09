@@ -115,13 +115,15 @@ class ParticleSystem {
 
     this.nodes = [];
     for(let i = 0; i < n; ++i) {
+      const layerNodes = [];
       const count = totalNeurons[i] * 0.5;
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
         const vel = getRandomVector(0.01, 0.05);
         const size = random(5, 12.5) * 4;
-        this.nodes.push(new Node(pos, vel, size, gradientFill[i]));        
+        layerNodes.push(new Node(pos, vel, size, gradientFill[i]));        
       }
+      this.nodes.push(layerNodes);
     }
     
     const lineGradientFill = clone(gradientFill);
@@ -130,6 +132,8 @@ class ParticleSystem {
     
     this.lines = [];
     for(let i = 0; i <= n; ++i) {
+      const layerLines = [];
+
       const prev = (i == 0) ? 1 : totalNeurons[i-1];
       const nxt = (i == n) ? 1 : totalNeurons[i];
       const count = prev * nxt * 1.5;
@@ -140,8 +144,10 @@ class ParticleSystem {
         const angle = random(TAU);
         const v = getRandomVector(0.01, 0.05);
         const angV = random(0.00001, 0.00002);
-        this.lines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
+        layerLines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
       }
+
+      this.lines.push(layerLines)
     }
   }
   
@@ -162,22 +168,36 @@ class ParticleSystem {
   }
   
   update() {
-    for (const node of this.nodes) {
-      node.update();
-      this.reflectNode(node);
-    }    
-    for (const line of this.lines) {
-      line.update();
-      this.reflectLine(line);
-    }    
+    for(const layerLines of this.lines) {
+      for (const line of layerLines) {
+        line.update();
+        this.reflectLine(line);
+      }
+    }
+
+    for(const layerNodes of this.nodes) {
+      for (const node of layerNodes) {
+        node.update();
+        this.reflectNode(node);
+      }
+    }  
   }
   
-  draw(canvas, paperColor, shape, fillMode) {
-    for (const line of this.lines) {
-      line.draw(canvas, paperColor);
+  draw(canvas, paperColor, shape, fillMode, stageRatio) {
+    const drawRatio = max(0, map(stageRatio, 0.5, 1, 0, 1));
+
+    for(const layerLines of this.lines) {
+      const drawCount = layerLines.length * drawRatio;
+      for (let i = 0; i < drawCount; ++i) {
+        layerLines[i].draw(canvas, paperColor);
+      }
     }
-    for (const node of this.nodes) {
-      node.draw(canvas, paperColor, shape, fillMode);
+
+    for(const layerNodes of this.nodes) {
+      const drawCount = layerNodes.length * drawRatio;
+      for (let i = 0; i < drawCount; ++i) {
+        layerNodes[i].draw(canvas, paperColor, shape, fillMode);
+      }
     }
   }
 }

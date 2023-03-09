@@ -62,6 +62,7 @@ let output_prediction;
 let particleSystem;
 let deadCanvas;
 let predictions;
+let stageRatio;
 
 async function setup() {
   let w = windowHeight; 
@@ -378,6 +379,7 @@ function setupSketch() {
 
   const brainStatus = brain.getBrainStatus();
   inputDim = brainStatus.inputDim;
+  stageRatio = brainStatus.stageRatio;
 
   border = 100*maxR;
   spacing = 50*maxR;
@@ -527,7 +529,7 @@ function setupSketch() {
 function drawDeadAnimation() {
   eraseCanvas(deadCanvas);
   particleSystem.update();
-  particleSystem.draw(deadCanvas, paperColor, shape, fillMode);
+  particleSystem.draw(deadCanvas, paperColor, shape, fillMode, stageRatio);
 }
 
 function draw() {

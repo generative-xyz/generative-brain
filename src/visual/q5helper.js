@@ -126,6 +126,17 @@ class q5Element {
     return this;
   };
 
+  value() {
+    if (arguments.length > 0) {
+      this.elt.value = arguments[0];
+      return this;
+    } else {
+      if (this.elt.type === 'range') {
+        return parseFloat(this.elt.value);
+      } else return this.elt.value;
+    }
+  };
+
   mouseClicked(fxn) {
     this._adjustListener('click', fxn, this);
     return this;
@@ -223,6 +234,15 @@ createImg = function () {
     if (typeof last === 'function') last(self);
   });
   return self;
+};
+
+createInput = function () {
+  var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
+  var elt = document.createElement('input');
+  elt.setAttribute('value', value);
+  elt.setAttribute('type', type);
+  return addElement(elt, this);
 };
 
 function addElement(elt) {
