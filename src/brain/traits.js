@@ -57,7 +57,7 @@ const ColorPallete = [
   ['Blueprint', 1],
   ['Industrial Steel', 1],
   ['Full Spectrum', 1],
-  ['Deep Sea', 1],
+  ['Mariana Trench', 1],
   ['Twilight', 1],
   ['Gaia', 1],
   ['Autumn Harvest', 1],
@@ -75,7 +75,7 @@ const ColorPallete = [
   ['Matcha Latte', 1],
   ['Alluvial Soils', 1],
   ['Royal Plum', 1],
-  ['Dark Rose', 1],
+  ['Lemonade', 1],
   ['Sweetheart!', 1],
   ['Campfire', 1],
   ['Black Pink', 1],
@@ -93,7 +93,7 @@ function getTraits(trainingTraits) {
   // const birthYear = getRandomItem(BirthYear);
   const hardwareAcceleration = 'Standard';
   const growthPeriod = 'Year';
-  const birthYear = '2023';
+  const birthYear = '1964';
 
   const traits = {
     visual: {

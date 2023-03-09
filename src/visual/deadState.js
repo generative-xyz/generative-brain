@@ -12,6 +12,7 @@ class Node {
   
   draw(canvas, paperColor, shape, fillMode) {
     const {x, y} = this.p;
+    const size = this.size;
     
     let nodeColor;
     let strokeColor;
@@ -25,24 +26,27 @@ class Node {
       strokeColor = addAlpha(this.col,1);
     }
     
-    canvas.stroke(strokeColor);
-    canvas.fill(nodeColor);
+    let opacity = 1;
+    
+    canvas.stroke(addAlpha(strokeColor,1));
+    canvas.fill(addAlpha(nodeColor,0));
+
     if (shape == 1) {
-      canvas.ellipse(x,y,this.size);
+      canvas.ellipse(x,y,size);
     } else if (shape == 2) {
-      canvas.rect(x,y,this.size*7/8);
+      canvas.rect(x,y,size*7/8,size*7/8);
     } else if (shape == 3) {
       canvas.beginShape();
-      canvas.vertex(x-this.size*4/7,y);
-      canvas.vertex(x,y-this.size*4/7);
-      canvas.vertex(x+this.size*4/7,y);
-      canvas.vertex(x,y+this.size*4/7);
+      canvas.vertex(x-size*4/7,y);
+      canvas.vertex(x,y-size*4/7);
+      canvas.vertex(x+size*4/7,y);
+      canvas.vertex(x,y+size*4/7);
       canvas.endShape(CLOSE);
     } else {
       let n = 4;
       let theta = TAU/n;
-      let innerRadius = this.size/5;
-      let outerRadius = this.size*4/7;
+      let innerRadius = size/5;
+      let outerRadius = size*4/7;
       let rotation = PI;
       canvas.beginShape();
       for (let i=0; i<n; i++) {
@@ -111,10 +115,11 @@ class ParticleSystem {
 
     this.nodes = [];
     for(let i = 0; i < n; ++i) {
-      for(let j = 0; j < totalNeurons[i]; ++j) {
+      const count = totalNeurons[i] * 0.5;
+      for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const vel = getRandomVector(0.1, 0.5);
-        const size = random(5, 12.5);
+        const vel = getRandomVector(0.01, 0.05);
+        const size = random(5, 12.5) * 4;
         this.nodes.push(new Node(pos, vel, size, gradientFill[i]));        
       }
     }
@@ -127,18 +132,17 @@ class ParticleSystem {
     for(let i = 0; i <= n; ++i) {
       const prev = (i == 0) ? 1 : totalNeurons[i-1];
       const nxt = (i == n) ? 1 : totalNeurons[i];
-      const count = prev * nxt;
+      const count = prev * nxt * 1.5;
 
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const len = random(10, 25);
+        const len = random(1, 10);
         const angle = random(TAU);
-        const v = getRandomVector(0.1, 0.5);
-        const angV = random(0.005, 0.01);
+        const v = getRandomVector(0.01, 0.05);
+        const angV = random(0.00001, 0.00002);
         this.lines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
       }
     }
-    
   }
   
   reflectNode(node) {

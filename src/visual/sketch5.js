@@ -16,7 +16,7 @@ let progress;
 let animationLoopCount;
 let processingSpeed;
 let satFee,activeAmount,sparkRate;
-let percentage,finishedNum,finishedText;
+let percentage,finishedNumber,finishedText,defaultSize,startTime;
 
 let xsize,ysize,nodeSize;
 let layerNum,maxNodes,compareArray,realMaxNodes,realCompareArray;
@@ -29,24 +29,12 @@ let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,war
 let nodeColor,strokeColor;
 let strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
-let paletteType,colorPalette,fillMode;  // 1-Solid, 2-Outline, 3-XRAY
+let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 
-let seed;  // 1-2023
-let architecture;  // random, random triangle, regular triangle, zigzag, symmetric, rectangle
-let birthYear;  // 1943, 1951, 1957, 1969, 1970, 1980, 1982, 1986, 1988, 1997, 1998, 2002, 2009, 2012, 2014, 2015, 2016, 2023
-let growPeriod;  // year, month, week, day
-let epochs;  // 4-10
-let framework = [' ','Theano','Torch','TensorFlow','Caffe'];
-let dataSet = [' ','MNIST','CIFAR','IMAGENET','IRIS'];
-let paper = [' ','Plain','Dotted','Squared'];  // 1-Plain, 2-Dotted, 3-Squared
-let liveState = [' ','Growing','Stable','Decay','Dead']  // 1-growing, 2-stable, 3-decay, 4-dead
-let activationFunction = [' ','Sigmoid','ReLU','LeakyReLU','Tanh'];  // 1-ellipse, 2-square, 3-diamond, 4-star
-let acceleration = [' ','Basic','Standard','Advanced'];  // 1-basic, 2-standard, 3-advance
-let shapeName = [' ','Round','Square','Diamond','Shuriken'];
-let fillName = [' ','Solid','Outline','X-RAY'];
+let seed,architecture,birthYear,growPeriod,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
+let paletteName = [' ','Monochrome','Zebra','Blueprint','Industrial Steel','Full Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Oceanic Greens','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Alluvial Soils','Royal Plum','Lemonade','Sweetheart!','Campfire','Black Pink','Chlorophyll'];
 let example = ['CRYPTOPUNKS','CRYPTOADZ','MOONBIRDS','NOUNS','GAZERS','FIDENZA','ACEQUIA','TIMECHAIN','SATOSHI','SQUIGGLE','TERRAFORMS','FINILIAR','BITGANS','GARDEN','DRAGONS','SMOLSKULL','CONTRAPUNTOS','HOLLOW','TOCCATA','SOLACE','BAYC','0XAI','NAKAMOTO VILLAGE','LUMINARIES','ANGELS','A BUGGED FOREST','CONTEMPORARY RELIEF','PERPENDICULAR INHABITATION','TYCH','SELF-HEALING CONCRETE','INDUSTRIAL DEVOLUTION','LIFE IN THE WASTE LAND'];
-let paletteName = [' ','Monochrome','Zebra','Blueprint','Industrial Steel','Full Spectrum','Deep Sea','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Oceanic Greens','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Alluvial Soils','Royal Plum','Dark Rose','Sweetheart!','Campfire','Black Pink','Chlorophyll'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -105,6 +93,12 @@ function setupRandom() {
 function setupTraits() {
   traits = getTraits(___default_inscription.training_traits);
   reportTraits(traits);
+  framework = [' ','Theano','Torch','TensorFlow','Caffe'];
+  dataSet = [' ','MNIST','CIFAR','IMAGENET'];
+  paper = [' ','Plain','Dotted','Squared'];
+  liveState = [' ','Growing','Stable','Decay','Dead'];
+  acceleration = [' ','Basic','Standard','Advanced'];
+  shuffle(example,true);
 }
 
 async function setupModel() {
@@ -159,7 +153,7 @@ function setupColor() {
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3
                   ['#949494','#231f20','#231f20'],                                                  // 4
-                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5  
+                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5 
                   ['#0a141d','#043c3d','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#043c3d'],  // 6
                   ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 7
                   ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 8
@@ -178,11 +172,11 @@ function setupColor() {
                   ['#476930','#c8b88a','#86b049','#c8b88a','#FFFDC7'],                          // 21   
                   ['#704f38','#52392f','#ceb371','#dd866e','#e9ccaf'],                          // 22
                   ['#3d1460','#df678c','#df678c'],                                                  // 23
-                  ['#e8a39c','#080a52','#080a52'],                                                  // 24
+                  ['#00b8ff','#9be8ff','#fffbba','#feff50','#fffbba'],                          // 24
                   ['#ffc6cc','#ffffff','#cc313d'],                                                  // 25
                   ['#ec642a','#ffff8b','#ffff8b'],                                                  // 26
                   ['#1c1c1a','#ce4980','#ce4980'],                                                  // 27
-                  ['#8dc63f','#078513','#078513']];                                                 // 28  
+                  ['#8dc63f','#078513','#078513']];                                                 // 28
                 // paperColor,patternColor,startColor,colorStops,endColor
 
   for(let i = 0; i < colorPalette.length; ++i) {
@@ -194,7 +188,6 @@ function setupColor() {
   colorStops = [];
   paperColor = colorPalette[paletteType-1][0];
   patternColor = colorPalette[paletteType-1][1];
-  nodeDecayColor = strokeDecayColor = paperColor;
 }
 
 function installCustomUploadIfle(){ 
@@ -307,6 +300,7 @@ function processPhase() {
       progress = border;
       if (animationLoopCount == 1) {
         isProcessPhase = false;
+        startTime = millis();
         resultWindow();
       }
     }
@@ -363,11 +357,14 @@ function setupSketch() {
   setupRandom();
   maxR = min(width,height)/1024;
   drewInfoWindow = false;
-  
+  finishedNumber = false;
+  finishedText = false;
+    
   architecture = traits.training.structure_gen;
   birthYear = traits.visual.birthYear;
   growPeriod = traits.visual.growthPeriod;
   epochs = traits.training.epoch_num;
+  activationFunction = traits.training.activation_func;
   
   drawSpeed = acceleration.indexOf(traits.visual.hardwareAcceleration);
   if (drawSpeed == 1) {
@@ -383,11 +380,13 @@ function setupSketch() {
   border = 100*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
-  shape = activationFunction.indexOf(traits.training.activation_func);
+  shape = framework.indexOf(traits.visual.nodeShape);
   // fillMode = 1;
   fillMode = dataSet.indexOf(traits.visual.nodeFill);
   // pattern = 3;
   pattern = paper.indexOf(traits.visual.pattern);
+
+  console.log(shape);
 
   satFee = Math.tanh(Math.log10(stats.avgfeerate));
   satFee = map(satFee, 0, 1, 0.2, 0.8);
@@ -758,7 +757,7 @@ function drawNode(x,y,size,shape,nodeColor,strokeColor,dash,opacity,canvas) {
   if (shape == 1) {
     canvas.ellipse(x,y,size);
   } else if (shape == 2) {
-    canvas.rect(x,y,size*7/8);
+    canvas.rect(x,y,size*7/8,size*7/8);
   } else if (shape == 3) {
     canvas.beginShape();
     canvas.vertex(x-size*4/7,y);
@@ -820,38 +819,63 @@ function drawResultWindow() {
   
   popupCanvas.strokeWeight(1*maxR);
   if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(paperColor);
+    popupCanvas.fill(startColor);
   } else {
-    popupCanvas.fill(patternColor);
+    popupCanvas.fill(paperColor);
   }
   popupCanvas.rect(width/2-80*maxR,height/2+185*maxR,150*maxR,40*maxR,5*maxR);
   if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(paperColor);
+    popupCanvas.fill(startColor);
   } else {
-    popupCanvas.fill(patternColor);
+    popupCanvas.fill(paperColor);
   }
   popupCanvas.rect(width/2+80*maxR,height/2+185*maxR,150*maxR,40*maxR,5*maxR);
   
   popupCanvas.noStroke();
   popupCanvas.fill(startColor);
-  popupCanvas.textSize(100*maxR);
-  popupCanvas.text(percentage+'%',width/2+130*maxR,height/2-10*maxR);
-  popupCanvas.textSize(75*maxR);
-  popupCanvas.text('"FIDENZA"',width/2+130*maxR,height/2+85*maxR);
+  if (!finishedNumber) {
+    popupCanvas.textSize(100*maxR);
+    percentage = round(random(10,100),2);
+    popupCanvas.text(percentage,width/2+130*maxR,height/2-35*maxR);
+  } else {
+    popupCanvas.textSize(100*maxR);
+    popupCanvas.text(percentage+'%',width/2+130*maxR,height/2-35*maxR);
+  }
+  popupCanvas.textAlign(CENTER,CENTER);
+  defaultSize = popupCanvas.textWidth('"FIDENZA"');
+  if (!finishedText) {
+    let randomIndex = getRandomInt(0,example.length);
+    let name = example[randomIndex];
+    let newSize = 75*defaultSize/popupCanvas.textWidth(example[randomIndex])*maxR;
+    if (newSize > 75) {newSize = 75}
+    popupCanvas.textSize(newSize);
+    popupCanvas.text(name,width/2+130*maxR,height/2+65*maxR); 
+  } else {
+    let newSize = 75*defaultSize/popupCanvas.textWidth('"'+example[0]+'"')*maxR;
+    if (newSize > 75) {newSize = 75}
+    popupCanvas.textSize(newSize);
+    popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR);    
+  }
+  if (millis()-startTime > 1000) {
+    finishedNumber = true;
+  }
+  if (millis()-startTime > 1500) {
+    finishedText = true;
+  }
 
   popupCanvas.textSize(20*maxR);
   if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(patternColor);
-  } else {
     popupCanvas.fill(paperColor);
+  } else {
+    popupCanvas.fill(startColor);
   }
-  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+192*maxR);
+  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+187*maxR);
   if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(patternColor);
-  } else {
     popupCanvas.fill(paperColor);
+  } else {
+    popupCanvas.fill(startColor);
   }
-  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+192*maxR);
+  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+187*maxR);
 }
 
 function drawInfoWindow() {
