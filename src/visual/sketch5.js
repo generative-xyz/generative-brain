@@ -33,7 +33,7 @@ let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 
 let seed,architecture,birthYear,growPeriod,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
-let paletteName = [' ','Monochrome','Zebra','Blueprint','Industrial Steel','Full Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Oceanic Greens','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Alluvial Soils','Royal Plum','Lemonade','Sweetheart!','Campfire','Black Pink','Chlorophyll'];
+let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Cinnamon','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
 let example = ['CRYPTOPUNKS','CRYPTOADZ','MOONBIRDS','NOUNS','GAZERS','FIDENZA','ACEQUIA','TIMECHAIN','SATOSHI','SQUIGGLE','TERRAFORMS','FINILIAR','BITGANS','GARDEN','DRAGONS','SMOLSKULL','CONTRAPUNTOS','HOLLOW','TOCCATA','SOLACE','BAYC','0XAI','NAKAMOTO VILLAGE','LUMINARIES','ANGELS','A BUGGED FOREST','CONTEMPORARY RELIEF','PERPENDICULAR INHABITATION','TYCH','SELF-HEALING CONCRETE','INDUSTRIAL DEVOLUTION','LIFE IN THE WASTE LAND'];
 
 let nodeSet = [];
@@ -149,7 +149,7 @@ function checkIt() {
 }  
 
 function setupColor() {
-  paletteType = paletteName.indexOf(traits.visual.colorPallete);
+  paletteType = paletteName.indexOf(traits.visual.colorPalette);
   colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3

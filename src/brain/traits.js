@@ -51,12 +51,12 @@ const NodeShape = [
   ['Caffe', 1],  
 ];
 
-const ColorPallete = [ 
+const ColorPalette = [ 
   ['Monochrome', 1],
-  ['Zebra', 1],
+  ['Blackboard', 1],
   ['Blueprint', 1],
   ['Industrial Steel', 1],
-  ['Full Spectrum', 1],
+  ['Spectrum', 1],
   ['Mariana Trench', 1],
   ['Twilight', 1],
   ['Gaia', 1],
@@ -67,16 +67,16 @@ const ColorPallete = [
   ['Warning Zone', 1],
   ['Chilli Sauce', 1],
   ['American Dream', 1],
-  ['Oceanic Greens', 1],
+  ['Broken Beach', 1],
   ['Nightlife', 1],
   ['Nautical Adventure', 1],
   ['Cotton Candy', 1],
   ['Golden Hour', 1],
   ['Matcha Latte', 1],
-  ['Alluvial Soils', 1],
-  ['Royal Plum', 1],
+  ['Cinnamon', 1],
+  ['Midnight Blossoms', 1],
   ['Lemonade', 1],
-  ['Sweetheart!', 1],
+  ['Strawberry Milk', 1],
   ['Campfire', 1],
   ['Black Pink', 1],
   ['Chlorophyll', 1],
@@ -88,7 +88,7 @@ function getTraits(trainingTraits) {
   // const hardwareAcceleration = getRandomItem(HardwareAcceleration);
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
-  const colorPallete = getRandomItem(ColorPallete);
+  const colorPalette = getRandomItem(ColorPalette);
   // const growthPeriod = getRandomItem(GrowthPeriod);
   // const birthYear = getRandomItem(BirthYear);
   const hardwareAcceleration = 'Standard';
@@ -101,7 +101,7 @@ function getTraits(trainingTraits) {
       hardwareAcceleration,
       nodeFill,
       nodeShape,
-      colorPallete,
+      colorPalette,
       growthPeriod,
       birthYear,  
     },
@@ -126,5 +126,6 @@ function reportTraits(traits) {
     "Paper pattern": traits.visual.pattern,
     "Growth speed": traits.visual.growthPeriod,
     "Birth year": traits.visual.birthYear,
+    "Color palette": traits.visual.colorPalette,
   }
 }
