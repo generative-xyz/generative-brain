@@ -45,7 +45,8 @@ let activationFunction = [' ','Sigmoid','ReLU','LeakyReLU','Tanh'];  // 1-ellips
 let acceleration = [' ','Basic','Standard','Advanced'];  // 1-basic, 2-standard, 3-advance
 let shapeName = [' ','Round','Square','Diamond','Shuriken'];
 let fillName = [' ','Solid','Outline','X-RAY'];
-let example = ['CryptoPunks','Cryptoadz','Moonbids','BAYC','Nouns','Gazers','Fidenza','Acequia','Timechain','Satoshi','Squiggle','Terraforms','Finiliar','bitGANS','0xAI','Garden','Dragons','SMOLSKULL','contrapuntos','hollow','Toccata','Solace'];
+let example = ['CRYPTOPUNKS','CRYPTOADZ','MOONBIRDS','NOUNS','GAZERS','FIDENZA','ACEQUIA','TIMECHAIN','SATOSHI','SQUIGGLE','TERRAFORMS','FINILIAR','BITGANS','GARDEN','DRAGONS','SMOLSKULL','CONTRAPUNTOS','HOLLOW','TOCCATA','SOLACE','BAYC','0XAI','NAKAMOTO VILLAGE','LUMINARIES','ANGELS','A BUGGED FOREST','CONTEMPORARY RELIEF','PERPENDICULAR INHABITATION','TYCH','SELF-HEALING CONCRETE','INDUSTRIAL DEVOLUTION','LIFE IN THE WASTE LAND'];
+let paletteName = [' ','Monochrome','Zebra','Blueprint','Industrial Steel','Full Spectrum','Deep Sea','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Oceanic Greens','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Alluvial Soils','Royal Plum','Dark Rose','Sweetheart!','Campfire','Black Pink','Chlorophyll'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -153,7 +154,7 @@ function checkIt() {
 }  
 
 function setupColor() {
-  paletteType = getRandomInt(1,29);
+  paletteType = paletteName.indexOf(traits.visual.colorPallete);
   colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3
@@ -384,7 +385,7 @@ function setupSketch() {
   state = brainStatus.stage;
   shape = activationFunction.indexOf(traits.training.activation_func);
   // fillMode = 1;
-  fillMode = getRandomInt(1,4);
+  fillMode = dataSet.indexOf(traits.visual.nodeFill);
   // pattern = 3;
   pattern = paper.indexOf(traits.visual.pattern);
 
@@ -866,7 +867,7 @@ function drawInfoWindow() {
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
   infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
-  infoCanvas.text('NAME:',width/2+20*maxR,height-165*maxR);
+  infoCanvas.text('NAME:',width/2+15*maxR,height-165*maxR);
   infoCanvas.textSize(12*maxR);
   infoCanvas.text('SCALE:',width/2-285*maxR,height-135*maxR);
   infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-120*maxR);
@@ -876,31 +877,31 @@ function drawInfoWindow() {
   infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-60*maxR);
   infoCanvas.text('FILL MODE:',width/2-285*maxR,height-45*maxR);
   infoCanvas.text('PAPER PATTERN:',width/2-285*maxR,height-30*maxR);
-  infoCanvas.text('ARCHITECTURE:',width/2+20*maxR,height-135*maxR);
-  infoCanvas.text('ACTIVATION FUNCTION:',width/2+20*maxR,height-120*maxR);
-  infoCanvas.text('DATA SET:',width/2+20*maxR,height-105*maxR);
-  infoCanvas.text('FRAMEWORK: ',width/2+20*maxR,height-90*maxR);
-  infoCanvas.text('HARDWARE ACCELERATION:',width/2+20*maxR,height-75*maxR);
-  infoCanvas.text('BIRTH YEAR:',width/2+20*maxR,height-60*maxR);
-  infoCanvas.text('GROW PERIOD:',width/2+20*maxR,height-45*maxR);
-  infoCanvas.text('STATE:',width/2+20*maxR,height-30*maxR);
+  infoCanvas.text('ARCHITECTURE:',width/2+15*maxR,height-135*maxR);
+  infoCanvas.text('ACTIVATION FUNCTION:',width/2+15*maxR,height-120*maxR);
+  infoCanvas.text('DATA SET:',width/2+15*maxR,height-105*maxR);
+  infoCanvas.text('FRAMEWORK: ',width/2+15*maxR,height-90*maxR);
+  infoCanvas.text('HARDWARE ACCELERATION:',width/2+15*maxR,height-75*maxR);
+  infoCanvas.text('BIRTH YEAR:',width/2+15*maxR,height-60*maxR);
+  infoCanvas.text('GROW PERIOD:',width/2+15*maxR,height-45*maxR);
+  infoCanvas.text('STATE:',width/2+15*maxR,height-30*maxR);
   infoCanvas.textStyle(ITALIC);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textSize(15*maxR);
-  infoCanvas.text('Sapien #'+seed,width/2+285*maxR,height-165*maxR);
+  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
   infoCanvas.textSize(12*maxR);
   infoCanvas.text('1:'+scaleRatio,width/2-15*maxR,height-135*maxR);
   infoCanvas.text(layerNum-2,width/2-15*maxR,height-120*maxR);
   infoCanvas.text(realMaxNodes,width/2-15*maxR,height-105*maxR);
   infoCanvas.text(epochs,width/2-15*maxR,height-90*maxR);
-  infoCanvas.text(shapeName[shape],width/2-15*maxR,height-75*maxR);
-  infoCanvas.text('#'+paletteType,width/2-15*maxR,height-60*maxR);
-  infoCanvas.text(fillName[fillMode],width/2-15*maxR,height-45*maxR);
+  infoCanvas.text(framework[shape],width/2-15*maxR,height-75*maxR);
+  infoCanvas.text(paletteName[paletteType],width/2-15*maxR,height-60*maxR);
+  infoCanvas.text(dataSet[fillMode],width/2-15*maxR,height-45*maxR);
   infoCanvas.text(paper[pattern],width/2-15*maxR,height-30*maxR);
   infoCanvas.text(architecture,width/2+285*maxR,height-135*maxR);
-  infoCanvas.text(activationFunction[shape],width/2+285*maxR,height-120*maxR);
-  infoCanvas.text(dataSet[1],width/2+285*maxR,height-105*maxR);
-  infoCanvas.text(framework[1],width/2+285*maxR,height-90*maxR);
+  infoCanvas.text(activationFunction,width/2+285*maxR,height-120*maxR);
+  infoCanvas.text(dataSet[fillMode],width/2+285*maxR,height-105*maxR);
+  infoCanvas.text(framework[shape],width/2+285*maxR,height-90*maxR);
   infoCanvas.text(acceleration[drawSpeed],width/2+285*maxR,height-75*maxR);
   infoCanvas.text(birthYear,width/2+285*maxR,height-60*maxR);
   infoCanvas.text(growPeriod,width/2+285*maxR,height-45*maxR);

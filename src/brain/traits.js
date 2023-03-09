@@ -26,21 +26,8 @@ const BirthYear = [
   ['2023', 1],
 ];
 
-const LineStroke = [
-  ['0.25pt', 1, 0.25],
-  ['0.5pt', 1, 0.5],
-  ['0.75pt', 1, 0.75],
-];
-
-const NodeStroke = [
-  ['0.25pt', 1, 0.25],
-  ['0.5pt', 1, 0.5],
-  ['0.75pt', 1, 0.75],
-];
-
 const Pattern = [
   ['Plain', 1],
-  ['Ruled', 1],
   ['Dotted', 1],
   ['Squared', 1],
 ];
@@ -51,28 +38,57 @@ const HardwareAcceleration = [
   ['Advanced', 1],
 ];
 
-const NodeType = [
+const NodeFill = [
   ['MNIST', 1], 
   ['CIFAR', 1],  
   ['IMAGENET', 1],  
-  ['IRIS', 1], 
 ];
 
-const BackgroundColor = [
+const NodeShape = [
   ['Theano', 1],
   ['Torch', 1],
   ['TensorFlow', 1],
   ['Caffe', 1],  
 ];
 
+const ColorPallete = [ 
+  ['Monochrome', 1],
+  ['Zebra', 1],
+  ['Blueprint', 1],
+  ['Industrial Steel', 1],
+  ['Full Spectrum', 1],
+  ['Deep Sea', 1],
+  ['Twilight', 1],
+  ['Gaia', 1],
+  ['Autumn Harvest', 1],
+  ['Bubblegum', 1],
+  ['Sleek Neutrals', 1],
+  ['Barbie World', 1],
+  ['Warning Zone', 1],
+  ['Chilli Sauce', 1],
+  ['American Dream', 1],
+  ['Oceanic Greens', 1],
+  ['Nightlife', 1],
+  ['Nautical Adventure', 1],
+  ['Cotton Candy', 1],
+  ['Golden Hour', 1],
+  ['Matcha Latte', 1],
+  ['Alluvial Soils', 1],
+  ['Royal Plum', 1],
+  ['Dark Rose', 1],
+  ['Sweetheart!', 1],
+  ['Campfire', 1],
+  ['Black Pink', 1],
+  ['Chlorophyll', 1],
+];
+
 function getTraits(trainingTraits) {
   // Visual traits
-  const lineStroke = getRandomItem(LineStroke);
-  const nodeStroke = getRandomItem(NodeStroke);
   const pattern = getRandomItem(Pattern);
   // const hardwareAcceleration = getRandomItem(HardwareAcceleration);
-  const nodeType = getRandomItem(NodeType);
-  const backgroundColor = getRandomItem(BackgroundColor);
+  const nodeFill = getRandomItem(NodeFill);
+  const nodeShape = getRandomItem(NodeShape);
+  const colorPallete = getRandomItem(ColorPallete);
   // const growthPeriod = getRandomItem(GrowthPeriod);
   // const birthYear = getRandomItem(BirthYear);
   const hardwareAcceleration = 'Standard';
@@ -81,12 +97,11 @@ function getTraits(trainingTraits) {
 
   const traits = {
     visual: {
-      lineStroke,
-      nodeStroke,
       pattern,
       hardwareAcceleration,
-      nodeType,
-      backgroundColor,
+      nodeFill,
+      nodeShape,
+      colorPallete,
       growthPeriod,
       birthYear,  
     },
@@ -105,12 +120,10 @@ function reportTraits(traits) {
     "Max neurons per layer": traits.training.max_nodes,
     "Activation function": traits.training.activation_func,
     "Training epochs": traits.training.epoch_num,
-    "Line stroke": traits.visual.lineStroke,
-    "Node stroke": traits.visual.nodeStroke,
-    "Paper": traits.visual.pattern,
+    "Dataset (fill mode)": traits.visual.nodeFill,
+    "Deep learning framework (shape)": traits.visual.nodeShape,
     "Hardware acceleration (animation speed)": traits.visual.hardwareAcceleration,
-    "Dataset (neuron color)": traits.visual.nodeType,
-    "ML framework (background)": traits.visual.backgroundColor,
+    "Paper pattern": traits.visual.pattern,
     "Growth speed": traits.visual.growthPeriod,
     "Birth year": traits.visual.birthYear,
   }
