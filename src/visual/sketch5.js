@@ -61,6 +61,7 @@ let brain;
 let output_prediction;
 let particleSystem;
 let deadCanvas;
+let predictions;
 
 async function setup() {
   let w = windowHeight; 
@@ -98,7 +99,6 @@ function setupTraits() {
   paper = [' ','Plain','Dotted','Squared'];
   liveState = [' ','Growing','Stable','Decay','Dead'];
   acceleration = [' ','Basic','Standard','Advanced'];
-  shuffle(example,true);
 }
 
 async function setupModel() {
@@ -119,7 +119,7 @@ async function setupModel() {
 
   // TODO: Change default traits to inscription training traits
 
-  classes_name = inscription.classes_name;
+  classes_name = inscription.classes_name.map(e => e.toUpperCase());
 }
 
 function initialize() {
@@ -262,15 +262,16 @@ function customDoubleClicked() {
   drewLineAnim = true;
   progress = border;
 
-  loadImage(img.elt.src, q5img => {
-    const graphic = createGraphics(28, 28);
-    graphic.image(q5img, 0, 0, 28, 28);
+  loadImage(img.elt.src, q5img => {    
+    const [w_img, h_img, c_img] = inputDim;
+    const graphic = createGraphics(w_img, h_img);
+    graphic.image(q5img, 0, 0, w_img, h_img);
     graphic.loadPixels();
 
     const data = graphic.pixels.filter((_, i) => i%4 != 3); 
-    const predictions = brain.classifyImage(data);
-    percentage = 50;
-    // percentage = max(...predictions.map(x => Math.round(x * 100)));
+    const result = brain.classifyImage(data);
+    predictions = zip([result, classes_name])
+      .sort((a, b) => a[0] > b[0] ? -1 : 1);
   });
 }
 
@@ -376,7 +377,8 @@ function setupSketch() {
   }
 
   const brainStatus = brain.getBrainStatus();
-  
+  inputDim = brainStatus.inputDim;
+
   border = 100*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
@@ -835,14 +837,16 @@ function drawResultWindow() {
   popupCanvas.fill(startColor);
   if (!finishedNumber) {
     popupCanvas.textSize(100*maxR);
-    percentage = round(random(10,100),2);
-    popupCanvas.text(percentage,width/2+130*maxR,height/2-35*maxR);
+    percentage = random(10,100);
+    popupCanvas.text(percentage.toFixed(2),width/2+130*maxR,height/2-35*maxR);
   } else {
     popupCanvas.textSize(100*maxR);
-    popupCanvas.text(percentage+'%',width/2+130*maxR,height/2-35*maxR);
+    popupCanvas.text((predictions[0][0] * 100).toFixed(2) + '%',width/2+130*maxR,height/2-35*maxR);
   }
   popupCanvas.textAlign(CENTER,CENTER);
   defaultSize = popupCanvas.textWidth('"FIDENZA"');
+
+  example = predictions.map(e => e[1]);
   if (!finishedText) {
     let randomIndex = getRandomInt(0,example.length);
     let name = example[randomIndex];

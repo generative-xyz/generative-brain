@@ -1,0 +1,6 @@
+- Recovery process: 
++ First 2 weeks: nothing happens
++ The remaining period: recover linearly
+- Reduce file size
+- Fix windows traits
+- Fix dead state to use general code flow
