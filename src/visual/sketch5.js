@@ -26,7 +26,7 @@ let state;
 let shape; 
 let shapeStroke,lineStroke,strokeRatio;
 let classNum,classArray,inputNum,inputArray;
-let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas;
+let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas;
 let nodeColor,strokeColor;
 let strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
@@ -66,6 +66,11 @@ let deadCanvas;
 let predictions;
 let stageRatio;
 
+let isCheckingEndpointsFinished;
+let drewCheckingWindows;
+let blockApiResult;
+let modelInscriptionResult;
+
 async function setup() {
   let w = windowHeight; 
   let h = windowHeight;
@@ -79,6 +84,7 @@ async function setup() {
   loadingCanvas = createGraphics(w,h);
   warningCanvas = createGraphics(w,h);
   settingCanvas = createGraphics(w,h);
+  checkCanvas = createGraphics(w,h);
   setupRandom();
   setupTraits();
   preloadingSetup();
@@ -379,9 +385,35 @@ function submit() {
   modelAddress = address.value();
   address.hide();
 
-  setBlocksApiEndpoint(bitcoinNode);
-  setModelInscriptionEndpoint(modelAddress);
-  window.location.reload();
+  isCheckingEndpointsFinished = false;
+  startEndpointsCheck();
+}
+
+async function startEndpointsCheck() {
+  [blockApiResult, modelInscriptionResult] = await Promise.all([
+    isValidBlocksApiEndpoint(),
+    isValidModelInscriptionEndpoint(),
+  ]);
+
+  isCheckingEndpointsFinished = true;
+
+  if (blockApiResult && modelInscriptionResult) {
+    setBlocksApiEndpoint(bitcoinNode);
+    setModelInscriptionEndpoint(modelAddress);
+    window.location.reload();
+  } else {
+    drewCheckingWindows = true;
+  }
+}
+
+function drawCheckingResult() {
+  checkCanvas.textFont('Trebuchet MS');
+  checkCanvas.fill(paperColor);
+  checkCanvas.rect(width/2, height/2, 400, 400);
+  checkCanvas.noStroke();
+  checkCanvas.fill(startColor);
+  checkCanvas.textSize(36);
+  checkCanvas.text("INVALID ENDPOINTS", width/2, height/2, 400, 400);
 }
 
 function closeSetting() {
@@ -656,6 +688,15 @@ function draw() {
   settingCanvas.strokeWeight(8*maxR);
   settingCanvas.fill(paperColor);
 
+  checkCanvas.background(255);
+  checkCanvas.rectMode(CENTER);
+  eraseCanvas(checkCanvas);
+  checkCanvas.textAlign(CENTER);
+  checkCanvas.textStyle(BOLD);
+  checkCanvas.stroke(patternColor);
+  checkCanvas.strokeWeight(8*maxR);
+  checkCanvas.fill(paperColor);
+
   if (!setupFinished) {
     drawLoadingScreen();
     image(loadingCanvas, 0, 0);
@@ -746,6 +787,10 @@ function draw() {
   if (drewInfoWindow) {
     drawInfoWindow();
     image(infoCanvas,0,0);
+  }
+  if (drewCheckingWindows) {
+    drawCheckingResult();
+    image(checkCanvas,0,0);
   }
     
   frameCount++; 
