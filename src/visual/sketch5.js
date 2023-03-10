@@ -938,12 +938,6 @@ function drawResultWindow() {
       popupCanvas.textLeading(newSize*maxR);
       popupCanvas.textSize(newSize*maxR);
       popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
-
-      popupCanvas.push();
-      popupCanvas.stroke(255);
-      popupCanvas.noFill();
-      popupCanvas.rect(width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
-      popupCanvas.pop();
     }
   } else {
     const numWords = example[0].split(" ").length;
@@ -958,12 +952,6 @@ function drawResultWindow() {
       popupCanvas.textLeading(newSize*maxR);
       popupCanvas.textSize(newSize*maxR);
       popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
-
-      popupCanvas.push();
-      popupCanvas.stroke(255);
-      popupCanvas.noFill();
-      popupCanvas.rect(width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
-      popupCanvas.pop();
     }
   }
   if (millis()-startTime > 1000) {
