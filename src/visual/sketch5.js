@@ -10,6 +10,7 @@ let img;
 let drewResultWindow = false;
 let drewInfoWindow = false;
 let drewAnim = true;
+let drewSetting = false;
 let isProcessPhase;
 let processingLayer;
 let progress;
@@ -25,16 +26,16 @@ let state;
 let shape; 
 let shapeStroke,lineStroke,strokeRatio;
 let classNum,classArray,inputNum,inputArray;
-let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas;
+let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas;
 let nodeColor,strokeColor;
 let strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
 let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
+let bitcoinNode,modelAddress;
 
 let seed,architecture,birthYear,growPeriod,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
 let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Cinnamon','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
-let example = ['CRYPTOPUNKS','CRYPTOADZ','MOONBIRDS','NOUNS','GAZERS','FIDENZA','ACEQUIA','TIMECHAIN','SATOSHI','SQUIGGLE','TERRAFORMS','FINILIAR','BITGANS','GARDEN','DRAGONS','SMOLSKULL','CONTRAPUNTOS','HOLLOW','TOCCATA','SOLACE','BAYC','0XAI','NAKAMOTO VILLAGE','LUMINARIES','ANGELS','A BUGGED FOREST','CONTEMPORARY RELIEF','PERPENDICULAR INHABITATION','TYCH','SELF-HEALING CONCRETE','INDUSTRIAL DEVOLUTION','LIFE IN THE WASTE LAND'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -46,6 +47,7 @@ let frameCount = 0;
 let drewInputLine = false;
 let drewOutputLine = false;
 let drewWarningScreen = false;
+let drewBorder = true;
 
 let isIdleMode;
 let wrapInput = null;
@@ -76,9 +78,10 @@ async function setup() {
   deadCanvas = createGraphics(w,h);
   loadingCanvas = createGraphics(w,h);
   warningCanvas = createGraphics(w,h);
+  settingCanvas = createGraphics(w,h);
   setupRandom();
   setupTraits();
-  setupColor();
+  preloadingSetup();
   await setupModel();
   setupSketch();
   installCustomUploadIfle();
@@ -148,7 +151,8 @@ function checkIt() {
      }, 100)
 }  
 
-function setupColor() {
+function preloadingSetup() {
+  maxR = min(width,height)/1024;
   paletteType = paletteName.indexOf(traits.visual.colorPalette);
   colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
@@ -196,13 +200,15 @@ function installCustomUploadIfle(){
   fileInput = document.querySelector('#inputUpload');
   
   wrapInput.addEventListener('dblclick', ()=>{
-    if (isNeuronsConnected(nodesArray)) {
+    if (isNeuronsConnected(nodesArray) && drewSetting == false && drewOutputLine == true) {
       fileInput.click();
-      initialize();      
-    }
-    else {
+      initialize();
+    } else if (isNeuronsConnected(nodesArray) && drewSetting == true) {
+      return;
+    } else if (!isNeuronsConnected(nodesArray) && drewSetting == false && drewOutputLine == true) {
       drewWarningScreen = true;
-    }
+      warning();
+    } else {return}
   } )
   
   fileInput.addEventListener('change', ()=>{
@@ -233,27 +239,6 @@ function isNeuronsConnected(nodesArray) {
   return true;
 }
 
-function drawLoadingScreen() {
-  loadingCanvas.textFont('Tahoma');
-  loadingCanvas.stroke(patternColor);
-  loadingCanvas.strokeWeight(2*maxR);
-  loadingCanvas.fill(patternColor);
-  loadingCanvas.textSize(48);
-  loadingCanvas.text('LOADING...', width/2, height/2);
-}
-
-function drawDisconnectedWarning() {
-  warningCanvas.textFont('Tahoma');
-  warningCanvas.stroke(patternColor);
-  warningCanvas.strokeWeight(2*maxR);
-  warningCanvas.fill(paperColor);
-  warningCanvas.rect(width/2, height/2, 400, 200);
-
-  warningCanvas.fill(patternColor);
-  warningCanvas.textSize(24);
-  warningCanvas.text('Your network is disconnected', width/2, height/2, width, 100);
-}
-
 function customDoubleClicked() {
   if (img == null) return;
   frameCount = 0;
@@ -263,7 +248,7 @@ function customDoubleClicked() {
   drewLineAnim = true;
   progress = border;
 
-  loadImage(img.elt.src, q5img => {    
+  loadImage(img.elt.src, q5img => {
     const [w_img, h_img, c_img] = inputDim;
     const graphic = createGraphics(w_img, h_img);
     graphic.image(q5img, 0, 0, w_img, h_img);
@@ -274,6 +259,12 @@ function customDoubleClicked() {
     predictions = zip([result, classes_name])
       .sort((a, b) => a[0] > b[0] ? -1 : 1);
   });
+}
+
+function handleFile(fileSrc) {
+    img = createImg(fileSrc,'');
+    img.hide();
+    customDoubleClicked();
 }
 
 function processPhase() {
@@ -302,8 +293,8 @@ function processPhase() {
       progress = border;
       if (animationLoopCount == 1) {
         isProcessPhase = false;
-        startTime = millis();
         resultWindow();
+        startTime = millis();
       }
     }
   }
@@ -311,6 +302,8 @@ function processPhase() {
 
 function resultWindow() {
   drewResultWindow = true;
+  finishedNumber = false;
+  finishedText = false;
   tryButton = createButton('Try Again');
   tryButton.position(width/2-155*maxR,height/2+165*maxR);
   tryButton.size(150*maxR,40*maxR);
@@ -342,23 +335,74 @@ function closeResult() {
 }
 
 function keyTyped() {
-  if ((key === 'i' || key === 'I') && drewInfoWindow == false) {
+  if ((key === 'i' || key === 'I') && drewInfoWindow == false && drewSetting == false) {
     drewInfoWindow = true;
   } else if ((key === 'i' || key === 'I') && drewInfoWindow == true) {
     drewInfoWindow = false;
   }
+  if ((key === 'e' || key === 'E') && drewSetting == false && drewResultWindow == false && drewWarningScreen == false) {
+    settingPopup();
+  }
+  if ((key == 'b' || key == 'B') && drewBorder == true && drewSetting == false) {
+    drewBorder = false;
+  } else if ((key == 'b' || key == 'B') && drewBorder == false && drewSetting == false) {drewBorder = true}
 }
 
-function handleFile(fileSrc) {
-    img = createImg(fileSrc,'');
-    img.hide();
-    customDoubleClicked();
+function settingPopup() {
+  drewSetting = true;
+  submitButton = createButton('Submit');
+  submitButton.position(width/2-155*maxR,height/2+115*maxR);
+  submitButton.size(150*maxR,40*maxR);
+  submitButton.style('opacity','0');
+  submitButton.mouseClicked(submit);
+  closeSettingButton = createButton('Close');
+  closeSettingButton.position(width/2+5*maxR,height/2+115*maxR);
+  closeSettingButton.size(150*maxR,40*maxR);
+  closeSettingButton.style('opacity','0');
+  closeSettingButton.mouseClicked(closeSetting);
+  bitcoin = createInput();
+  bitcoin.position(width/2-252.5*maxR,height/2-40*maxR);
+  bitcoin.size(500*maxR,25*maxR);
+  bitcoin.style('font-size','20px');
+  address = createInput();
+  address.position(width/2-252.2*maxR,height/2+35*maxR);
+  address.size(500*maxR,25*maxR);
+  address.style('font-size','20px');
+}
+
+function submit() {
+  drewSetting = false;
+  submitButton.hide();
+  closeSettingButton.hide();
+  bitcoinNode = bitcoin.value();
+  bitcoin.hide();
+  modelAddress = address.value();
+  address.hide();
+}
+
+function closeSetting() {
+  drewSetting = false;
+  submitButton.hide();
+  closeSettingButton.hide();
+  bitcoin.hide();
+  address.hide();
+}
+
+function warning() {
+  closeWarningButton = createButton('Close');
+  closeWarningButton.position(width/2-75*maxR,height/2+90*maxR);
+  closeWarningButton.size(150*maxR,40*maxR);
+  closeWarningButton.style('opacity','0');
+  closeWarningButton.mouseClicked(closeWarning);
+}
+
+function closeWarning() {
+  drewWarningScreen = false;
+  closeWarningButton.hide();
 }
 
 function setupSketch() {
   setupRandom();
-  maxR = min(width,height)/1024;
-  drewInfoWindow = false;
   finishedNumber = false;
   finishedText = false;
     
@@ -380,14 +424,12 @@ function setupSketch() {
   const brainStatus = brain.getBrainStatus();
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;
-
+  
   border = 100*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
   shape = framework.indexOf(traits.visual.nodeShape);
-  // fillMode = 1;
   fillMode = dataSet.indexOf(traits.visual.nodeFill);
-  // pattern = 3;
   pattern = paper.indexOf(traits.visual.pattern);
 
   console.log(shape);
@@ -396,7 +438,7 @@ function setupSketch() {
   satFee = map(satFee, 0, 1, 0.2, 0.8);
   
   inputNodes = 3;
-  classNum = 4;
+  classNum = classes_name.length;
   classArray = [];
   inputArray = [];
   
@@ -441,7 +483,19 @@ function setupSketch() {
     // console.log(scaleToggle,maxNodes,scaleRatio)
   } else {scaleNodesArray = nodesArray}
   scaleNodesArray.unshift(inputArray);
-  // console.log(scaleNodesArray)
+  
+  if (state == 1) {
+    for (let i=0; i<scaleNodesArray.length; i++) {
+      let arr = [];
+      for (let j=0; j<scaleNodesArray[i].length; j++) {
+        if (scaleNodesArray[i][j] != 0) arr.push(scaleNodesArray[i][j]);
+      }
+      scaleNodesArray[i] = arr;
+    }
+    for (let i=0; i<scaleNodesArray.length; i++) {
+      if (scaleNodesArray[i].length == 0) {scaleNodesArray[i].push(0)}
+    }
+  }
   
   compareArray = [];
   for (let i=0; i<scaleNodesArray.length; i++) {
@@ -566,15 +620,17 @@ function draw() {
   patternCanvas.strokeWeight(0.1*maxR);
   createPattern(pattern);
   patternCanvas.noStroke();
-  patternCanvas.rect(border/16,height/2,border/8,height);
-  patternCanvas.rect(width-border/16,height/2,border/8,height);
-  patternCanvas.rect(width/2,border/16,width,border/8);
-  patternCanvas.rect(width/2,height-border/16,width,border/8);
+  if (drewBorder) {
+    patternCanvas.rect(border/16,height/2,border/8,height);
+    patternCanvas.rect(width-border/16,height/2,border/8,height);
+    patternCanvas.rect(width/2,border/16,width,border/8);
+    patternCanvas.rect(width/2,height-border/16,width,border/8);
+  }
 
   warningCanvas.background(255);
   warningCanvas.rectMode(CENTER);
   eraseCanvas(warningCanvas);
-  warningCanvas.textAlign(CENTER);
+  warningCanvas.textAlign(CENTER,CENTER);
   warningCanvas.textStyle(BOLD);
   warningCanvas.stroke(patternColor);
   warningCanvas.strokeWeight(8*maxR);
@@ -583,11 +639,18 @@ function draw() {
   loadingCanvas.background(255);
   loadingCanvas.rectMode(CENTER);
   eraseCanvas(loadingCanvas);
-  loadingCanvas.textAlign(CENTER);
+  loadingCanvas.textAlign(CENTER,CENTER);
   loadingCanvas.textStyle(BOLD);
   loadingCanvas.stroke(patternColor);
-  loadingCanvas.strokeWeight(8*maxR);
-  loadingCanvas.fill(paperColor);
+  
+  settingCanvas.background(255);
+  settingCanvas.rectMode(CENTER);
+  eraseCanvas(settingCanvas);
+  settingCanvas.textAlign(CENTER);
+  settingCanvas.textStyle(BOLD);
+  settingCanvas.stroke(patternColor);
+  settingCanvas.strokeWeight(8*maxR);
+  settingCanvas.fill(paperColor);
 
   if (!setupFinished) {
     drawLoadingScreen();
@@ -663,20 +726,22 @@ function draw() {
   }
   image(lineCanvas,0,0);
   image(nodeCanvas,0,0);
-
   if (drewResultWindow) {
     drawResultWindow();
     image(popupCanvas,0,0);
   }
   }
-
-  if (drewInfoWindow) {
-    drawInfoWindow();
-    image(infoCanvas,0,0);
-  }
   if (drewWarningScreen) {
     drawDisconnectedWarning();
     image(warningCanvas,0,0);
+  }
+  if (drewSetting) {
+    drawSetting();
+    image(settingCanvas,0,0);
+  }
+  if (drewInfoWindow) {
+    drawInfoWindow();
+    image(infoCanvas,0,0);
   }
     
   frameCount++; 
@@ -819,7 +884,7 @@ function drawResultWindow() {
   popupCanvas.fill(paperColor);
   popupCanvas.rect(width/2,height/2,700*maxR,300*maxR,25*maxR);
   popupCanvas.strokeWeight(6*maxR);
-  popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR)
+  popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR,240*maxR);
   popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
   
   popupCanvas.strokeWeight(1*maxR);
@@ -841,10 +906,14 @@ function drawResultWindow() {
   if (!finishedNumber) {
     popupCanvas.textSize(100*maxR);
     percentage = random(10,100);
-    popupCanvas.text(percentage.toFixed(2),width/2+130*maxR,height/2-35*maxR);
+    popupCanvas.text(percentage.toFixed(2)+'%',width/2+130*maxR,height/2-35*maxR);
   } else {
     popupCanvas.textSize(100*maxR);
-    popupCanvas.text((predictions[0][0] * 100).toFixed(2) + '%',width/2+130*maxR,height/2-35*maxR);
+    let prediction_str = (predictions[0][0] * 100).toFixed(2);
+    if (prediction_str == "100.00") {
+      prediction_str = "100";
+    }
+    popupCanvas.text(prediction_str + '%',width/2+130*maxR,height/2-35*maxR);
   }
   popupCanvas.textAlign(CENTER,CENTER);
   defaultSize = popupCanvas.textWidth('"FIDENZA"');
@@ -856,7 +925,7 @@ function drawResultWindow() {
     let newSize = 75*defaultSize/popupCanvas.textWidth(example[randomIndex])*maxR;
     if (newSize > 75) {newSize = 75}
     popupCanvas.textSize(newSize);
-    popupCanvas.text(name,width/2+130*maxR,height/2+65*maxR); 
+    popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR); 
   } else {
     let newSize = 75*defaultSize/popupCanvas.textWidth('"'+example[0]+'"')*maxR;
     if (newSize > 75) {newSize = 75}
@@ -891,24 +960,22 @@ function drawInfoWindow() {
   infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
   infoCanvas.rect(width/2,height-95*maxR,600*maxR,150*maxR);
-  infoCanvas.rect(width/2+150*maxR,height-170*maxR,300*maxR,30*maxR)
-  infoCanvas.rect(width/2-150*maxR,height-170*maxR,300*maxR,30*maxR);
+  infoCanvas.rect(width/2+150*maxR,height-155*maxR,300*maxR,30*maxR)
+  infoCanvas.rect(width/2-150*maxR,height-155*maxR,300*maxR,30*maxR);
   infoCanvas.noStroke();
   infoCanvas.fill(startColor);
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
-  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
-  infoCanvas.text('NAME:',width/2+15*maxR,height-165*maxR);
+  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-150*maxR);
+  infoCanvas.text('NAME:',width/2+15*maxR,height-150*maxR);
   infoCanvas.textSize(12*maxR);
-  infoCanvas.text('SCALE:',width/2-285*maxR,height-135*maxR);
-  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-120*maxR);
-  infoCanvas.text('MAXIMUM NEURONS PER LAYER:',width/2-285*maxR,height-105*maxR);
-  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-90*maxR);
-  infoCanvas.text('SHAPE:',width/2-285*maxR,height-75*maxR);
-  infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-60*maxR);
-  infoCanvas.text('FILL MODE:',width/2-285*maxR,height-45*maxR);
+  infoCanvas.text('SCALE:',width/2-285*maxR,height-120*maxR);
+  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-105*maxR);
+  infoCanvas.text('MAXIMUM NEURONS PER LAYER:',width/2-285*maxR,height-90*maxR);
+  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-75*maxR);
+  infoCanvas.text('ARCHITECTURE:',width/2-285*maxR,height-60*maxR);
+  infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-45*maxR);
   infoCanvas.text('PAPER PATTERN:',width/2-285*maxR,height-30*maxR);
-  infoCanvas.text('ARCHITECTURE:',width/2+15*maxR,height-135*maxR);
   infoCanvas.text('ACTIVATION FUNCTION:',width/2+15*maxR,height-120*maxR);
   infoCanvas.text('DATA SET:',width/2+15*maxR,height-105*maxR);
   infoCanvas.text('FRAMEWORK: ',width/2+15*maxR,height-90*maxR);
@@ -919,17 +986,15 @@ function drawInfoWindow() {
   infoCanvas.textStyle(ITALIC);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textSize(15*maxR);
-  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
+  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-150*maxR);
   infoCanvas.textSize(12*maxR);
-  infoCanvas.text('1:'+scaleRatio,width/2-15*maxR,height-135*maxR);
-  infoCanvas.text(layerNum-2,width/2-15*maxR,height-120*maxR);
-  infoCanvas.text(realMaxNodes,width/2-15*maxR,height-105*maxR);
-  infoCanvas.text(epochs,width/2-15*maxR,height-90*maxR);
-  infoCanvas.text(framework[shape],width/2-15*maxR,height-75*maxR);
-  infoCanvas.text(paletteName[paletteType],width/2-15*maxR,height-60*maxR);
-  infoCanvas.text(dataSet[fillMode],width/2-15*maxR,height-45*maxR);
+  infoCanvas.text('1:'+scaleRatio,width/2-15*maxR,height-120*maxR);
+  infoCanvas.text(layerNum-2,width/2-15*maxR,height-105*maxR);
+  infoCanvas.text(realMaxNodes,width/2-15*maxR,height-90*maxR);
+  infoCanvas.text(epochs,width/2-15*maxR,height-75*maxR);
+  infoCanvas.text(architecture,width/2-15*maxR,height-60*maxR);
+  infoCanvas.text(paletteName[paletteType],width/2-15*maxR,height-45*maxR);
   infoCanvas.text(paper[pattern],width/2-15*maxR,height-30*maxR);
-  infoCanvas.text(architecture,width/2+285*maxR,height-135*maxR);
   infoCanvas.text(activationFunction,width/2+285*maxR,height-120*maxR);
   infoCanvas.text(dataSet[fillMode],width/2+285*maxR,height-105*maxR);
   infoCanvas.text(framework[shape],width/2+285*maxR,height-90*maxR);
@@ -937,6 +1002,86 @@ function drawInfoWindow() {
   infoCanvas.text(birthYear,width/2+285*maxR,height-60*maxR);
   infoCanvas.text(growPeriod,width/2+285*maxR,height-45*maxR);
   infoCanvas.text(liveState[state],width/2+285*maxR,height-30*maxR);
+}
+
+function drawSetting() {
+  settingCanvas.textFont('Trebuchet MS');
+  settingCanvas.noStroke();
+  settingCanvas.fill(0,0,0,75);
+  settingCanvas.rect(width/2,height/2,width,height);
+  settingCanvas.stroke(patternColor);
+  settingCanvas.fill(paperColor);
+  settingCanvas.rect(width/2,height/2,600*maxR,200*maxR,25*maxR);
+  
+  settingCanvas.strokeWeight(1*maxR);
+  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
+    settingCanvas.fill(startColor);
+  } else {
+    settingCanvas.fill(paperColor);
+  }
+  settingCanvas.rect(width/2-80*maxR,height/2+135*maxR,150*maxR,40*maxR,5*maxR);
+  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
+    settingCanvas.fill(startColor);
+  } else {
+    settingCanvas.fill(paperColor);
+  }
+  settingCanvas.rect(width/2+80*maxR,height/2+135*maxR,150*maxR,40*maxR,5*maxR);
+  
+  settingCanvas.noStroke();
+  settingCanvas.textSize(20*maxR);
+  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
+    settingCanvas.fill(paperColor);
+  } else {
+    settingCanvas.fill(startColor);
+  }
+  settingCanvas.text('SUBMIT',width/2-80*maxR,height/2+142*maxR);
+  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
+    settingCanvas.fill(paperColor);
+  } else {
+    settingCanvas.fill(startColor);
+  }
+  settingCanvas.text('CLOSE',width/2+80*maxR,height/2+142*maxR);
+  settingCanvas.textAlign(LEFT);
+  settingCanvas.fill(startColor);
+  settingCanvas.text('UPDATE BITCOIN FULL NODE',width/2-252.5*maxR,height/2-50*maxR);
+  settingCanvas.text('UPDATE MODEL ADDRESS',width/2-252.5*maxR,height/2+25*maxR);
+}
+
+function drawLoadingScreen() {
+  loadingCanvas.textFont('Trebuchet MS');
+  loadingCanvas.fill(patternColor);
+  loadingCanvas.textSize(50*maxR);
+  loadingCanvas.text('GENERATING...', width/2, height/2);
+}
+
+function drawDisconnectedWarning() {
+  warningCanvas.textFont('Trebuchet MS');
+  warningCanvas.noStroke();
+  warningCanvas.fill(0,0,0,75);
+  warningCanvas.rect(width/2,height/2,width,height);
+  warningCanvas.stroke(patternColor);
+  warningCanvas.fill(paperColor);
+  warningCanvas.rect(width/2,height/2,600*maxR,150*maxR,15*maxR);
+  warningCanvas.fill(startColor);
+  warningCanvas.textSize(40*maxR);
+  warningCanvas.noStroke();
+  warningCanvas.text('PERCEPTRON MALFUNCTION',width/2,height/2+2*maxR);
+  
+  warningCanvas.strokeWeight(1*maxR);
+  if (mouseX>width/2-75*maxR && mouseX<width/2+75*maxR && mouseY>height/2+90*maxR && mouseY<height/2+130*maxR) {
+    warningCanvas.fill(startColor);
+  } else {
+    warningCanvas.fill(paperColor);
+  }
+  warningCanvas.rect(width/2,height/2+110*maxR,150*maxR,40*maxR,5*maxR);
+  warningCanvas.noStroke();
+  warningCanvas.textSize(20*maxR);
+  if (mouseX>width/2-75*maxR && mouseX<width/2+75*maxR && mouseY>height/2+90*maxR && mouseY<height/2+130*maxR) {
+    warningCanvas.fill(paperColor);
+  } else {
+    warningCanvas.fill(startColor);
+  }
+  warningCanvas.text('CLOSE',width/2,height/2+112*maxR);
 }
 
 function getGradientColors(startColor, endColor, colorStops, numSteps) {
@@ -1011,7 +1156,7 @@ function addAlpha(colorString, opacity) {
 }
 
 keyPressed = () => {
-  if (key == 'S' || key == 's') {
+  if (key == 'S' || key == 's' && drewSetting == false) {
     saveCanvasAtCurrentTime();
   }
 }

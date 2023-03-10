@@ -28,9 +28,11 @@ class Node {
     
     let opacity = 1;
     
-    canvas.stroke(addAlpha(strokeColor,1));
-    canvas.fill(addAlpha(nodeColor,0));
-
+    canvas.stroke(addAlpha(strokeColor,map(opacity,0,1,0.25,1)));
+    canvas.fill(addAlpha(nodeColor,map(opacity,0,1,0.15,1)));
+    if (fillMode == 3) {
+      canvas.fill(addAlpha(nodeColor,0));
+    }
     if (shape == 1) {
       canvas.ellipse(x,y,size);
     } else if (shape == 2) {
@@ -116,11 +118,11 @@ class ParticleSystem {
     this.nodes = [];
     for(let i = 0; i < n; ++i) {
       const layerNodes = [];
-      const count = totalNeurons[i] * 0.5;
+      const count = totalNeurons[i] * 0.25;
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
         const vel = getRandomVector(0.01, 0.05);
-        const size = random(5, 12.5) * 4;
+        const size = random(5, 12.5) * 2;
         layerNodes.push(new Node(pos, vel, size, gradientFill[i]));        
       }
       this.nodes.push(layerNodes);
@@ -179,8 +181,8 @@ class ParticleSystem {
       for (const node of layerNodes) {
         node.update();
         this.reflectNode(node);
-      }
-    }  
+      }    
+    }    
   }
   
   draw(canvas, paperColor, shape, fillMode, stageRatio) {
