@@ -1,3 +1,5 @@
+- Sync spark rate cycle and total animation length
+- Change btc and inscription endpoint feature
 - Reduce file size
 
 Done

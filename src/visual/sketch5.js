@@ -378,6 +378,10 @@ function submit() {
   bitcoin.hide();
   modelAddress = address.value();
   address.hide();
+
+  setBlocksApiEndpoint(bitcoinNode);
+  setModelInscriptionEndpoint(modelAddress);
+  window.location.reload();
 }
 
 function closeSetting() {

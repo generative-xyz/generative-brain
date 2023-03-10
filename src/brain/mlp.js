@@ -209,9 +209,11 @@ function getActivation(name) {
   }  
 }
 
-function loadModel(layersConfig, weights) {
+function loadModel(layersConfig, weights_b64) {
   const preprocessLayers = [];
   const hiddenLayers = [];
+
+  const weights = base64ToFloatArray(weights_b64);
 
   let dim = null;
   let p = 0;

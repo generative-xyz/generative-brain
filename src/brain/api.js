@@ -49,7 +49,6 @@ async function sendBtcRequest(endpoint, method, params) {
   };
   
   let data = await fetchData(endpoint, options);
-  data = data || await fetchData(DEFAULT_BTC_ENDPOINT, options);
   return data?.result;
 }
 
@@ -58,19 +57,52 @@ async function getLatestBlockStats(endpoint) {
     avgfee: 10,
     time: Date.now() / 1000,
   };
-  const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
-  if (blockId == null) {
-    return defaultStats;
-  } 
-  let stats = await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
-  return stats || defaultStats;
+  return await getValidBlocksApi(endpoint) || await getValidBlocksApi(DEFAULT_BTC_ENDPOINT) || defaultStats;
 }
 
 async function getModelInscription(endpoint) {
-  if (endpoint == null) {
-    return ___default_inscription;
+  return await getValidModelInscription(endpoint) || ___default_inscription;
+}
+
+async function isValidBlocksApiEndpoint(endpoint) {
+  return await getValidBlocksApi(endpoint) != null;
+}
+
+async function isValidModelInscriptionEndpoint(endpoint) {  
+  return await getValidModelInscription(endpoint) != null;
+}
+
+async function getValidBlocksApi(endpoint) {
+  const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
+  if (blockId == null) return false;
+  const stats = await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
+  return verifyBlockStats(stats) ? stats : null;
+}
+
+async function getValidModelInscription(endpoint) {
+  const inscription = await fetchData(endpoint, {});
+  return verifyModelInscription(inscription) ? inscription : null;
+}
+
+function verifyBlockStats(stats) {
+  return typeof stats?.time == 'number'
+      && typeof stats?.avgfee == 'number';
+}
+
+function verifyModelInscription(inscription) {
+  if (inscription == null) return false;
+
+  const { classes_name, training_traits, layers_config, weight_b64 } = inscription;
+
+  if (!Array.isArray(classes_name)) return false;
+  if (training_traits == null) return false;
+  try {
+    loadModel(layers_config, weight_b64);
+  } catch (err) {
+    return false;
   }
-  return (await fetchData(endpoint, {})) || ___default_inscription;
+
+  return true;
 }
 
 const ___sample_inscription = {    
