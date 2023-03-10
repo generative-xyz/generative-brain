@@ -919,22 +919,52 @@ function drawResultWindow() {
     }
     popupCanvas.text(prediction_str + '%',width/2+130*maxR,height/2-35*maxR);
   }
+  
+  example = predictions.map(e => e[1]);
   popupCanvas.textAlign(CENTER,CENTER);
   defaultSize = popupCanvas.textWidth('"FIDENZA"');
-
-  example = predictions.map(e => e[1]);
+  defaultPhrase = popupCanvas.textWidth('"PERPENDICULAR INHABITATION"');
   if (!finishedText) {
-    let randomIndex = getRandomInt(0,example.length);
-    let name = example[randomIndex];
-    let newSize = 75*defaultSize/popupCanvas.textWidth(example[randomIndex])*maxR;
-    if (newSize > 75) {newSize = 75}
-    popupCanvas.textSize(newSize);
-    popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR); 
+    let name = random(example);
+    const numWords = name.split(" ").length;
+    if (numWords === 1) {
+      let newSize = 75*defaultSize/popupCanvas.textWidth('"'+name+'"');
+      if (newSize > 75) {newSize = 75}
+      popupCanvas.textSize(newSize*maxR);
+      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR);      
+    } else {
+      let newSize = 45*defaultPhrase/popupCanvas.textWidth('"'+name+'"');
+      if (newSize > 45) {newSize = 45}
+      popupCanvas.textLeading(newSize*maxR);
+      popupCanvas.textSize(newSize*maxR);
+      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
+
+      popupCanvas.push();
+      popupCanvas.stroke(255);
+      popupCanvas.noFill();
+      popupCanvas.rect(width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
+      popupCanvas.pop();
+    }
   } else {
-    let newSize = 75*defaultSize/popupCanvas.textWidth('"'+example[0]+'"')*maxR;
-    if (newSize > 75) {newSize = 75}
-    popupCanvas.textSize(newSize);
-    popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR);    
+    const numWords = example[0].split(" ").length;
+    if (numWords === 1) {
+      let newSize = 75*defaultSize/popupCanvas.textWidth('"'+example[0]+'"');
+      if (newSize > 75) {newSize = 75}
+      popupCanvas.textSize(newSize*maxR);
+      popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR);   
+    } else {
+      let newSize = 45*defaultPhrase/popupCanvas.textWidth('"'+example[0]+'"');
+      if (newSize > 45) {newSize = 45}
+      popupCanvas.textLeading(newSize*maxR);
+      popupCanvas.textSize(newSize*maxR);
+      popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
+
+      popupCanvas.push();
+      popupCanvas.stroke(255);
+      popupCanvas.noFill();
+      popupCanvas.rect(width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
+      popupCanvas.pop();
+    }
   }
   if (millis()-startTime > 1000) {
     finishedNumber = true;

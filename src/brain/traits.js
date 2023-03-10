@@ -89,11 +89,20 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  // const growthPeriod = getRandomItem(GrowthPeriod);
-  // const birthYear = getRandomItem(BirthYear);
-  const hardwareAcceleration = 'Standard';
-  const growthPeriod = 'Year';
-  const birthYear = '2000';
+  const growthPeriod = getRandomItem(GrowthPeriod);
+  const birthYear = getRandomItem(BirthYear);
+  
+  // const hardwareAcceleration = 'Basic';
+  const hardwareAcceleration = 'Advanced';
+  // const growthPeriod = 'Year';
+  // const birthYear = '1964';
+  // const nodeFill = 'MNIST';
+  // const nodeShape = 'Theano';
+  // const colorPalette = 'Monochrome';
+  
+  // 1964: Dead
+  // 2000: Stable
+  // 2023: Growing (disconnected)
 
   const traits = {
     visual: {

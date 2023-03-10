@@ -8,7 +8,7 @@ Cycle of 60 years:
 
 const GROW_END = 25;
 const STABLE_END = 50;
-const DECAY_END = 58;
+const DECAY_END = 59;
 const CYCLE_END = 60;
 
 // Shape: 1 - (1 - px)^n = py
