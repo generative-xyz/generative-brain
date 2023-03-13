@@ -204,16 +204,16 @@ function installCustomUploadIfle(){
   fileInput = document.querySelector('#inputUpload');
   
   wrapInput.addEventListener('dblclick', ()=>{
-    if (isNeuronsConnected(nodesArray) && drewSetting == false && drewOutputLine == true) {
+    if (drewSetting) return;
+
+    if (isNeuronsConnected(nodesArray) && drewOutputLine == true) {
       fileInput.click();
       initialize();
-    } else if (isNeuronsConnected(nodesArray) && drewSetting == true) {
-      return;
-    } else if (state == 4 || (!isNeuronsConnected(nodesArray) && drewSetting == false && drewOutputLine == true)) {
+    } else if (state == 4 || (!isNeuronsConnected(nodesArray) && drewOutputLine == true)) {
       drewWarningScreen = true;
       warning();
     } else {return}
-  } )
+  })
   
   fileInput.addEventListener('change', ()=>{
     
