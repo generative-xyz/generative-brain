@@ -63,7 +63,7 @@ let particleSystem;
 let deadCanvas;
 let predictions;
 let stageRatio;
-
+let mainCanvas;
 let drewCheckingWindow = false;
 let blockEndpoint;
 let inscriptionEndpoint;
@@ -74,6 +74,8 @@ async function setup() {
   let w = windowHeight; 
   let h = windowHeight;
   createCanvas(w,h);
+
+  mainCanvas = createGraphics(w,h);
   lineCanvas = createGraphics(w,h);
   nodeCanvas = createGraphics(w,h);
   patternCanvas = createGraphics(w,h);
@@ -344,17 +346,20 @@ function keyTyped() {
   if (drewSetting === false && drewCheckingWindow === false) {
     if ((key === 'i' || key === 'I')) {
       drewInfoWindow = !drewInfoWindow;
-  }
+   }
     if ((key === 'b' || key === 'B')) {
       drewBorder = !drewBorder;
     }
     if ((key === 's' || key === 'S')) {
       saveCanvasAtCurrentTime();
     }  
+    if ((key === 'h' || key === 'H')) {
+      saveHDCanvasAtCurrentTime();
+    }
     if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false) {
-    settingPopup();
-    drewInfoWindow = false;
-  }
+      settingPopup();
+      drewInfoWindow = false;
+    }
   }
 }
 
@@ -644,8 +649,80 @@ function drawDeadAnimation() {
   particleSystem.draw(deadCanvas, paperColor, fillMode, stageRatio);
 }
 
-function draw() {
-  background(paperColor);
+function drawCanvases() {
+  if (!setupFinished) {
+    drawLoadingScreen();
+    mainCanvas.image(loadingCanvas, 0, 0);  
+    return;
+  }
+
+  if (state == 4) {
+    drawDeadAnimation();
+    mainCanvas.image(deadCanvas, 0, 0);
+    return;
+  } 
+  
+  // draw neural nodes
+  for (let i=0; i<currentNode; i++) {
+    let node = nodeSet[i];
+    if (fillMode == 1) {
+      nodeColor = strokeColor = gradientFill[node];
+    } else if (fillMode == 2) {
+      nodeColor = paperColor;
+      strokeColor = gradientFill[node];
+    } else {
+      nodeColor = paperColor;
+      strokeColor = gradientFill[node];
+    }
+    drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
+  }
+  
+  if (frameCount >= speedAcce && currentNode < nodeSet.length) {
+    let node = nodeSet[currentNode];
+    if (fillMode == 1) {
+      nodeColor = strokeColor = gradientFill[node];
+    } else if (fillMode == 2) {
+      nodeColor = paperColor;
+      strokeColor = gradientFill[node];
+    } else {
+      nodeColor = paperColor;
+      strokeColor = gradientFill[node];
+    }
+    drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
+
+    currentNode++;
+    frameCount = 0;
+  }
+  
+  // draw input lines
+  if (frameCount >= speedAcce && drewInputLine == false) {
+    drewInputLine = true;
+    frameCount = 0;
+  }
+  if (drewInputLine) drawInputLine(lineCanvas);
+
+  // draw neural lines
+  for (let i=0; i<currentLine; i++) {
+    let neuline = lineSet[i];
+    drawLineSet(neuline,state,lineCanvas);
+  }
+  if (frameCount >= speedAcce && currentLine < lineSet.length) {
+    let neuline = lineSet[currentLine];
+    drawLineSet(neuline,state,lineCanvas);
+    currentLine++;
+    frameCount = 0;
+  }  
+  
+  // draw output lines
+  if (frameCount >= speedAcce && drewOutputLine == false) {
+    drewOutputLine = true;
+    frameCount = 0;
+  }
+  if (drewOutputLine) drawOutputLine(lineCanvas);    
+}
+
+function drawOnMainCanvas() {
+  mainCanvas.background(paperColor);
 
   popupCanvas.background(255);
   popupCanvas.rectMode(CENTER);
@@ -718,102 +795,39 @@ function draw() {
   checkCanvas.strokeWeight(8*maxR);
   checkCanvas.fill(paperColor);
 
-  if (!setupFinished) {
-    drawLoadingScreen();
-    image(loadingCanvas, 0, 0);
-    return;
-  }
+  drawCanvases();
 
-  if (state == 4) {
-    drawDeadAnimation();
-    image(deadCanvas, 0, 0);  
-  } else {
-  // draw neural nodes
-  for (let i=0; i<currentNode; i++) {
-    let node = nodeSet[i];
-    if (fillMode == 1) {
-      nodeColor = strokeColor = gradientFill[node];
-    } else if (fillMode == 2) {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
-    } else {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
-    }
-    drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
-  }
-  
-  if (frameCount >= speedAcce && currentNode < nodeSet.length) {
-    let node = nodeSet[currentNode];
-    if (fillMode == 1) {
-      nodeColor = strokeColor = gradientFill[node];
-    } else if (fillMode == 2) {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
-    } else {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
-    }
-    drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
-
-    currentNode++;
-    frameCount = 0;
-  }
-  
-  // draw input lines
-  if (frameCount >= speedAcce && drewInputLine == false) {
-    drewInputLine = true;
-    frameCount = 0;
-  }
-  if (drewInputLine) drawInputLine(lineCanvas);
-
-  // draw neural lines
-  for (let i=0; i<currentLine; i++) {
-    let neuline = lineSet[i];
-    drawLineSet(neuline,state,lineCanvas);
-  }
-  if (frameCount >= speedAcce && currentLine < lineSet.length) {
-    let neuline = lineSet[currentLine];
-    drawLineSet(neuline,state,lineCanvas);
-    currentLine++;
-    frameCount = 0;
-  }  
-  
-  // draw output lines
-  if (frameCount >= speedAcce && drewOutputLine == false) {
-    drewOutputLine = true;
-    frameCount = 0;
-  }
-  if (drewOutputLine) drawOutputLine(lineCanvas);  
-  }
-
-  image(patternCanvas,0,0);
+  mainCanvas.image(patternCanvas,0,0);
   if (isProcessPhase) {
     processPhase();
   }
-  image(lineCanvas,0,0);
-  image(nodeCanvas,0,0);
+  mainCanvas.image(lineCanvas,0,0);
+  mainCanvas.image(nodeCanvas,0,0);
   if (drewResultWindow) {
     drawResultWindow();
-    image(popupCanvas,0,0);
+    mainCanvas.image(popupCanvas,0,0);
   }
   if (drewWarningScreen) {
     drawDisconnectedWarning();
-    image(warningCanvas,0,0);
+    mainCanvas.image(warningCanvas,0,0);
   }
   if (drewSetting) {
     drawSetting();
-    image(settingCanvas,0,0);
+    mainCanvas.image(settingCanvas,0,0);
   }
   if (drewInfoWindow) {
     drawInfoWindow();
-    image(infoCanvas,0,0);
+    mainCanvas.image(infoCanvas,0,0);
   }
   if (drewCheckingWindow) {
     drawCheckingWindow();
-    image(checkCanvas,0,0);
+    mainCanvas.image(checkCanvas,0,0);
   }
-    
+}
+
+function draw() {
+  drawOnMainCanvas();
+  image(mainCanvas, 0, 0);
   frameCount++; 
 }
 
@@ -1256,6 +1270,49 @@ function addAlpha(colorString, opacity) {
 saveCanvasAtCurrentTime = () => {
   let offset = new Date().getTimezoneOffset() * 60 * 1000;
   let localTimeStr = new Date(Date.now() - offset).toISOString().slice(0, -1);
-  let filename = localTimeStr + '.png';
+  let filename = localTimeStr;
   save(filename);
+}
+
+saveHDCanvasAtCurrentTime = () => {
+  const w = width, h = height;
+
+  resizeCanvas(2*w, 2*h, true);
+  lineCanvas.resizeCanvas(2*w,2*h);
+  nodeCanvas.resizeCanvas(2*w,2*h);
+  patternCanvas.resizeCanvas(2*w,2*h);
+  popupCanvas.resizeCanvas(2*w,2*h);
+  infoCanvas.resizeCanvas(2*w,2*h);
+  deadCanvas.resizeCanvas(2*w,2*h);
+  loadingCanvas.resizeCanvas(2*w,2*h);
+  warningCanvas.resizeCanvas(2*w,2*h);
+  settingCanvas.resizeCanvas(2*w,2*h);
+  checkCanvas.resizeCanvas(2*w,2*h);
+  mainCanvas.resizeCanvas(2*w, 2*h);
+
+  maxR = min(2*w,2*h)/1024;
+  border = 100*maxR;
+  spacing = 50*maxR;
+  
+  drawOnMainCanvas();
+
+  let offset = new Date().getTimezoneOffset() * 60 * 1000;
+  let localTimeStr = new Date(Date.now() - offset).toISOString().slice(0, -1);
+  let filename = 'HD_' + localTimeStr + '.png';
+  saveCanvas(mainCanvas, filename);
+
+  resizeCanvas(w, h, true);
+  lineCanvas.resizeCanvas(w,h);
+  nodeCanvas.resizeCanvas(w,h);
+  patternCanvas.resizeCanvas(w,h);
+  popupCanvas.resizeCanvas(w,h);
+  infoCanvas.resizeCanvas(w,h);
+  deadCanvas.resizeCanvas(w,h);
+  loadingCanvas.resizeCanvas(w,h);
+  warningCanvas.resizeCanvas(w,h);
+  settingCanvas.resizeCanvas(w,h);
+  checkCanvas.resizeCanvas(w,h);
+  mainCanvas.resizeCanvas(w,h);
+
+  maxR = min(w,h)/1024;
 }
