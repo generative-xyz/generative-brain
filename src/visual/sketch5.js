@@ -32,7 +32,7 @@ let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 let bitcoinNode,modelAddress;
 
-let seed,architecture,birthYear,growPeriod,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
+let seed,architecture,birthYear,lifeCycle,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
 let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Hot Chocolate','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
 
 let nodeSet = [];
@@ -442,7 +442,7 @@ function setupSketch() {
     
   architecture = traits.training.structure_gen;
   birthYear = traits.visual.birthYear;
-  growPeriod = traits.visual.growthPeriod;
+  lifeCycle = traits.visual.lifeCycle;
   epochs = traits.training.epoch_num;
   activationFunction = traits.training.activation_func;
   
@@ -1066,7 +1066,7 @@ function drawInfoWindow() {
   infoCanvas.text(framework[shape],width/2+285*maxR,height-90*maxR);
   infoCanvas.text(acceleration[drawSpeed],width/2+285*maxR,height-75*maxR);
   infoCanvas.text(birthYear,width/2+285*maxR,height-60*maxR);
-  infoCanvas.text(growPeriod,width/2+285*maxR,height-45*maxR);
+  infoCanvas.text(lifeCycle,width/2+285*maxR,height-45*maxR);
   infoCanvas.text(liveState[state],width/2+285*maxR,height-30*maxR);
 }
 

@@ -1,4 +1,4 @@
-const GrowthPeriod = [
+const LifeCycle = [
   ['Year', 1, 365.0 / 365.0],
   ['Month', 1, 365.0 / 30],
   ['Week', 1, 365.0 / 7],
@@ -89,12 +89,12 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  // const growthPeriod = getRandomItem(GrowthPeriod);
+  // const lifeCycle = getRandomItem(LifeCycle);
   // const birthYear = getRandomItem(BirthYear);
   
   // const hardwareAcceleration = 'Basic';
   const hardwareAcceleration = 'Advanced';
-  const growthPeriod = 'Year';
+  const lifeCycle = 'Year';
   const birthYear = '1964';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
@@ -111,7 +111,7 @@ function getTraits(trainingTraits) {
       nodeFill,
       nodeShape,
       colorPalette,
-      growthPeriod,
+      lifeCycle,
       birthYear,  
     },
     training: trainingTraits,
@@ -133,7 +133,7 @@ function reportTraits(traits) {
     "Deep Learning Framework (Shape)": traits.visual.nodeShape,
     "Hardware Acceleration (animation speed)": traits.visual.hardwareAcceleration,
     "Paper Pattern": traits.visual.pattern,
-    "Growth Speed": traits.visual.growthPeriod,
+    "Growth Speed": traits.visual.lifeCycle,
     "Birth Year": traits.visual.birthYear,
     "Color Palette": traits.visual.colorPalette,
     // add number of classes trait
