@@ -22,20 +22,18 @@ let percentage,finishedNumber,finishedText,defaultSize,startTime;
 let xsize,ysize,nodeSize;
 let layerNum,maxNodes,compareArray,realMaxNodes,realCompareArray;
 let nodesArray,scaleNodesArray,scaleRatio,scaleToggle,liveNodesArray,animArray,animSet;
-let state; 
-let shape; 
+let state,shape; 
 let shapeStroke,lineStroke,strokeRatio;
 let classNum,classArray,inputNum,inputArray;
 let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas;
-let nodeColor,strokeColor;
-let strokeOpacity;
+let nodeColor,strokeColor,strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
 let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 let bitcoinNode,modelAddress;
 
 let seed,architecture,birthYear,growPeriod,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
-let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Cinnamon','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
+let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Cinnamon Sunset','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -107,7 +105,7 @@ function setupTraits() {
   framework = [' ','Theano','Torch','TensorFlow','Caffe'];
   dataSet = [' ','MNIST','CIFAR','IMAGENET'];
   paper = [' ','Plain','Dotted','Squared'];
-  liveState = [' ','Growing','Stable','Decay','Dead'];
+  liveState = [' ','Growing','Stable','Decaying','Dead'];
   acceleration = [' ','Basic','Standard','Advanced'];
 }
 
@@ -211,7 +209,7 @@ function installCustomUploadIfle(){
       initialize();
     } else if (isNeuronsConnected(nodesArray) && drewSetting == true) {
       return;
-    } else if (!isNeuronsConnected(nodesArray) && drewSetting == false && drewOutputLine == true) {
+    } else if (state == 4 || (!isNeuronsConnected(nodesArray) && drewSetting == false && drewOutputLine == true)) {
       drewWarningScreen = true;
       warning();
     } else {return}
@@ -346,7 +344,7 @@ function keyTyped() {
   } else if ((key === 'i' || key === 'I') && drewInfoWindow == true) {
     drewInfoWindow = false;
   }
-  if ((key === 'e' || key === 'E') && drewSetting == false && drewResultWindow == false && drewWarningScreen == false) {
+  if ((key === 'u' || key === 'U') && drewSetting == false && drewResultWindow == false && drewWarningScreen == false) {
     settingPopup();
   }
   if ((key == 'b' || key == 'B') && drewBorder == true && drewSetting == false) {
@@ -369,11 +367,11 @@ function settingPopup() {
   bitcoin = createInput();
   bitcoin.position(width/2-252.5*maxR,height/2-40*maxR);
   bitcoin.size(500*maxR,25*maxR);
-  bitcoin.style('font-size','20px');
+  bitcoin.style('font-size','15px');
   address = createInput();
   address.position(width/2-252.2*maxR,height/2+35*maxR);
   address.size(500*maxR,25*maxR);
-  address.style('font-size','20px');
+  address.style('font-size','15px');
 }
 
 function submit() {
@@ -398,9 +396,9 @@ async function startEndpointsCheck() {
   isCheckingEndpointsFinished = true;
 
   if (blockApiResult && modelInscriptionResult) {
-    setBlocksApiEndpoint(bitcoinNode);
-    setModelInscriptionEndpoint(modelAddress);
-    window.location.reload();
+  setBlocksApiEndpoint(bitcoinNode);
+  setModelInscriptionEndpoint(modelAddress);
+  window.location.reload();
   } else {
     drewCheckingWindows = true;
   }
@@ -605,10 +603,10 @@ function setupSketch() {
   }
 
   const wall = {
-    xLeft: 10,
-    xRight: width - 10,
-    yTop: 10,
-    yBottom: height - 10,
+    xLeft: border/8,
+    xRight: width - border/8,
+    yTop: border/8,
+    yBottom: height - border/8,
   }
 
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
@@ -677,7 +675,6 @@ function draw() {
   eraseCanvas(loadingCanvas);
   loadingCanvas.textAlign(CENTER,CENTER);
   loadingCanvas.textStyle(BOLD);
-  loadingCanvas.stroke(patternColor);
   
   settingCanvas.background(255);
   settingCanvas.rectMode(CENTER);
@@ -764,6 +761,7 @@ function draw() {
     frameCount = 0;
   }
   if (drewOutputLine) drawOutputLine(lineCanvas);  
+  }
 
   image(patternCanvas,0,0);
   if (isProcessPhase) {
@@ -774,7 +772,6 @@ function draw() {
   if (drewResultWindow) {
     drawResultWindow();
     image(popupCanvas,0,0);
-  }
   }
   if (drewWarningScreen) {
     drawDisconnectedWarning();
@@ -982,7 +979,7 @@ function drawResultWindow() {
       if (newSize > 45) {newSize = 45}
       popupCanvas.textLeading(newSize*maxR);
       popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
+      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR);
     }
   } else {
     const numWords = example[0].split(" ").length;
@@ -996,7 +993,7 @@ function drawResultWindow() {
       if (newSize > 45) {newSize = 45}
       popupCanvas.textLeading(newSize*maxR);
       popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR,400*maxR,120*maxR);
+      popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR);
     }
   }
   if (millis()-startTime > 1000) {
@@ -1026,42 +1023,44 @@ function drawInfoWindow() {
   infoCanvas.stroke(patternColor);
   infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
-  infoCanvas.rect(width/2,height-95*maxR,600*maxR,150*maxR);
-  infoCanvas.rect(width/2+150*maxR,height-155*maxR,300*maxR,30*maxR)
-  infoCanvas.rect(width/2-150*maxR,height-155*maxR,300*maxR,30*maxR);
+  infoCanvas.rect(width/2,height-87.5*maxR,600*maxR,135*maxR);
+  infoCanvas.fill(patternColor);
+  infoCanvas.rect(width/2-175*maxR,height-170*maxR,250*maxR,30*maxR)
   infoCanvas.noStroke();
-  infoCanvas.fill(startColor);
+  infoCanvas.fill(paperColor);
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
-  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-150*maxR);
-  infoCanvas.text('NAME:',width/2+15*maxR,height-150*maxR);
+  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
+  infoCanvas.fill(startColor);
   infoCanvas.textSize(12*maxR);
+  infoCanvas.text('NAME:',width/2-285*maxR,height-135*maxR);
   infoCanvas.text('SCALE:',width/2-285*maxR,height-120*maxR);
-  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-105*maxR);
-  infoCanvas.text('MAXIMUM NEURONS PER LAYER:',width/2-285*maxR,height-90*maxR);
-  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-75*maxR);
-  infoCanvas.text('ARCHITECTURE:',width/2-285*maxR,height-60*maxR);
+  infoCanvas.text('NUMBER OF CLASSES:',width/2-285*maxR,height-105*maxR);
+  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-90*maxR);
+  infoCanvas.text('MAXIMUM NEURONS PER LAYER:',width/2-285*maxR,height-75*maxR);
+  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-60*maxR);
   infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-45*maxR);
   infoCanvas.text('PAPER PATTERN:',width/2-285*maxR,height-30*maxR);
-  infoCanvas.text('ACTIVATION FUNCTION:',width/2+15*maxR,height-120*maxR);
-  infoCanvas.text('DATA SET:',width/2+15*maxR,height-105*maxR);
-  infoCanvas.text('FRAMEWORK: ',width/2+15*maxR,height-90*maxR);
-  infoCanvas.text('HARDWARE ACCELERATION:',width/2+15*maxR,height-75*maxR);
-  infoCanvas.text('BIRTH YEAR:',width/2+15*maxR,height-60*maxR);
-  infoCanvas.text('GROW PERIOD:',width/2+15*maxR,height-45*maxR);
-  infoCanvas.text('STATE:',width/2+15*maxR,height-30*maxR);
+  infoCanvas.text('NETWORK ARCHITECTURE:',width/2+10*maxR,height-135*maxR);
+  infoCanvas.text('ACTIVATION FUNCTION:',width/2+10*maxR,height-120*maxR);
+  infoCanvas.text('DATA SET:',width/2+10*maxR,height-105*maxR);
+  infoCanvas.text('DEEP LEARNING FRAMEWORK: ',width/2+10*maxR,height-90*maxR);
+  infoCanvas.text('HARDWARE ACCELERATION:',width/2+10*maxR,height-75*maxR);
+  infoCanvas.text('BIRTH YEAR:',width/2+10*maxR,height-60*maxR);
+  infoCanvas.text('GROWTH SPEED:',width/2+10*maxR,height-45*maxR);
+  infoCanvas.text('STATE:',width/2+10*maxR,height-30*maxR);
   infoCanvas.textStyle(ITALIC);
   infoCanvas.textAlign(RIGHT);
-  infoCanvas.textSize(15*maxR);
-  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-150*maxR);
   infoCanvas.textSize(12*maxR);
-  infoCanvas.text('1:'+scaleRatio,width/2-15*maxR,height-120*maxR);
-  infoCanvas.text(layerNum-2,width/2-15*maxR,height-105*maxR);
-  infoCanvas.text(realMaxNodes,width/2-15*maxR,height-90*maxR);
-  infoCanvas.text(epochs,width/2-15*maxR,height-75*maxR);
-  infoCanvas.text(architecture,width/2-15*maxR,height-60*maxR);
-  infoCanvas.text(paletteName[paletteType],width/2-15*maxR,height-45*maxR);
-  infoCanvas.text(paper[pattern],width/2-15*maxR,height-30*maxR);
+  infoCanvas.text('Perceptron #'+seed,width/2-10*maxR,height-135*maxR);
+  infoCanvas.text('1:'+scaleRatio,width/2-10*maxR,height-120*maxR);
+  infoCanvas.text(classNum,width/2-10*maxR,height-105*maxR);
+  infoCanvas.text(layerNum-2,width/2-10*maxR,height-90*maxR);
+  infoCanvas.text(realMaxNodes,width/2-10*maxR,height-75*maxR);
+  infoCanvas.text(epochs,width/2-10*maxR,height-60*maxR);
+  infoCanvas.text(paletteName[paletteType],width/2-10*maxR,height-45*maxR);
+  infoCanvas.text(paper[pattern],width/2-10*maxR,height-30*maxR);
+  infoCanvas.text(architecture,width/2+285*maxR,height-135*maxR);
   infoCanvas.text(activationFunction,width/2+285*maxR,height-120*maxR);
   infoCanvas.text(dataSet[fillMode],width/2+285*maxR,height-105*maxR);
   infoCanvas.text(framework[shape],width/2+285*maxR,height-90*maxR);
@@ -1118,6 +1117,8 @@ function drawLoadingScreen() {
   loadingCanvas.textFont('Trebuchet MS');
   loadingCanvas.fill(patternColor);
   loadingCanvas.textSize(50*maxR);
+  loadingCanvas.stroke(patternColor);
+  loadingCanvas.strokeWeight(1*maxR);
   loadingCanvas.text('GENERATING...', width/2, height/2);
 }
 
@@ -1132,7 +1133,7 @@ function drawDisconnectedWarning() {
   warningCanvas.fill(startColor);
   warningCanvas.textSize(40*maxR);
   warningCanvas.noStroke();
-  warningCanvas.text('PERCEPTRON MALFUNCTION',width/2,height/2+2*maxR);
+  warningCanvas.text('PERCEPTRON MALFUNCTION',width/2,height/2+2.5*maxR);
   
   warningCanvas.strokeWeight(1*maxR);
   if (mouseX>width/2-75*maxR && mouseX<width/2+75*maxR && mouseY>height/2+90*maxR && mouseY<height/2+130*maxR) {

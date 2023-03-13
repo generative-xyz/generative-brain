@@ -34,3 +34,7 @@ function shuffle(arr) {
     arr[j] = t;
   }
 }
+
+function isNullOrEmpty(str) {
+  return str == null || str === '';
+}

@@ -2,7 +2,7 @@ const GrowthPeriod = [
   ['Year', 1, 365.0 / 365.0],
   ['Month', 1, 365.0 / 30],
   ['Week', 1, 365.0 / 7],
-  ['Daily', 1, 365.0 / 1],
+  ['Day', 1, 365.0 / 1],
 ];
 
 const BirthYear = [
@@ -73,7 +73,7 @@ const ColorPalette = [
   ['Cotton Candy', 1],
   ['Golden Hour', 1],
   ['Matcha Latte', 1],
-  ['Cinnamon', 1],
+  ['Cinnamon Sunset', 1],
   ['Midnight Blossoms', 1],
   ['Lemonade', 1],
   ['Strawberry Milk', 1],
@@ -89,13 +89,13 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  const growthPeriod = getRandomItem(GrowthPeriod);
-  const birthYear = getRandomItem(BirthYear);
+  // const growthPeriod = getRandomItem(GrowthPeriod);
+  // const birthYear = getRandomItem(BirthYear);
   
   // const hardwareAcceleration = 'Basic';
   const hardwareAcceleration = 'Advanced';
-  // const growthPeriod = 'Year';
-  // const birthYear = '1964';
+  const growthPeriod = 'Year';
+  const birthYear = '1964';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';
@@ -124,17 +124,21 @@ function getTraits(trainingTraits) {
 
 function reportTraits(traits) {
   window.$generativeTraits = {
-    "Network architecture": traits.training.structure_gen,
-    "Hidden layers": traits.training.n_layers,
-    "Max neurons per layer": traits.training.max_nodes,
-    "Activation function": traits.training.activation_func,
-    "Training epochs": traits.training.epoch_num,
-    "Dataset (fill mode)": traits.visual.nodeFill,
-    "Deep learning framework (shape)": traits.visual.nodeShape,
-    "Hardware acceleration (animation speed)": traits.visual.hardwareAcceleration,
-    "Paper pattern": traits.visual.pattern,
-    "Growth speed": traits.visual.growthPeriod,
-    "Birth year": traits.visual.birthYear,
-    "Color palette": traits.visual.colorPalette,
+    "Network Architecture": traits.training.structure_gen,
+    "Hidden Layers": traits.training.n_layers,
+    "Max Neurons Per Layer": traits.training.max_nodes,
+    "Activation Function": traits.training.activation_func,
+    "Training Epochs": traits.training.epoch_num,
+    "Dataset (Fill Mode)": traits.visual.nodeFill,
+    "Deep Learning Framework (Shape)": traits.visual.nodeShape,
+    "Hardware Acceleration (animation speed)": traits.visual.hardwareAcceleration,
+    "Paper Pattern": traits.visual.pattern,
+    "Growth Speed": traits.visual.growthPeriod,
+    "Birth Year": traits.visual.birthYear,
+    "Color Palette": traits.visual.colorPalette,
+    // add number of classes trait
+    // check again architecture name and other traits name
+    // dead interaction: border on/off, malfunction
+    // should not add artist name (reason: too long or too many, when collaboration)
   }
 }

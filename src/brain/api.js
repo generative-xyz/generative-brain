@@ -3,7 +3,7 @@
 const DEFAULT_BTC_ENDPOINT = 'https://ancient-crimson-rain.btc.discover.quiknode.pro/c268fb026303ae8443f785200f2ea4b82f0082dd';
 
 function setBlocksApiEndpoint(endpoint) {
-  if (endpoint == null || endpoint == '') {
+  if (isNullOrEmpty(endpoint)) {
     localStorage.removeItem('blocksApiEndpoint');
   } else {
     localStorage.blocksApiEndpoint = endpoint;
@@ -15,7 +15,7 @@ function getBlocksApiEndpoint() {
 }
 
 function setModelInscriptionEndpoint(endpoint) {
-  if (endpoint == null || endpoint == '') {
+  if (isNullOrEmpty(endpoint)) {
     localStorage.removeItem('modelInscriptionEndpoint');
   } else {
     localStorage.modelInscriptionEndpoint = endpoint;
@@ -65,14 +65,15 @@ async function getModelInscription(endpoint) {
 }
 
 async function isValidBlocksApiEndpoint(endpoint) {
-  return await getValidBlocksApi(endpoint) != null;
+  return isNullOrEmpty(endpoint) || await getValidBlocksApi(endpoint) != null;
 }
 
 async function isValidModelInscriptionEndpoint(endpoint) {  
-  return await getValidModelInscription(endpoint) != null;
+  return isNullOrEmpty(endpoint) || await getValidModelInscription(endpoint) != null;
 }
 
 async function getValidBlocksApi(endpoint) {
+  if (isNullOrEmpty(endpoint)) return null;
   const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
   if (blockId == null) return false;
   const stats = await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
@@ -80,6 +81,7 @@ async function getValidBlocksApi(endpoint) {
 }
 
 async function getValidModelInscription(endpoint) {
+  if (isNullOrEmpty(endpoint)) return null;
   const inscription = await fetchData(endpoint, {});
   return verifyModelInscription(inscription) ? inscription : null;
 }

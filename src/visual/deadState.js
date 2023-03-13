@@ -3,6 +3,7 @@ class Node {
     this.p = p;
     this.v = v;
     this.size = size;
+    this.visualSize = size;
     this.col = col;
   }
   
@@ -110,7 +111,7 @@ function getRandomVector(minMag, maxMag) {
 }
 
 class ParticleSystem {
-  constructor(gradientFill, totalNeurons, wall) {
+  constructor(gradientFill, totalNeurons, wall, nodeShape) {
     this.wall = wall;
 
     const n = totalNeurons.length;
@@ -121,7 +122,7 @@ class ParticleSystem {
       const count = totalNeurons[i] * 0.25;
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const vel = getRandomVector(0.01, 0.05);
+        const vel = getRandomVector(0.1, 0.5);
         const size = random(5, 12.5) * 2;
         layerNodes.push(new Node(pos, vel, size, gradientFill[i]));        
       }
@@ -144,7 +145,7 @@ class ParticleSystem {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
         const len = random(1, 10);
         const angle = random(TAU);
-        const v = getRandomVector(0.01, 0.05);
+        const v = getRandomVector(0.1, 0.5);
         const angV = random(0.00001, 0.00002);
         layerLines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
       }
@@ -156,7 +157,7 @@ class ParticleSystem {
   reflectNode(node) {
     const {xLeft, yTop, xRight, yBottom} = this.wall;
     const {p, v} = node;
-    if ((p.x < xLeft && v.x < 0) || (p.x > xRight && v.x > 0)) v.x = -v.x;
+    if ((p.x - p.size < xLeft && v.x < 0) || (p.x > xRight && v.x > 0)) v.x = -v.x;
     if ((p.y < yTop && v.y < 0) || (p.y > yBottom && v.y > 0)) v.y = -v.y;
   }
 
