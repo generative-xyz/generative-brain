@@ -38,3 +38,7 @@ function shuffle(arr) {
 function isNullOrEmpty(str) {
   return str == null || str === '';
 }
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

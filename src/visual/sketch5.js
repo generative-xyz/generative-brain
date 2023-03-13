@@ -64,10 +64,9 @@ let deadCanvas;
 let predictions;
 let stageRatio;
 
-let isCheckingEndpointsFinished;
-let drewCheckingWindows;
-let blockApiResult;
-let modelInscriptionResult;
+let drewCheckingWindow = false;
+let blockApiResult = null;
+let modelInscriptionResult = null;
 
 async function setup() {
   let w = windowHeight; 
@@ -205,6 +204,7 @@ function installCustomUploadIfle(){
   
   wrapInput.addEventListener('dblclick', ()=>{
     if (drewSetting) return;
+    if (drewCheckingWindow) return;
 
     if (isNeuronsConnected(nodesArray) && drewOutputLine == true) {
       fileInput.click();
@@ -339,21 +339,28 @@ function closeResult() {
 }
 
 function keyTyped() {
-  if ((key === 'i' || key === 'I') && drewInfoWindow == false && drewSetting == false) {
-    drewInfoWindow = true;
-  } else if ((key === 'i' || key === 'I') && drewInfoWindow == true) {
-    drewInfoWindow = false;
+  if (drewSetting === false && drewCheckingWindow === false) {
+    if ((key === 'i' || key === 'I')) {
+      drewInfoWindow = !drewInfoWindow;
+    }
+    if ((key === 'b' || key === 'B')) {
+      drewBorder = !drewBorder;
+    }
+    if ((key === 's' || key === 'S')) {
+      saveCanvasAtCurrentTime();
+    }  
+    if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false) {
+      settingPopup();
+      drewInfoWindow = false;
+    }
   }
-  if ((key === 'u' || key === 'U') && drewSetting == false && drewResultWindow == false && drewWarningScreen == false) {
-    settingPopup();
-  }
-  if ((key == 'b' || key == 'B') && drewBorder == true && drewSetting == false) {
-    drewBorder = false;
-  } else if ((key == 'b' || key == 'B') && drewBorder == false && drewSetting == false) {drewBorder = true}
 }
 
 function settingPopup() {
   drewSetting = true;
+  blockApiResult = null;
+  modelInscriptionResult = null;
+
   submitButton = createButton('Submit');
   submitButton.position(width/2-155*maxR,height/2+115*maxR);
   submitButton.size(150*maxR,40*maxR);
@@ -375,46 +382,54 @@ function settingPopup() {
 }
 
 function submit() {
-  drewSetting = false;
+  bitcoinNode = bitcoin.value();
+  modelAddress = address.value();
+
   submitButton.hide();
   closeSettingButton.hide();
-  bitcoinNode = bitcoin.value();
   bitcoin.hide();
-  modelAddress = address.value();
   address.hide();
 
-  isCheckingEndpointsFinished = false;
+  drewSetting = false;
+  drewCheckingWindow = true;
   startEndpointsCheck();
 }
 
 async function startEndpointsCheck() {
-  [blockApiResult, modelInscriptionResult] = await Promise.all([
+  [blockApiResult, modelInscriptionResult, _] = await Promise.all([
     isValidBlocksApiEndpoint(bitcoinNode),
     isValidModelInscriptionEndpoint(modelAddress),
+    sleep(1000),
   ]);
 
-  isCheckingEndpointsFinished = true;
+  drewCheckingWindow = false;
 
   if (blockApiResult && modelInscriptionResult) {
-  setBlocksApiEndpoint(bitcoinNode);
-  setModelInscriptionEndpoint(modelAddress);
-  window.location.reload();
+    setBlocksApiEndpoint(bitcoinNode);
+    setModelInscriptionEndpoint(modelAddress);
+    window.location.reload();
   } else {
-    drewCheckingWindows = true;
+    drewSetting = true;
+    submitButton.show();
+    closeSettingButton.show();
+    bitcoin.show();
+    address.show();
   }
 }
 
-function drawCheckingResult() {
+function drawCheckingWindow() {
   checkCanvas.textFont('Trebuchet MS');
   checkCanvas.fill(paperColor);
-  checkCanvas.rect(width/2, height/2, 400, 400);
+  checkCanvas.rect(width/2, height/2, 400, 200);
   checkCanvas.noStroke();
   checkCanvas.fill(startColor);
   checkCanvas.textSize(36);
-  checkCanvas.text("INVALID ENDPOINTS", width/2, height/2, 400, 400);
+  checkCanvas.text("CHECKING...", width/2, height/2, 400, 200);
 }
 
 function closeSetting() {
+  blockApiResult = null;
+  modelInscriptionResult = null;
   drewSetting = false;
   submitButton.hide();
   closeSettingButton.hide();
@@ -785,8 +800,8 @@ function draw() {
     drawInfoWindow();
     image(infoCanvas,0,0);
   }
-  if (drewCheckingWindows) {
-    drawCheckingResult();
+  if (drewCheckingWindow) {
+    drawCheckingWindow();
     image(checkCanvas,0,0);
   }
     
@@ -1221,12 +1236,6 @@ function addAlpha(colorString, opacity) {
   let g = green(c);
   let b = blue(c);
   return color(r, g, b, opacity * 255);
-}
-
-keyPressed = () => {
-  if ((key == 'S' || key == 's') && drewSetting == false) {
-    saveCanvasAtCurrentTime();
-  }
 }
 
 saveCanvasAtCurrentTime = () => {

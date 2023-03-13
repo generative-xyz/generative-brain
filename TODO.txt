@@ -1,9 +1,4 @@
+- Change "Reflection" trait name to "Symmetric"
+- Make deadState drawing scale to maxR
 - Sync spark rate cycle and total animation length
 - Reduce file size
-
-Done
-- Recovery process: 
-+ First 2 weeks: nothing happens
-+ The remaining period: recover linearly
-- Fix windows traits
-- Fix dead state to use general code flow
