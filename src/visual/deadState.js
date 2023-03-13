@@ -1,19 +1,27 @@
 class Node {
-  constructor(p, v, size, col) {
+  constructor(p, v, size, col, shape) {
     this.p = p;
     this.v = v;
     this.size = size;
-    this.visualSize = size;
+    this.shape = shape;
     this.col = col;
+  }
+
+  getRadius() {
+    if (shape == 1) return this.size * 1/2;
+    if (shape == 2) return this.size * 7/16;
+    if (shape == 3) return this.size * 4/7;
+    if (shape == 4) return this.size * 4/7;
+    return 0;
   }
   
   update() {
     this.p.add(this.v);
   }
   
-  draw(canvas, paperColor, shape, fillMode) {
+  draw(canvas, paperColor, fillMode) {
     const {x, y} = this.p;
-    const size = this.size;
+    const {size, shape} = this;
     
     let nodeColor;
     let strokeColor;
@@ -35,7 +43,7 @@ class Node {
       canvas.fill(addAlpha(nodeColor,0));
     }
     if (shape == 1) {
-      canvas.ellipse(x,y,size);
+      canvas.ellipse(x,y,size,size);
     } else if (shape == 2) {
       canvas.rect(x,y,size*7/8,size*7/8);
     } else if (shape == 3) {
@@ -122,9 +130,9 @@ class ParticleSystem {
       const count = totalNeurons[i] * 0.25;
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const vel = getRandomVector(0.1, 0.5);
+        const vel = getRandomVector(0.02, 0.05);
         const size = random(5, 12.5) * 2;
-        layerNodes.push(new Node(pos, vel, size, gradientFill[i]));        
+        layerNodes.push(new Node(pos, vel, size, gradientFill[i], nodeShape));        
       }
       this.nodes.push(layerNodes);
     }
@@ -145,7 +153,7 @@ class ParticleSystem {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
         const len = random(1, 10);
         const angle = random(TAU);
-        const v = getRandomVector(0.1, 0.5);
+        const v = getRandomVector(0.02, 0.05);
         const angV = random(0.00001, 0.00002);
         layerLines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
       }
@@ -157,8 +165,9 @@ class ParticleSystem {
   reflectNode(node) {
     const {xLeft, yTop, xRight, yBottom} = this.wall;
     const {p, v} = node;
-    if ((p.x - p.size < xLeft && v.x < 0) || (p.x > xRight && v.x > 0)) v.x = -v.x;
-    if ((p.y < yTop && v.y < 0) || (p.y > yBottom && v.y > 0)) v.y = -v.y;
+    const r = node.getRadius();
+    if ((p.x - r < xLeft && v.x < 0) || (p.x + r > xRight && v.x > 0)) v.x = -v.x;
+    if ((p.y - r < yTop && v.y < 0) || (p.y + r > yBottom && v.y > 0)) v.y = -v.y;
   }
 
   reflectLine(line) {
@@ -186,7 +195,8 @@ class ParticleSystem {
     }    
   }
   
-  draw(canvas, paperColor, shape, fillMode, stageRatio) {
+  draw(canvas, paperColor, fillMode, stageRatio) {
+    canvas.rectMode(CENTER);
     const drawRatio = max(0, map(stageRatio, 0.5, 1, 0, 1));
 
     for(const layerLines of this.lines) {

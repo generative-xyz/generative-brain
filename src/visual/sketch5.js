@@ -611,13 +611,13 @@ function setupSketch() {
 
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
   console.log(scaledTotalNeurons);
-  particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall);
+  particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape);
 }
 
 function drawDeadAnimation() {
   eraseCanvas(deadCanvas);
   particleSystem.update();
-  particleSystem.draw(deadCanvas, paperColor, shape, fillMode, stageRatio);
+  particleSystem.draw(deadCanvas, paperColor, fillMode, stageRatio);
 }
 
 function draw() {
