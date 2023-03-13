@@ -389,16 +389,16 @@ function submit() {
 
 async function startEndpointsCheck() {
   [blockApiResult, modelInscriptionResult] = await Promise.all([
-    isValidBlocksApiEndpoint(),
-    isValidModelInscriptionEndpoint(),
+    isValidBlocksApiEndpoint(bitcoinNode),
+    isValidModelInscriptionEndpoint(modelAddress),
   ]);
 
   isCheckingEndpointsFinished = true;
 
   if (blockApiResult && modelInscriptionResult) {
-  setBlocksApiEndpoint(bitcoinNode);
-  setModelInscriptionEndpoint(modelAddress);
-  window.location.reload();
+    setBlocksApiEndpoint(bitcoinNode);
+    setModelInscriptionEndpoint(modelAddress);
+    window.location.reload();
   } else {
     drewCheckingWindows = true;
   }
@@ -1224,7 +1224,7 @@ function addAlpha(colorString, opacity) {
 }
 
 keyPressed = () => {
-  if (key == 'S' || key == 's' && drewSetting == false) {
+  if ((key == 'S' || key == 's') && drewSetting == false) {
     saveCanvasAtCurrentTime();
   }
 }

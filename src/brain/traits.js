@@ -73,7 +73,7 @@ const ColorPalette = [
   ['Cotton Candy', 1],
   ['Golden Hour', 1],
   ['Matcha Latte', 1],
-  ['Cinnamon Sunset', 1],
+  ['Hot Cocoa', 1],
   ['Midnight Blossoms', 1],
   ['Lemonade', 1],
   ['Strawberry Milk', 1],
@@ -89,13 +89,13 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  // const growthPeriod = getRandomItem(GrowthPeriod);
-  // const birthYear = getRandomItem(BirthYear);
+  const growthPeriod = getRandomItem(GrowthPeriod);
+  const birthYear = getRandomItem(BirthYear);
   
   // const hardwareAcceleration = 'Basic';
   const hardwareAcceleration = 'Advanced';
-  const growthPeriod = 'Year';
-  const birthYear = '1964';
+  // const growthPeriod = 'Year';
+  // const birthYear = '1964';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';

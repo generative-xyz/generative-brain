@@ -75,7 +75,7 @@ async function isValidModelInscriptionEndpoint(endpoint) {
 async function getValidBlocksApi(endpoint) {
   if (isNullOrEmpty(endpoint)) return null;
   const blockId = await sendBtcRequest(endpoint, 'getblockcount', []);
-  if (blockId == null) return false;
+  if (blockId == null) return null;
   const stats = await sendBtcRequest(endpoint, 'getblockstats', [blockId]);
   return verifyBlockStats(stats) ? stats : null;
 }
