@@ -65,6 +65,8 @@ let predictions;
 let stageRatio;
 
 let drewCheckingWindow = false;
+let blockEndpoint;
+let inscriptionEndpoint;
 let blockApiResult = null;
 let modelInscriptionResult = null;
 
@@ -109,8 +111,8 @@ function setupTraits() {
 }
 
 async function setupModel() {
-  const blockEndpoint = getBlocksApiEndpoint();
-  const inscriptionEndpoint = getModelInscriptionEndpoint();
+  blockEndpoint = getBlocksApiEndpoint();
+  inscriptionEndpoint = getModelInscriptionEndpoint();
 
   let inscription;
   [stats, inscription] = await Promise.all([
@@ -342,7 +344,7 @@ function keyTyped() {
   if (drewSetting === false && drewCheckingWindow === false) {
     if ((key === 'i' || key === 'I')) {
       drewInfoWindow = !drewInfoWindow;
-    }
+  }
     if ((key === 'b' || key === 'B')) {
       drewBorder = !drewBorder;
     }
@@ -350,9 +352,9 @@ function keyTyped() {
       saveCanvasAtCurrentTime();
     }  
     if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false) {
-      settingPopup();
-      drewInfoWindow = false;
-    }
+    settingPopup();
+    drewInfoWindow = false;
+  }
   }
 }
 
@@ -375,10 +377,12 @@ function settingPopup() {
   bitcoin.position(width/2-252.5*maxR,height/2-40*maxR);
   bitcoin.size(500*maxR,25*maxR);
   bitcoin.style('font-size','15px');
+  bitcoin.value(blockEndpoint || '');
   address = createInput();
   address.position(width/2-252.2*maxR,height/2+35*maxR);
   address.size(500*maxR,25*maxR);
   address.style('font-size','15px');
+  address.value(inscriptionEndpoint || '');
 }
 
 function submit() {
@@ -405,9 +409,9 @@ async function startEndpointsCheck() {
   drewCheckingWindow = false;
 
   if (blockApiResult && modelInscriptionResult) {
-    setBlocksApiEndpoint(bitcoinNode);
-    setModelInscriptionEndpoint(modelAddress);
-    window.location.reload();
+  setBlocksApiEndpoint(bitcoinNode);
+  setModelInscriptionEndpoint(modelAddress);
+  window.location.reload();
   } else {
     drewSetting = true;
     submitButton.show();
@@ -1134,7 +1138,7 @@ function drawLoadingScreen() {
   loadingCanvas.textSize(50*maxR);
   loadingCanvas.stroke(patternColor);
   loadingCanvas.strokeWeight(1*maxR);
-  loadingCanvas.text('GENERATING...', width/2, height/2);
+  loadingCanvas.text('SYNTHESIZING...', width/2, height/2);
 }
 
 function drawDisconnectedWarning() {
