@@ -630,7 +630,7 @@ function setupSketch() {
 
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
   console.log(scaledTotalNeurons);
-  particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape);
+  particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape, maxR);
 }
 
 function drawDeadAnimation() {

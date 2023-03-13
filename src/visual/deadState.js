@@ -119,7 +119,7 @@ function getRandomVector(minMag, maxMag) {
 }
 
 class ParticleSystem {
-  constructor(gradientFill, totalNeurons, wall, nodeShape) {
+  constructor(gradientFill, totalNeurons, wall, nodeShape, maxR) {
     this.wall = wall;
 
     const n = totalNeurons.length;
@@ -130,8 +130,8 @@ class ParticleSystem {
       const count = totalNeurons[i] * 0.25;
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const vel = getRandomVector(0.02, 0.05);
-        const size = random(5, 12.5) * 2;
+        const vel = getRandomVector(0.02*maxR, 0.05*maxR);
+        const size = random(10, 25) * maxR;
         layerNodes.push(new Node(pos, vel, size, gradientFill[i], nodeShape));        
       }
       this.nodes.push(layerNodes);
@@ -151,9 +151,9 @@ class ParticleSystem {
 
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const len = random(1, 10);
+        const len = random(5*maxR, 10*maxR);
         const angle = random(TAU);
-        const v = getRandomVector(0.02, 0.05);
+        const v = getRandomVector(0.02*maxR, 0.05*maxR);
         const angV = random(0.00001, 0.00002);
         layerLines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
       }

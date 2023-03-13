@@ -89,8 +89,8 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  const lifeCycle = getRandomItem(LifeCycle);
-  const birthYear = getRandomItem(BirthYear);
+  // const lifeCycle = getRandomItem(LifeCycle);
+  // const birthYear = getRandomItem(BirthYear);
   
   // const hardwareAcceleration = 'Basic';
   // const pattern = 'Plain';
@@ -98,8 +98,8 @@ function getTraits(trainingTraits) {
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';
-  // const lifeCycle = 'Year';
-  // const birthYear = '1990';
+  const lifeCycle = 'Year';
+  const birthYear = '1964';
   
   // 1964: Dead
   // 2000: Stable
