@@ -89,17 +89,16 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  // const lifeCycle = getRandomItem(LifeCycle);
-  // const birthYear = getRandomItem(BirthYear);
+  const lifeCycle = getRandomItem(LifeCycle);
+  const birthYear = getRandomItem(BirthYear);
   
-  // const hardwareAcceleration = 'Basic';
   // const pattern = 'Plain';
   const hardwareAcceleration = 'Advanced';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';
-  const lifeCycle = 'Year';
-  const birthYear = '1964';
+  // const lifeCycle = 'Year';
+  // const birthYear = '1964';
   
   // 1964: Dead
   // 2000: Stable
@@ -137,9 +136,5 @@ function reportTraits(traits) {
     "Life Cycle": traits.visual.lifeCycle,
     "Birth Year": traits.visual.birthYear,
     "Color Palette": traits.visual.colorPalette,
-    // add number of classes trait
-    // check again architecture name and other traits name
-    // dead interaction: border on/off, malfunction
-    // should not add artist name (reason: too long or too many, when collaboration)
   }
 }

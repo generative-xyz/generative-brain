@@ -1,4 +1,4 @@
 - Change "Reflection" trait name to "Symmetric"
-- Make deadState drawing scale to maxR
+- High resolution screenshot
 - Sync spark rate cycle and total animation length
 - Reduce file size

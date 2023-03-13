@@ -423,12 +423,17 @@ async function startEndpointsCheck() {
 
 function drawCheckingWindow() {
   checkCanvas.textFont('Trebuchet MS');
-  checkCanvas.fill(paperColor);
-  checkCanvas.rect(width/2, height/2, 400, 200);
   checkCanvas.noStroke();
+  checkCanvas.fill(0,0,0,75);
+  checkCanvas.rect(width/2,height/2,width,height);
+  checkCanvas.stroke(patternColor);
+  checkCanvas.fill(paperColor);
+  checkCanvas.rect(width/2,height/2,600*maxR,200*maxR,25*maxR);
+  checkCanvas.strokeWeight(1*maxR);
+  checkCanvas.stroke(startColor);
   checkCanvas.fill(startColor);
-  checkCanvas.textSize(36);
-  checkCanvas.text("CHECKING...", width/2, height/2, 400, 200);
+  checkCanvas.textSize(50*maxR);
+  checkCanvas.text("UPDATING...", width/2, height/2+2.5*maxR);
 }
 
 function closeSetting() {
@@ -707,7 +712,7 @@ function draw() {
   checkCanvas.background(255);
   checkCanvas.rectMode(CENTER);
   eraseCanvas(checkCanvas);
-  checkCanvas.textAlign(CENTER);
+  checkCanvas.textAlign(CENTER,CENTER);
   checkCanvas.textStyle(BOLD);
   checkCanvas.stroke(patternColor);
   checkCanvas.strokeWeight(8*maxR);
@@ -1130,6 +1135,12 @@ function drawSetting() {
   settingCanvas.fill(startColor);
   settingCanvas.text('UPDATE BITCOIN FULL NODE',width/2-252.5*maxR,height/2-50*maxR);
   settingCanvas.text('UPDATE MODEL ADDRESS',width/2-252.5*maxR,height/2+25*maxR);
+  settingCanvas.textAlign(RIGHT);
+  settingCanvas.textStyle(ITALIC);
+  settingCanvas.fill(startColor);
+  settingCanvas.textSize(15*maxR);
+  if (blockApiResult == false) {settingCanvas.text('(*) Invalid API',width/2+252.5*maxR,height/2-50*maxR)}
+  if (modelInscriptionResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2+25*maxR)}
 }
 
 function drawLoadingScreen() {
