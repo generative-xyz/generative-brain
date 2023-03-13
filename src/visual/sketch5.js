@@ -33,7 +33,7 @@ let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newG
 let bitcoinNode,modelAddress;
 
 let seed,architecture,birthYear,growPeriod,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
-let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Cinnamon Sunset','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
+let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Hot Chocolate','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -179,7 +179,7 @@ function preloadingSetup() {
                   ['#fbfaff','#8b31ce','#f04bb1','#fac373','#82cef0'],                          // 19
                   ['#34333e','#191820','#f6b941','#ca4b17'],                                      // 20
                   ['#476930','#c8b88a','#86b049','#c8b88a','#FFFDC7'],                          // 21   
-                  ['#704f38','#52392f','#ceb371','#dd866e','#e9ccaf'],                          // 22
+                  ['#704f38','#52392f','#e9ccaf','#f0bd90','#e9ccaf'],                          // 22
                   ['#3d1460','#df678c','#df678c'],                                                  // 23
                   ['#00b8ff','#9be8ff','#fffbba','#feff50','#fffbba'],                          // 24
                   ['#ffc6cc','#ffffff','#cc313d'],                                                  // 25
