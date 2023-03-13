@@ -1,8 +1,8 @@
 const LifeCycle = [
-  ['Year', 1, 365.0 / 365.0],
-  ['Month', 1, 365.0 / 30],
-  ['Week', 1, 365.0 / 7],
-  ['Day', 1, 365.0 / 1],
+  ['Year', 3, 365],
+  ['Month', 40, 30],
+  ['Week', 37, 7],
+  ['Day', 20, 1],
 ];
 
 const BirthYear = [
@@ -27,59 +27,59 @@ const BirthYear = [
 ];
 
 const Pattern = [
-  ['Plain', 1],
-  ['Dotted', 1],
-  ['Squared', 1],
+  ['Plain', 20],
+  ['Dotted', 40],
+  ['Squared', 40],
 ];
 
 const HardwareAcceleration = [
-  ['Basic', 1],
-  ['Standard', 1],
-  ['Advanced', 1],
+  ['Basic', 30],
+  ['Standard', 60],
+  ['Advanced', 10],
 ];
 
 const NodeFill = [
-  ['MNIST', 1], 
-  ['CIFAR', 1],  
-  ['IMAGENET', 1],  
+  ['MNIST', 70], // solid
+  ['CIFAR', 25],  // outline
+  ['IMAGENET', 5],  // x-ray
 ];
 
 const NodeShape = [
-  ['Theano', 1],
-  ['Torch', 1],
-  ['TensorFlow', 1],
-  ['Caffe', 1],  
+  ['Theano', 50], // ellipse
+  ['Torch', 15], // square
+  ['TensorFlow', 30], // diamond
+  ['Caffe', 5],  // star
 ];
 
 const ColorPalette = [ 
   ['Monochrome', 1],
   ['Blackboard', 1],
   ['Blueprint', 1],
-  ['Industrial Steel', 1],
-  ['Spectrum', 1],
-  ['Mariana Trench', 1],
-  ['Twilight', 1],
-  ['Gaia', 1],
-  ['Autumn Harvest', 1],
+  ['Industrial Steel', 5],
+  ['Spectrum', 5],
+  ['Mariana Trench', 5],
+  ['Twilight', 5],
+  ['Gaia', 5],
+  ['Autumn Harvest', 5],
   ['Bubblegum', 1],
-  ['Sleek Neutrals', 1],
-  ['Barbie World', 1],
-  ['Warning Zone', 1],
+  ['Sleek Neutrals', 5],
+  ['Barbie World', 5],
+  ['Warning Zone', 5],
   ['Chilli Sauce', 1],
-  ['American Dream', 1],
-  ['Broken Beach', 1],
-  ['Nightlife', 1],
-  ['Nautical Adventure', 1],
+  ['American Dream', 5],
+  ['Broken Beach', 5],
+  ['Nightlife', 5],
+  ['Nautical Adventure', 5],
   ['Cotton Candy', 1],
-  ['Golden Hour', 1],
+  ['Golden Hour', 5],
   ['Matcha Latte', 1],
   ['Hot Cocoa', 1],
-  ['Midnight Blossoms', 1],
+  ['Midnight Blossoms', 5],
   ['Lemonade', 1],
   ['Strawberry Milk', 1],
-  ['Campfire', 1],
-  ['Black Pink', 1],
-  ['Chlorophyll', 1],
+  ['Campfire', 5],
+  ['Black Pink', 5],
+  ['Chlorophyll', 5],
 ];
 
 function getTraits(trainingTraits) {
@@ -133,7 +133,7 @@ function reportTraits(traits) {
     "Deep Learning Framework (Shape)": traits.visual.nodeShape,
     "Hardware Acceleration (animation speed)": traits.visual.hardwareAcceleration,
     "Paper Pattern": traits.visual.pattern,
-    "Growth Speed": traits.visual.lifeCycle,
+    "Life Cycle": traits.visual.lifeCycle,
     "Birth Year": traits.visual.birthYear,
     "Color Palette": traits.visual.colorPalette,
     // add number of classes trait

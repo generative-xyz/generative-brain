@@ -30,7 +30,8 @@ class Brain {
     this.iteration = 0;
     this.stage = 0;    
     this.birthDate = new Date(parseInt(visualTraits.birthYear), 0, 1);
-    this.growSpeed = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
+    const lifeCycle = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
+    this.growSpeed = 365.0 / lifeCycle;
 
     this.growthFunc = getGrowthFunc(0.4, 0.8);
   }

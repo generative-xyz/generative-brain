@@ -33,7 +33,7 @@ let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newG
 let bitcoinNode,modelAddress;
 
 let seed,architecture,birthYear,lifeCycle,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
-let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Hot Chocolate','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
+let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Hot Cocoa','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
 
 let nodeSet = [];
 let lineSet = [];
@@ -396,9 +396,9 @@ async function startEndpointsCheck() {
   isCheckingEndpointsFinished = true;
 
   if (blockApiResult && modelInscriptionResult) {
-    setBlocksApiEndpoint(bitcoinNode);
-    setModelInscriptionEndpoint(modelAddress);
-    window.location.reload();
+  setBlocksApiEndpoint(bitcoinNode);
+  setModelInscriptionEndpoint(modelAddress);
+  window.location.reload();
   } else {
     drewCheckingWindows = true;
   }
@@ -1047,7 +1047,7 @@ function drawInfoWindow() {
   infoCanvas.text('DEEP LEARNING FRAMEWORK: ',width/2+10*maxR,height-90*maxR);
   infoCanvas.text('HARDWARE ACCELERATION:',width/2+10*maxR,height-75*maxR);
   infoCanvas.text('BIRTH YEAR:',width/2+10*maxR,height-60*maxR);
-  infoCanvas.text('GROWTH SPEED:',width/2+10*maxR,height-45*maxR);
+  infoCanvas.text('LIFE CYCLE:',width/2+10*maxR,height-45*maxR);
   infoCanvas.text('STATE:',width/2+10*maxR,height-30*maxR);
   infoCanvas.textStyle(ITALIC);
   infoCanvas.textAlign(RIGHT);
