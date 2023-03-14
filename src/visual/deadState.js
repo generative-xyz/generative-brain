@@ -200,9 +200,8 @@ class ParticleSystem {
     }    
   }
   
-  draw(canvas, paperColor, fillMode, stageRatio, maxR) {
+  draw(canvas, paperColor, fillMode, drawRatio, maxR) {
     const scale = maxR / this.maxR;
-    const drawRatio = max(0, map(stageRatio, 0.5, 1, 0, 1));
 
     for(const layerLines of this.lines) {
       const drawCount = layerLines.length * drawRatio;

@@ -1,4 +1,4 @@
-- Change "Reflection" trait name to "Symmetric"
-- High resolution screenshot
+- Script to change "Reflection" trait name to "Symmetric"
+- Add state 5
 - Sync spark rate cycle and total animation length
 - Reduce file size

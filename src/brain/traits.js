@@ -94,8 +94,8 @@ function getTraits(trainingTraits) {
   
   // const hardwareAcceleration = 'Basic';
   const hardwareAcceleration = 'Advanced';
-  const lifeCycle = '60 Days';
-  const birthYear = '2083';
+  const lifeCycle = '60 Years';
+  const birthYear = '1964';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';

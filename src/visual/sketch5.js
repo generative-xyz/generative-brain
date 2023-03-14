@@ -109,7 +109,7 @@ function setupTraits() {
   framework = [' ','Theano','Torch','TensorFlow','Caffe'];
   dataSet = [' ','MNIST','CIFAR','IMAGENET'];
   paper = [' ','Plain','Dotted','Squared'];
-  liveState = [' ','Growing','Stable','Decaying','Dead'];
+  liveState = [' ','Growing','Stable','Decaying','Dead','Rebirth'];
   acceleration = [' ','Basic','Standard','Advanced'];
 }
 
@@ -214,7 +214,7 @@ function installCustomUploadIfle(){
     if (isNeuronsConnected(nodesArray) && drewOutputLine == true) {
       fileInput.click();
       initialize();
-    } else if (state == 4 || (!isNeuronsConnected(nodesArray) && drewOutputLine == true)) {
+    } else if (state == 4 || state == 5 || (!isNeuronsConnected(nodesArray) && drewOutputLine == true)) {
       drewWarningScreen = true;
       drewWarningText = true;
       warningCount = 0;
@@ -690,7 +690,8 @@ function updateMaxR(width, height) {
 
 function drawDeadAnimation() {
   particleSystem.update();
-  particleSystem.draw(deadCanvas, paperColor, fillMode, stageRatio, maxR);
+  const drawRatio = (state == 4) ? 0 : stageRatio;
+  particleSystem.draw(deadCanvas, paperColor, fillMode, drawRatio, maxR);
 }
 
 function drawCanvases() {
@@ -700,7 +701,7 @@ function drawCanvases() {
     return;
   }
 
-  if (state == 4) {
+  if (state == 4 || state == 5) {
     drawDeadAnimation();
     mainCanvas.image(deadCanvas, 0, 0);
     return;
