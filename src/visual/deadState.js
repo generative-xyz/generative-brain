@@ -19,24 +19,26 @@ class Node {
     this.p.add(this.v);
   }
   
-  draw(canvas, paperColor, fillMode) {
-    const {x, y} = this.p;
-    const {size, shape} = this;
+  draw(canvas, paperColor, fillMode, scale) {
+    const x = this.p.x * scale;
+    const y = this.p.y * scale;
+    const size = this.size * scale;
+    const {col, shape} = this;
     
     let nodeColor;
     let strokeColor;
     if (fillMode == 1) {
-      nodeColor = strokeColor = this.col;
+      nodeColor = strokeColor = col;
     } else if (fillMode == 2) {
       nodeColor = addAlpha(paperColor,1);
-      strokeColor = this.col;
+      strokeColor = col;
     } else {
       nodeColor = addAlpha(paperColor,0);
-      strokeColor = addAlpha(this.col,1);
+      strokeColor = addAlpha(col,1);
     }
     
     let opacity = 1;
-    
+
     canvas.stroke(addAlpha(strokeColor,map(opacity,0,1,0.25,1)));
     canvas.fill(addAlpha(nodeColor,map(opacity,0,1,0.15,1)));
     if (fillMode == 3) {
@@ -92,11 +94,13 @@ class Line {
     this.angle += this.angV;
   }
   
-  draw(canvas, paperColor) {
+  draw(canvas, scale) {
     const [p1, p2] = this.getEndpoints();
     
-    const {x: x1, y: y1} = p1;
-    const {x: x2, y: y2} = p2;
+    const x1 = p1.x * scale;
+    const y1 = p1.y * scale;
+    const x2 = p2.x * scale;
+    const y2 = p2.y * scale;
     const color1 = this.c1;
     const color2 = this.c2;
     const opacity = 1;
@@ -121,6 +125,7 @@ function getRandomVector(minMag, maxMag) {
 class ParticleSystem {
   constructor(gradientFill, totalNeurons, wall, nodeShape, maxR) {
     this.wall = wall;
+    this.maxR = maxR;
 
     const n = totalNeurons.length;
 
@@ -130,7 +135,7 @@ class ParticleSystem {
       const count = totalNeurons[i] * 0.25;
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const vel = getRandomVector(0.02*maxR, 0.05*maxR);
+        const vel = getRandomVector(0.02 * maxR, 0.05 * maxR);
         const size = random(10, 25) * maxR;
         layerNodes.push(new Node(pos, vel, size, gradientFill[i], nodeShape));        
       }
@@ -151,10 +156,10 @@ class ParticleSystem {
 
       for(let j = 0; j < count; ++j) {
         const pos = createVector(random(wall.xLeft, wall.xRight), random(wall.yTop, wall.yBottom));
-        const len = random(5*maxR, 10*maxR);
+        const len = random(5 * maxR, 10 * maxR);
         const angle = random(TAU);
-        const v = getRandomVector(0.02*maxR, 0.05*maxR);
-        const angV = random(0.00001, 0.00002);
+        const v = getRandomVector(0.02 * maxR, 0.05 * maxR);
+        const angV = random(0.0002, 0.001);
         layerLines.push(new Line(pos, len, angle, v, angV, lineGradientFill[i], lineGradientFill[i+1]));
       }
 
@@ -195,21 +200,21 @@ class ParticleSystem {
     }    
   }
   
-  draw(canvas, paperColor, fillMode, stageRatio) {
-    canvas.rectMode(CENTER);
+  draw(canvas, paperColor, fillMode, stageRatio, maxR) {
+    const scale = maxR / this.maxR;
     const drawRatio = max(0, map(stageRatio, 0.5, 1, 0, 1));
 
     for(const layerLines of this.lines) {
       const drawCount = layerLines.length * drawRatio;
       for (let i = 0; i < drawCount; ++i) {
-        layerLines[i].draw(canvas, paperColor);
+        layerLines[i].draw(canvas, scale);
       }
     }
 
     for(const layerNodes of this.nodes) {
       const drawCount = layerNodes.length * drawRatio;
       for (let i = 0; i < drawCount; ++i) {
-        layerNodes[i].draw(canvas, paperColor, shape, fillMode);
+        layerNodes[i].draw(canvas, paperColor, fillMode, scale);
       }
     }
   }

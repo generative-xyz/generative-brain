@@ -69,6 +69,7 @@ let blockEndpoint;
 let inscriptionEndpoint;
 let blockApiResult = null;
 let modelInscriptionResult = null;
+let screenshotMode = false;
 
 async function setup() {
   let w = windowHeight; 
@@ -254,7 +255,7 @@ function customDoubleClicked() {
   processingLayer = 0;
   animationLoopCount = 0;
   drewLineAnim = true;
-  progress = border;
+  progress = border / maxR;
 
   loadImage(img.elt.src, q5img => {
     const [w_img, h_img, c_img] = inputDim;
@@ -276,9 +277,12 @@ function handleFile(fileSrc) {
 }
 
 function processPhase() {
-  progress += (width-border*2-xsize/2)/(processingSpeed*2*layerNum);
+  if (!screenshotMode) {
+    progress += (width-border*2-xsize/2)/(processingSpeed*2*layerNum) / maxR;
+  }
+
   setEraseMode(lineCanvas);
-  lineCanvas.rect(progress,0,width,height);
+  lineCanvas.rect(progress * maxR,0,width,height);
   setNoEraseMode(lineCanvas);
 
   if (frameCount >= sparkRate && drewAnim == true) {
@@ -298,7 +302,7 @@ function processPhase() {
     if (processingLayer == ceil(layerNum*processingSpeed/sparkRate)) {
       ++animationLoopCount;
       processingLayer = 0;
-      progress = border;
+      progress = border / maxR;
       if (animationLoopCount == 1) {
         isProcessPhase = false;
         resultWindow();
@@ -343,7 +347,7 @@ function closeResult() {
 }
 
 function keyTyped() {
-  if (drewSetting === false && drewCheckingWindow === false) {
+  if (setupFinished && drewSetting === false && drewCheckingWindow === false) {
     if ((key === 'i' || key === 'I')) {
       drewInfoWindow = !drewInfoWindow;
    }
@@ -595,9 +599,9 @@ function setupSketch() {
     animArray = [];
   }
   
-  strokeRatio = xsize*ysize;
-  shapeStroke = map(strokeRatio,1700,58000,2,4)*maxR;
-  lineStroke = map(strokeRatio,1700,58000,0.75,4)*maxR;
+  strokeRatio = min(1 / layerNum, 1 / maxNodes);
+  shapeStroke = map(strokeRatio,1/30,1,2,4) * maxR;
+  lineStroke = map(strokeRatio,1/30,1,0.75,4) * maxR;
   strokeOpacity = 0.7;
 
   startColor = colorPalette[paletteType-1][2];
@@ -643,10 +647,61 @@ function setupSketch() {
   particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape, maxR);
 }
 
+function updateMaxR(width, height) {
+  maxR = min(width,height)/1024;
+  
+  border = 100*maxR;
+  spacing = 50*maxR;
+  
+  xsize = (width - border*2) / layerNum;
+  ysize = (height - border*2) / maxNodes;
+  nodeSize = min(xsize,ysize)/2;
+  
+  liveNodesArray = [];
+  for (let i=0; i<scaleNodesArray.length; i++) {
+    let nodeAmount = scaleNodesArray[i].length;
+    let x,y;
+    for (let r=0; r<nodeAmount; r++) {
+      x = i*xsize + xsize/2 + border;
+      if (nodeAmount%2 == 0) {
+        y = height/2 - nodeAmount/2*ysize + ysize/2 + r*ysize;
+      } else {y = height/2 - (nodeAmount-1)/2*ysize + r*ysize}
+      if (scaleNodesArray[i][r] == 1) {liveNodesArray.push([x,y])}
+    }
+  }
+
+  activeAmount = floor(liveNodesArray.length*satFee);
+  animSet = [];
+  animArray = [];
+  sparkRate = floor(map(satFee,0.2,0.8,15,2));
+  for (let k=0; k<ceil(layerNum*processingSpeed/sparkRate); k++) {
+    for (let i=0; i<activeAmount; i++) {
+      let j = floor(random(1.0)*liveNodesArray.length);
+      animArray.push(liveNodesArray.slice(j,j+1)[0]);
+    }
+    animSet.push(animArray);
+    animArray = [];
+  }  
+
+  strokeRatio = min(1 / layerNum, 1 / maxNodes);
+  shapeStroke = map(strokeRatio,1/30,1,2,4) * maxR;
+  lineStroke = map(strokeRatio,1/30,1,0.75,4) * maxR;
+
+  gradientColors = getGradientColors(startColor,endColor,colorStops,width);
+  gradientFill = [];
+  newGradientFill = [];
+  gradientUnit = width/(layerNum-1);
+  for (let i=0; i<layerNum; i++) {
+    gradientFill.push(getGradientColorAtPosition(gradientColors,gradientUnit*i/width));
+    newGradientFill.push(getGradientColorAtPosition(gradientColors,gradientUnit*i/width));
+  }
+  newGradientFill.unshift(gradientFill[0]);
+  newGradientFill.push(gradientFill[gradientFill.length-1]);
+}
+
 function drawDeadAnimation() {
-  eraseCanvas(deadCanvas);
   particleSystem.update();
-  particleSystem.draw(deadCanvas, paperColor, fillMode, stageRatio);
+  particleSystem.draw(deadCanvas, paperColor, fillMode, stageRatio, maxR);
 }
 
 function drawCanvases() {
@@ -733,6 +788,11 @@ function drawOnMainCanvas() {
   popupCanvas.strokeWeight(8*maxR);
   popupCanvas.fill(paperColor);
   
+  deadCanvas.background(255);
+  deadCanvas.rectMode(CENTER)
+  eraseCanvas(deadCanvas);
+  deadCanvas.strokeWeight(maxR);
+
   infoCanvas.background(255);
   infoCanvas.rectMode(CENTER);
   eraseCanvas(infoCanvas);
@@ -828,7 +888,10 @@ function drawOnMainCanvas() {
 function draw() {
   drawOnMainCanvas();
   image(mainCanvas, 0, 0);
-  frameCount++; 
+
+  if (!screenshotMode) {
+    frameCount++; 
+  }
 }
 
 function drawInputLine(canvas) {
@@ -889,9 +952,9 @@ function drawNodeSet(amount,nodeColor,strokeColor,canvas) {
       y = height/2 - nodeAmount/2*ysize + ysize/2 + r*ysize;
     } else {y = height/2 - (nodeAmount-1)/2*ysize + r*ysize}
     shapeOpacity = scaleNodesArray[amount][r];
-    shapeDashBySize = map(strokeRatio,1700,58000,3,10);
-    shapeDashByOpacity = map(scaleNodesArray[amount][r],0,1,shapeDashBySize*2,0);
-    drawNode(x,y,nodeSize,shape,nodeColor,strokeColor,shapeDashByOpacity*maxR,shapeOpacity,canvas);
+    shapeDashBySize = map(strokeRatio, 1/30, 1, 3, 10);
+    shapeDashByOpacity = map(scaleNodesArray[amount][r],0,1,shapeDashBySize*2,0) * maxR;
+    drawNode(x,y,nodeSize,shape,nodeColor,strokeColor,shapeDashByOpacity,shapeOpacity,canvas);
   }
 }
 
@@ -1278,22 +1341,20 @@ saveHDCanvasAtCurrentTime = () => {
   const w = width, h = height;
 
   resizeCanvas(2*w, 2*h, true);
-  lineCanvas.resizeCanvas(2*w,2*h);
-  nodeCanvas.resizeCanvas(2*w,2*h);
-  patternCanvas.resizeCanvas(2*w,2*h);
-  popupCanvas.resizeCanvas(2*w,2*h);
-  infoCanvas.resizeCanvas(2*w,2*h);
-  deadCanvas.resizeCanvas(2*w,2*h);
-  loadingCanvas.resizeCanvas(2*w,2*h);
-  warningCanvas.resizeCanvas(2*w,2*h);
-  settingCanvas.resizeCanvas(2*w,2*h);
-  checkCanvas.resizeCanvas(2*w,2*h);
-  mainCanvas.resizeCanvas(2*w, 2*h);
+  lineCanvas.resizeCanvas(2*w,2*h, true);
+  nodeCanvas.resizeCanvas(2*w,2*h, true);
+  patternCanvas.resizeCanvas(2*w,2*h, true);
+  popupCanvas.resizeCanvas(2*w,2*h, true);
+  infoCanvas.resizeCanvas(2*w,2*h, true);
+  deadCanvas.resizeCanvas(2*w,2*h, true);
+  loadingCanvas.resizeCanvas(2*w,2*h, true);
+  warningCanvas.resizeCanvas(2*w,2*h, true);
+  settingCanvas.resizeCanvas(2*w,2*h, true);
+  checkCanvas.resizeCanvas(2*w,2*h, true);
+  mainCanvas.resizeCanvas(2*w, 2*h, true);
 
-  maxR = min(2*w,2*h)/1024;
-  border = 100*maxR;
-  spacing = 50*maxR;
-  
+  screenshotMode = true;
+  updateMaxR(2*w, 2*h);  
   drawOnMainCanvas();
 
   let offset = new Date().getTimezoneOffset() * 60 * 1000;
@@ -1302,17 +1363,18 @@ saveHDCanvasAtCurrentTime = () => {
   saveCanvas(mainCanvas, filename);
 
   resizeCanvas(w, h, true);
-  lineCanvas.resizeCanvas(w,h);
-  nodeCanvas.resizeCanvas(w,h);
-  patternCanvas.resizeCanvas(w,h);
-  popupCanvas.resizeCanvas(w,h);
-  infoCanvas.resizeCanvas(w,h);
-  deadCanvas.resizeCanvas(w,h);
-  loadingCanvas.resizeCanvas(w,h);
-  warningCanvas.resizeCanvas(w,h);
-  settingCanvas.resizeCanvas(w,h);
-  checkCanvas.resizeCanvas(w,h);
-  mainCanvas.resizeCanvas(w,h);
+  lineCanvas.resizeCanvas(w,h, true);
+  nodeCanvas.resizeCanvas(w,h, true);
+  patternCanvas.resizeCanvas(w,h, true);
+  popupCanvas.resizeCanvas(w,h, true);
+  infoCanvas.resizeCanvas(w,h, true);
+  deadCanvas.resizeCanvas(w,h, true);
+  loadingCanvas.resizeCanvas(w,h, true);
+  warningCanvas.resizeCanvas(w,h, true);
+  settingCanvas.resizeCanvas(w,h, true);
+  checkCanvas.resizeCanvas(w,h, true);
+  mainCanvas.resizeCanvas(w,h, true);
 
-  maxR = min(w,h)/1024;
+  updateMaxR(w, h);  
+  screenshotMode = false;
 }
