@@ -1,29 +1,29 @@
 const LifeCycle = [
-  ['Year', 3, 365],
-  ['Month', 40, 30],
-  ['Week', 37, 7],
-  ['Day', 20, 1],
+  ['60 Years', 3, 365],
+  ['60 Months', 40, 30],
+  ['60 Weeks', 37, 7],
+  ['60 Days', 20, 1],
 ];
 
 const BirthYear = [
   ['1943', 1],
-  ['1951', 1],
-  ['1957', 1],
-  ['1969', 1],
-  ['1970', 1],
-  ['1980', 1],
-  ['1982', 1],
-  ['1986', 1],
-  ['1988', 1],
-  ['1997', 1],
-  ['1998', 1],
-  ['2002', 1],
-  ['2009', 1],
-  ['2012', 1],
-  ['2014', 1],
-  ['2015', 1],
-  ['2016', 1],
-  ['2023', 1],
+  ['1951', 1.5],
+  ['1957', 2],
+  ['1969', 2.5],
+  ['1970', 3],
+  ['1980', 3.5],
+  ['1982', 4],
+  ['1986', 4.5],
+  ['1988', 5],
+  ['1997', 5.5],
+  ['1998', 6],
+  ['2002', 6.5],
+  ['2009', 7],
+  ['2012', 7.5],
+  ['2014', 8],
+  ['2015', 8.5],
+  ['2016', 9],
+  ['2023', 15],
 ];
 
 const Pattern = [
@@ -89,16 +89,16 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  const lifeCycle = getRandomItem(LifeCycle);
-  const birthYear = getRandomItem(BirthYear);
+  // const lifeCycle = getRandomItem(LifeCycle);
+  // const birthYear = getRandomItem(BirthYear);
   
-  // const pattern = 'Plain';
+  // const hardwareAcceleration = 'Basic';
   const hardwareAcceleration = 'Advanced';
+  const lifeCycle = '60 Days';
+  const birthYear = '2083';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';
-  // const lifeCycle = 'Year';
-  // const birthYear = '1964';
   
   // 1964: Dead
   // 2000: Stable

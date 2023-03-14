@@ -44,7 +44,7 @@ let speedAcce;
 let frameCount = 0;
 let drewInputLine = false;
 let drewOutputLine = false;
-let drewWarningScreen = false;
+let drewWarningScreen = false, drewWarningText = true, warningCount;
 let drewBorder = true;
 
 let isIdleMode;
@@ -216,7 +216,9 @@ function installCustomUploadIfle(){
       initialize();
     } else if (state == 4 || (!isNeuronsConnected(nodesArray) && drewOutputLine == true)) {
       drewWarningScreen = true;
-      warning();
+      drewWarningText = true;
+      warningCount = 0;
+      frameCount = 0;
     } else {return}
   })
   
@@ -350,7 +352,7 @@ function keyTyped() {
   if (setupFinished && drewSetting === false && drewCheckingWindow === false) {
     if ((key === 'i' || key === 'I')) {
       drewInfoWindow = !drewInfoWindow;
-   }
+    }
     if ((key === 'b' || key === 'B')) {
       drewBorder = !drewBorder;
     }
@@ -442,7 +444,7 @@ function drawCheckingWindow() {
   checkCanvas.stroke(startColor);
   checkCanvas.fill(startColor);
   checkCanvas.textSize(50*maxR);
-  checkCanvas.text("UPDATING...", width/2, height/2+2.5*maxR);
+  checkCanvas.text("update()", width/2, height/2+2.5*maxR);
 }
 
 function closeSetting() {
@@ -453,19 +455,6 @@ function closeSetting() {
   closeSettingButton.hide();
   bitcoin.hide();
   address.hide();
-}
-
-function warning() {
-  closeWarningButton = createButton('Close');
-  closeWarningButton.position(width/2-75*maxR,height/2+90*maxR);
-  closeWarningButton.size(150*maxR,40*maxR);
-  closeWarningButton.style('opacity','0');
-  closeWarningButton.mouseClicked(closeWarning);
-}
-
-function closeWarning() {
-  drewWarningScreen = false;
-  closeWarningButton.hide();
 }
 
 function setupSketch() {
@@ -1074,13 +1063,9 @@ function drawResultWindow() {
       let newSize = 75*defaultSize/popupCanvas.textWidth('"'+name+'"');
       if (newSize > 75) {newSize = 75}
       popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR);      
+      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR);       
     } else {
-      let newSize = 45*defaultPhrase/popupCanvas.textWidth('"'+name+'"');
-      if (newSize > 45) {newSize = 45}
-      popupCanvas.textLeading(newSize*maxR);
-      popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR);
+      writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,name,popupCanvas);
     }
   } else {
     const numWords = example[0].split(" ").length;
@@ -1090,11 +1075,7 @@ function drawResultWindow() {
       popupCanvas.textSize(newSize*maxR);
       popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR);   
     } else {
-      let newSize = 45*defaultPhrase/popupCanvas.textWidth('"'+example[0]+'"');
-      if (newSize > 45) {newSize = 45}
-      popupCanvas.textLeading(newSize*maxR);
-      popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR);
+      writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,example[0],popupCanvas);
     }
   }
   if (millis()-startTime > 1000) {
@@ -1119,6 +1100,86 @@ function drawResultWindow() {
   popupCanvas.text('CLOSE',width/2+80*maxR,height/2+187*maxR);
 }
 
+function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
+  let wordsArray = word.split(' ');
+  let newSize = 75*defaultSize/canvas.textWidth('"'+word+'"');
+  let currentWidth = 0, words1 = [], words2 = [], wordsLeft = [], line1 = '', line2 = '';
+  if (newSize >= 45) {
+    if (newSize > 75) {newSize = 75}
+    canvas.textSize(newSize*maxR);
+    canvas.text('"'+word+'"',x,y);
+  } else {
+    if (newSize < 45) {
+      newSize = 45*defaultPhrase/canvas.textWidth('"'+word+'"');
+      if (newSize > 20) {
+        if (newSize > 45) {newSize = 45}
+        [line1,line2] = divideLines(newSize,textBoxWidth,currentWidth,words1,words2,wordsArray,line1,line2,popupCanvas);
+        if (words2.length == 0) {
+          canvas.textSize(newSize*maxR);
+          canvas.text('"'+word+'"',x,y);
+          return;
+        } else {
+          currentWidth = 0; words1 = []; words2 = [];
+          while (canvas.textWidth(line2) > textBoxWidth/maxR) {
+            newSize = newSize*textBoxWidth/maxR/canvas.textWidth(line2);
+            line1 = ''; line2 = '';
+            [line1,line2] = divideLines(newSize,textBoxWidth,currentWidth,words1,words2,wordsArray,line1,line2,popupCanvas);
+          }
+        }
+      } else {
+        newSize = 20;
+        canvas.textSize(newSize);
+        for (let i=0; i<wordsArray.length; i++) {
+          currentWidth += canvas.textWidth(' '+wordsArray[i]);
+          if (currentWidth <= textBoxWidth/maxR) {
+            words1.push(wordsArray[i]); 
+          } else if (currentWidth > textBoxWidth/maxR && currentWidth <= textBoxWidth/maxR*2) {
+            words2.push(wordsArray[i]);
+          } else {
+            wordsLeft.push(wordsArray[i]);
+          }
+        }
+        for (let i=1; i<words1.length; i++) {line1 = line1+' '+words1[i]}
+        line1 = '"'+words1[0]+line1;
+        if (wordsLeft.length == 0) {
+          for (let i=0; i<words2.length-1; i++) {line2 = line2+words2[i]+' '}
+          line2 = line2+words2[words2.length-1]+'"';
+        } else if (words2.length == 1) {line2 = '...'+' '+wordsLeft[wordsLeft.length-1]+'"'}
+        else {
+          for (let i=0; i<words2.length-1; i++) {line2 = line2+words2[i]+' '}
+          line2 = line2+'...'+' '+wordsLeft[wordsLeft.length-1]+'"'; 
+        }
+      }
+      canvas.textSize(newSize*maxR);
+      let textHeight = (canvas.textDescent() + canvas.textAscent())*1.25;
+      canvas.text(line1,x,y-textHeight/2);
+      canvas.text(line2,x,y+textHeight/2);
+    }
+  }
+  console.log('sie: '+newSize)
+}
+
+function divideLines(size,textBoxWidth,currentWidth,words1,words2,wordsArray,line1,line2,canvas) {
+  canvas.textSize(size);
+  for (let i=0; i<wordsArray.length; i++) {
+    currentWidth += canvas.textWidth(' '+wordsArray[i]);
+    if (currentWidth <= textBoxWidth/maxR) {
+      words1.push(wordsArray[i]); 
+    } else {
+      words2.push(wordsArray[i]);
+    }
+  }
+  for (let i=1; i<words1.length; i++) {line1 = line1+' '+words1[i]}
+  line1 = '"'+words1[0]+line1;
+  if (words2.length == 0) {line1 = line1 + '"'; line2 = ''}
+  if (words2.length == 1) {line2 = words2[words2.length-1]+'"'}
+  else {
+    for (let i=0; i<words2.length-1; i++) {line2 = line2+words2[i]+' '}
+    line2 = line2+words2[words2.length-1]+'"'; 
+  }
+  return [line1,line2];
+}
+  
 function drawInfoWindow() {
   infoCanvas.textFont('Tahoma');
   infoCanvas.stroke(patternColor);
@@ -1201,7 +1262,7 @@ function drawSetting() {
   } else {
     settingCanvas.fill(startColor);
   }
-  settingCanvas.text('SUBMIT',width/2-80*maxR,height/2+142*maxR);
+  settingCanvas.text('UPDATE',width/2-80*maxR,height/2+142*maxR);
   if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
     settingCanvas.fill(paperColor);
   } else {
@@ -1210,14 +1271,13 @@ function drawSetting() {
   settingCanvas.text('CLOSE',width/2+80*maxR,height/2+142*maxR);
   settingCanvas.textAlign(LEFT);
   settingCanvas.fill(startColor);
-  settingCanvas.text('UPDATE BITCOIN FULL NODE',width/2-252.5*maxR,height/2-50*maxR);
+  settingCanvas.text('UPDATE BITCOIN FULL NODE ADDRESS',width/2-252.5*maxR,height/2-50*maxR);
   settingCanvas.text('UPDATE MODEL ADDRESS',width/2-252.5*maxR,height/2+25*maxR);
   settingCanvas.textAlign(RIGHT);
   settingCanvas.textStyle(ITALIC);
-  settingCanvas.fill(startColor);
   settingCanvas.textSize(15*maxR);
-  if (blockApiResult == false) {settingCanvas.text('(*) Invalid API',width/2+252.5*maxR,height/2-50*maxR)}
-  if (modelInscriptionResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2+25*maxR)}
+  if (blockApiResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2-50*maxR)}
+  if (modelInscriptionResult == false) {settingCanvas.text('(*) Invalid Model',width/2+252.5*maxR,height/2+25*maxR)}
 }
 
 function drawLoadingScreen() {
@@ -1226,37 +1286,35 @@ function drawLoadingScreen() {
   loadingCanvas.textSize(50*maxR);
   loadingCanvas.stroke(patternColor);
   loadingCanvas.strokeWeight(1*maxR);
-  loadingCanvas.text('SYNTHESIZING...', width/2, height/2);
+  loadingCanvas.text('main()', width/2, height/2);
 }
 
 function drawDisconnectedWarning() {
-  warningCanvas.textFont('Trebuchet MS');
-  warningCanvas.noStroke();
-  warningCanvas.fill(0,0,0,75);
-  warningCanvas.rect(width/2,height/2,width,height);
-  warningCanvas.stroke(patternColor);
-  warningCanvas.fill(paperColor);
-  warningCanvas.rect(width/2,height/2,600*maxR,150*maxR,15*maxR);
-  warningCanvas.fill(startColor);
-  warningCanvas.textSize(40*maxR);
-  warningCanvas.noStroke();
-  warningCanvas.text('PERCEPTRON MALFUNCTION',width/2,height/2+2.5*maxR);
-  
-  warningCanvas.strokeWeight(1*maxR);
-  if (mouseX>width/2-75*maxR && mouseX<width/2+75*maxR && mouseY>height/2+90*maxR && mouseY<height/2+130*maxR) {
-    warningCanvas.fill(startColor);
-  } else {
+  if (frameCount >= 20 && drewWarningText == true) {
+    drewWarningText = false;
+    frameCount = 0;
+  } 
+  if (drewWarningText) {
+    warningCanvas.textFont('Trebuchet MS');    
+    warningCanvas.stroke(patternColor);
     warningCanvas.fill(paperColor);
-  }
-  warningCanvas.rect(width/2,height/2+110*maxR,150*maxR,40*maxR,5*maxR);
-  warningCanvas.noStroke();
-  warningCanvas.textSize(20*maxR);
-  if (mouseX>width/2-75*maxR && mouseX<width/2+75*maxR && mouseY>height/2+90*maxR && mouseY<height/2+130*maxR) {
-    warningCanvas.fill(paperColor);
-  } else {
+    warningCanvas.rect(width/2,height/2,600*maxR,150*maxR,25*maxR);
     warningCanvas.fill(startColor);
+    warningCanvas.textSize(75*maxR);
+    warningCanvas.noStroke();
+    if (state == 1) {warningCanvas.text('GROWING',width/2,height/2+5*maxR)}
+    else if (state == 3) {warningCanvas.text('AGING',width/2,height/2+5*maxR)}
+    else if (state == 4) {warningCanvas.text('DEAD',width/2,height/2+5*maxR)}
+    else if (state == 5) {warningCanvas.text('BIRTH',width/2,height/2+5*maxR)}
   }
-  warningCanvas.text('CLOSE',width/2,height/2+112*maxR);
+  if (frameCount >= 20 && drewWarningText == false) {
+    drewWarningText = true;
+    frameCount = 0;
+    warningCount ++;
+    if (warningCount == 3) {
+      drewWarningScreen = false;
+    }
+  }
 }
 
 function getGradientColors(startColor, endColor, colorStops, numSteps) {
