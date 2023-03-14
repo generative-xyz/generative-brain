@@ -89,13 +89,13 @@ function getTraits(trainingTraits) {
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
-  // const lifeCycle = getRandomItem(LifeCycle);
-  // const birthYear = getRandomItem(BirthYear);
+  const lifeCycle = getRandomItem(LifeCycle);
+  const birthYear = getRandomItem(BirthYear);
   
   // const hardwareAcceleration = 'Basic';
   const hardwareAcceleration = 'Advanced';
-  const lifeCycle = '60 Years';
-  const birthYear = '1964';
+  // const lifeCycle = '60 Days';
+  // const birthYear = '2083';
   // const nodeFill = 'MNIST';
   // const nodeShape = 'Theano';
   // const colorPalette = 'Monochrome';

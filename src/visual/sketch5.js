@@ -359,8 +359,8 @@ function keyTyped() {
     if ((key === 's' || key === 'S')) {
       saveCanvasAtCurrentTime();
     }  
-    if ((key === 'h' || key === 'H')) {
-      saveHDCanvasAtCurrentTime();
+    if ((key === 'k' || key === 'K')) {
+      save4KCanvasAtCurrentTime();
     }
     if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false) {
       settingPopup();
@@ -772,7 +772,7 @@ function drawOnMainCanvas() {
   popupCanvas.background(255);
   popupCanvas.rectMode(CENTER);
   eraseCanvas(popupCanvas);
-  popupCanvas.textAlign(CENTER);
+  popupCanvas.textAlign(CENTER,CENTER);
   popupCanvas.textStyle(BOLD);
   popupCanvas.stroke(patternColor);
   popupCanvas.strokeWeight(8*maxR);
@@ -1054,7 +1054,6 @@ function drawResultWindow() {
   }
   
   example = predictions.map(e => e[1]);
-  popupCanvas.textAlign(CENTER,CENTER);
   defaultSize = popupCanvas.textWidth('"FIDENZA"');
   defaultPhrase = popupCanvas.textWidth('"PERPENDICULAR INHABITATION"');
   if (!finishedText) {
@@ -1092,13 +1091,13 @@ function drawResultWindow() {
   } else {
     popupCanvas.fill(startColor);
   }
-  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+187*maxR);
+  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+186.5*maxR);
   if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
     popupCanvas.fill(paperColor);
   } else {
     popupCanvas.fill(startColor);
   }
-  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+187*maxR);
+  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+186.5*maxR);
 }
 
 function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
@@ -1396,29 +1395,30 @@ saveCanvasAtCurrentTime = () => {
   save(filename);
 }
 
-saveHDCanvasAtCurrentTime = () => {
+save4KCanvasAtCurrentTime = () => {
   const w = width, h = height;
+  const newW = 4096, newH = h * 4096/w;
 
-  resizeCanvas(2*w, 2*h, true);
-  lineCanvas.resizeCanvas(2*w,2*h, true);
-  nodeCanvas.resizeCanvas(2*w,2*h, true);
-  patternCanvas.resizeCanvas(2*w,2*h, true);
-  popupCanvas.resizeCanvas(2*w,2*h, true);
-  infoCanvas.resizeCanvas(2*w,2*h, true);
-  deadCanvas.resizeCanvas(2*w,2*h, true);
-  loadingCanvas.resizeCanvas(2*w,2*h, true);
-  warningCanvas.resizeCanvas(2*w,2*h, true);
-  settingCanvas.resizeCanvas(2*w,2*h, true);
-  checkCanvas.resizeCanvas(2*w,2*h, true);
-  mainCanvas.resizeCanvas(2*w, 2*h, true);
+  resizeCanvas(newW, newH, true);
+  lineCanvas.resizeCanvas(newW,newH, true);
+  nodeCanvas.resizeCanvas(newW,newH, true);
+  patternCanvas.resizeCanvas(newW,newH, true);
+  popupCanvas.resizeCanvas(newW,newH, true);
+  infoCanvas.resizeCanvas(newW,newH, true);
+  deadCanvas.resizeCanvas(newW,newH, true);
+  loadingCanvas.resizeCanvas(newW,newH, true);
+  warningCanvas.resizeCanvas(newW,newH, true);
+  settingCanvas.resizeCanvas(newW,newH, true);
+  checkCanvas.resizeCanvas(newW,newH, true);
+  mainCanvas.resizeCanvas(newW, newH, true);
 
   screenshotMode = true;
-  updateMaxR(2*w, 2*h);  
+  updateMaxR(newW, newH);  
   drawOnMainCanvas();
 
   let offset = new Date().getTimezoneOffset() * 60 * 1000;
   let localTimeStr = new Date(Date.now() - offset).toISOString().slice(0, -1);
-  let filename = 'HD_' + localTimeStr + '.png';
+  let filename = '4K_' + localTimeStr + '.png';
   saveCanvas(mainCanvas, filename);
 
   resizeCanvas(w, h, true);
