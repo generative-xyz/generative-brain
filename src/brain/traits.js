@@ -92,8 +92,8 @@ function getTraits(trainingTraits) {
   // const lifeCycle = getRandomItem(LifeCycle);
   // const birthYear = getRandomItem(BirthYear);
   
-  // const hardwareAcceleration = 'Basic';
-  const hardwareAcceleration = 'Advanced';
+  const hardwareAcceleration = 'Standard';
+  // const hardwareAcceleration = 'Advanced';
   const lifeCycle = '60 Years';
   const birthYear = '2000';
   // const nodeFill = 'MNIST';

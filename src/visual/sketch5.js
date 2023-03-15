@@ -70,6 +70,7 @@ let inscriptionEndpoint;
 let blockApiResult = null;
 let modelInscriptionResult = null;
 let screenshotMode = false;
+let totalAnimSteps;
 
 async function setup() {
   let w = windowHeight; 
@@ -301,7 +302,7 @@ function processPhase() {
     drewAnim = true;
     frameCount -= sparkRate;
     processingLayer += 1;
-    if (processingLayer == round(layerNum*processingFrames/sparkRate)) {
+    if (processingLayer == totalAnimSteps) {
       ++animationLoopCount;
       processingLayer = 0;
       progress = border / maxR;
@@ -489,7 +490,6 @@ function setupSketch() {
   pattern = paper.indexOf(traits.visual.pattern);
 
   // console.log(shape);
-
   satFee = Math.tanh(Math.log10(stats.avgfeerate));
   satFee = map(satFee, 0, 1, 0.2, 0.8);
   
@@ -575,15 +575,19 @@ function setupSketch() {
       if (scaleNodesArray[i][r] == 1) {liveNodesArray.push([x,y])}
     }
   }
-
+  
+  const totalFrames = (layerNum + 1) * processingFrames;
+  
   const sparkRateExact = map(satFee,0.2,0.8,15,2);
-  sparkRate = getClosestDivisibleFraction(layerNum*processingFrames, 2, sparkRateExact)
-  console.log(sparkRateExact, sparkRate, 1.0 * layerNum*processingFrames/sparkRate);
+  sparkRate = getClosestDivisibleFraction(totalFrames, 2, sparkRateExact);
+
+  totalAnimSteps = round(totalFrames/sparkRate);
+  console.log(sparkRateExact, sparkRate, totalFrames/sparkRate);
 
   activeAmount = floor(liveNodesArray.length*satFee);
   animSet = [];
   animArray = [];
-  for (let k=0; k<round(layerNum*processingFrames/sparkRate); k++) {
+  for (let k=0; k<totalAnimSteps; k++) {
     for (let i=0; i<activeAmount; i++) {
       let j = floor(random(1.0)*liveNodesArray.length);
       animArray.push(liveNodesArray.slice(j,j+1)[0]);
@@ -667,7 +671,7 @@ function updateMaxR(width, height) {
   animSet = [];
   animArray = [];
   sparkRate = floor(map(satFee,0.2,0.8,15,2));
-  for (let k=0; k<round(layerNum*processingFrames/sparkRate); k++) {
+  for (let k=0; k<totalAnimSteps; k++) {
     for (let i=0; i<activeAmount; i++) {
       let j = floor(random(1.0)*liveNodesArray.length);
       animArray.push(liveNodesArray.slice(j,j+1)[0]);
