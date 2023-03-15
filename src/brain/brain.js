@@ -2,14 +2,15 @@
 Cycle of 60 years:
 - [0, 25): Growing
 - [25, 50): Stable
-- [50, 59.9): Decaying
-- [59.9, 60): Dead
+- [50, 59 + 11/12): Decaying
+- [59 + 11/12 , 59 + 11.5/12): Dead
+- [59 + 11.5/12, 60): Rebirth
 */
 
 const GROW_END = 25;
 const STABLE_END = 50;
-const DECAY_END = 58;
-const DEAD_END = 59;
+const DECAY_END = 59 + 11/12;
+const DEAD_END = 59 + 11.5/12;
 const CYCLE_END = 60;
 
 // Shape: 1 - (1 - px)^n = py
@@ -30,7 +31,13 @@ class Brain {
   
     this.iteration = 0;
     this.stage = 0;    
-    this.birthDate = new Date(parseInt(visualTraits.birthYear), 0, 1);
+
+    const ts1 = new Date(parseInt(visualTraits.birthYear), 0, 1).getTime();
+    const ts2 = new Date(parseInt(visualTraits.birthYear) + 1, 0, 1).getTime();
+    this.birthDate = new Date(Math.floor((ts1 + ts2) / 2));
+
+    console.log(this.birthDate);
+    
     const lifeCycle = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
     this.growSpeed = 365.0 / lifeCycle;
 
@@ -39,12 +46,11 @@ class Brain {
 
   updateAge(time) {
     const deltaTimestamp = time.getTime() - this.birthDate.getTime();
+    console.log(deltaTimestamp);
     const deltaYear = deltaTimestamp / (1000 * 60 * 60 * 24 * 365);
     const age = deltaYear * this.growSpeed;
     this.iteration = Math.floor(age / CYCLE_END);        
     const cycleTime = age - this.iteration * CYCLE_END;
-
-    console.log("cycleTime:", cycleTime);
 
     let growth = 0;
     if (cycleTime < GROW_END) {
