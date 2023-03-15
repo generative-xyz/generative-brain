@@ -4,7 +4,6 @@ new Q5("global");
 
 let border;  // screen padding
 let maxR;
-let inputImg;
 let img;
 let drewResultWindow = false;
 let drewInfoWindow = false;
@@ -16,23 +15,23 @@ let progress;
 let animationLoopCount;
 let processingFrames;
 let satFee,activeAmount,sparkRate;
-let percentage,finishedNumber,finishedText,defaultSize,startTime;
+let finishedNumber,finishedText,defaultSize,startTime;
 
 let xsize,ysize,nodeSize;
 let layerNum,maxNodes,compareArray,realMaxNodes,realCompareArray,realHiddenLayerMaxNodes;
 let nodesArray,scaleNodesArray,scaleRatio,scaleToggle,liveNodesArray,animArray,animSet;
 let state,shape; 
 let shapeStroke,lineStroke,strokeRatio;
-let classNum,classArray,inputNum,inputArray;
-let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas;
+let classNum,classArray,inputArray;
+let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas,deadCanvas,mainCanvas;
 let nodeColor,strokeColor,strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
 let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 let bitcoinNode,modelAddress;
 
-let seed,architecture,birthYear,lifeCycle,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
-let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Hot Cocoa','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
+let seed,architecture,birthYear,lifeCycle,epochs,activationFunction;
+const liveState = [' ','Growing','Stable','Decaying','Dead','Rebirth'];
 
 let currentNode = 0;
 let currentLine = 0;
@@ -55,15 +54,11 @@ let traits;
 let brain;
 let output_prediction;
 let particleSystem;
-let deadCanvas;
 let predictions;
 let stageRatio;
-let mainCanvas;
 let drewCheckingWindow = false;
-let blockEndpoint;
-let inscriptionEndpoint;
-let blockApiResult = null;
-let modelInscriptionResult = null;
+let blockEndpoint, inscriptionEndpoint;
+let blockApiResult = null, modelInscriptionResult = null;
 let screenshotMode = false;
 let totalAnimSteps;
 
@@ -102,11 +97,6 @@ function setupRandom() {
 function setupTraits() {
   traits = getTraits(___default_inscription.training_traits);
   reportTraits(traits);
-  framework = [' ','Theano','Torch','TensorFlow','Caffe'];
-  dataSet = [' ','MNIST','CIFAR','IMAGENET'];
-  paper = [' ','Plain','Dotted','Squared'];
-  liveState = [' ','Growing','Stable','Decaying','Dead','Rebirth'];
-  acceleration = [' ','Basic','Standard','Advanced'];
 }
 
 async function setupModel() {
@@ -155,7 +145,7 @@ function checkIt() {
 
 function preloadingSetup() {
   maxR = min(width,height)/1024;
-  paletteType = paletteName.indexOf(traits.visual.colorPalette);
+  paletteType = ColorPalette.findIndex(e => e[0] === traits.visual.colorPalette);
   colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3
@@ -193,8 +183,8 @@ function preloadingSetup() {
   }
 
   colorStops = [];
-  paperColor = colorPalette[paletteType-1][0];
-  patternColor = colorPalette[paletteType-1][1];
+  paperColor = colorPalette[paletteType][0];
+  patternColor = colorPalette[paletteType][1];
 }
 
 function installCustomUploadIfle(){ 
@@ -440,7 +430,7 @@ function setupSketch() {
   epochs = traits.training.epoch_num;
   activationFunction = traits.training.activation_func;
   
-  drawSpeed = acceleration.indexOf(traits.visual.hardwareAcceleration);
+  drawSpeed = HardwareAcceleration.findIndex(e => e[0] == traits.visual.hardwareAcceleration) + 1;
   if (drawSpeed == 1) {
     speedAcce = 40; processingFrames = 40;
   } else if (drawSpeed == 2) {
@@ -456,9 +446,9 @@ function setupSketch() {
   border = 100*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
-  shape = framework.indexOf(traits.visual.nodeShape);
-  fillMode = dataSet.indexOf(traits.visual.nodeFill);
-  pattern = paper.indexOf(traits.visual.pattern);
+  shape = NodeShape.findIndex(e => e[0] == traits.visual.nodeShape) + 1;
+  fillMode = NodeFill.findIndex(e => e[0] == traits.visual.nodeFill) + 1;
+  pattern = Pattern.findIndex(e => e[0] == traits.visual.pattern) + 1;
 
   satFee = Math.tanh(Math.log10(stats.avgfeerate));
   satFee = map(satFee, 0, 1, 0.2, 0.8);
@@ -570,10 +560,10 @@ function setupSketch() {
   lineStroke = map(strokeRatio,1/30,1,0.75,4) * maxR;
   strokeOpacity = 0.7;
 
-  startColor = colorPalette[paletteType-1][2];
-  endColor = colorPalette[paletteType-1][colorPalette[paletteType-1].length-1];
-  for (let i=3; i<colorPalette[paletteType-1].length-1; i++) {
-    colorStops.push(colorPalette[paletteType-1][i]);
+  startColor = colorPalette[paletteType][2];
+  endColor = colorPalette[paletteType][colorPalette[paletteType].length-1];
+  for (let i=3; i<colorPalette[paletteType].length-1; i++) {
+    colorStops.push(colorPalette[paletteType][i]);
   }
   gradientColors = getGradientColors(startColor,endColor,colorStops,width);
   gradientFill = [];
@@ -1089,13 +1079,13 @@ function drawInfoWindow() {
     ['NUMBER OF HIDDEN LAYERS', layerNum-2],
     ['MAX NEURONS PER HIDDEN LAYER', realHiddenLayerMaxNodes],
     ['NUMBER OF TRAINING EPOCHS', epochs],
-    ['COLOR PALETTE', paletteName[paletteType]],
-    ['PAPER PATTERN', paper[pattern]],
+    ['COLOR PALETTE', ColorPalette[paletteType][0]],
+    ['PAPER PATTERN', Pattern[pattern-1][0]],
     ['NETWORK ARCHITECTURE', architecture],
     ['ACTIVATION FUNCTION', activationFunction],
-    ['DATA SET', dataSet[fillMode]],
-    ['DEEP LEARNING FRAMEWORK', framework[shape]],
-    ['HARDWARE ACCELERATION', acceleration[drawSpeed]],
+    ['DATA SET', NodeFill[fillMode-1][0]],
+    ['DEEP LEARNING FRAMEWORK', NodeShape[shape-1][0]],
+    ['HARDWARE ACCELERATION', HardwareAcceleration[drawSpeed-1][0]],
     ['BIRTH YEAR', birthYear],
     ['LIFE CYCLE', lifeCycle],
     ['STATE', liveState[state]],
