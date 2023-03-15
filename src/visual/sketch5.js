@@ -34,15 +34,11 @@ let bitcoinNode,modelAddress;
 let seed,architecture,birthYear,lifeCycle,epochs,framework,dataSet,paper,liveState,activationFunction,acceleration;
 let paletteName = [' ','Monochrome','Blackboard','Blueprint','Industrial Steel','Spectrum','Mariana Trench','Twilight','Gaia','Autumn Harvest','Bubblegum','Sleek Neutrals','Barbie World','Warning Zone','Chilli Sauce','American Dream','Broken Beach','Nightlife','Nautical Adventure','Cotton Candy','Golden Hour','Matcha Latte','Hot Cocoa','Midnight Blossoms','Lemonade','Strawberry Milk','Campfire','Black Pink','Chlorophyll'];
 
-let nodeSet = [];
-let lineSet = [];
 let currentNode = 0;
 let currentLine = 0;
 let drawSpeed; 
 let speedAcce;
 let frameCount = 0;
-let drewInputLine = false;
-let drewOutputLine = false;
 let drewWarningScreen = false, drewWarningText = true, warningCount;
 let drewBorder = true;
 
@@ -209,10 +205,10 @@ function installCustomUploadIfle(){
     if (drewSetting) return;
     if (drewCheckingWindow) return;
 
-    if (isNeuronsConnected(nodesArray) && drewOutputLine == true) {
+    if (isNeuronsConnected(nodesArray) && currentLine > layerNum) {
       fileInput.click();
       initialize();
-    } else if (state == 4 || state == 5 || (!isNeuronsConnected(nodesArray) && drewOutputLine == true)) {
+    } else if (state == 4 || state == 5 || (!isNeuronsConnected(nodesArray) && currentLine > layerNum)) {
       drewWarningScreen = true;
       drewWarningText = true;
       warningCount = 0;
@@ -542,13 +538,11 @@ function setupSketch() {
   liveNodesArray = [];
   for (let i=0; i<scaleNodesArray.length; i++) {
     let nodeAmount = scaleNodesArray[i].length;
-    let x,y;
     for (let r=0; r<nodeAmount; r++) {
-      x = i*xsize + xsize/2 + border;
-      if (nodeAmount%2 == 0) {
-        y = height/2 - nodeAmount/2*ysize + ysize/2 + r*ysize;
-      } else {y = height/2 - (nodeAmount-1)/2*ysize + r*ysize}
-      if (scaleNodesArray[i][r] == 1) {liveNodesArray.push([x,y])}
+      if (scaleNodesArray[i][r] == 1) {
+        const [x, y] = getNodePosition(i, r);
+        liveNodesArray.push([x, y]);
+      }
     }
   }
   
@@ -592,20 +586,10 @@ function setupSketch() {
   newGradientFill.unshift(gradientFill[0]);
   newGradientFill.push(gradientFill[gradientFill.length-1]);
 
-  nodeSet = [];
-  lineSet = [];
   currentNode = 0;
   currentLine = 0;
   frameCount = 0;
-  drewInputLine = false;
-  drewOutputLine = false;
   isIdleMode = true;
-  for (let i=0; i<layerNum; i++) {
-    nodeSet.push(i);
-  }
-  for (let i=0; i<layerNum-1; i++) {
-    lineSet.push(i);
-  }
 
   const wall = {
     xLeft: border/8,
@@ -614,8 +598,17 @@ function setupSketch() {
     yBottom: height - border/8,
   }
 
+  console.log(scaleNodesArray);
+
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
   particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape, maxR);
+}
+
+function getNodePosition(i, r) {
+  let nodeAmount = scaleNodesArray[i].length;
+  const x = i*xsize + xsize/2 + border;
+  const y = height/2 - (nodeAmount-1)/2*ysize + r*ysize;
+  return [x, y];
 }
 
 function updateMaxR(width, height) {
@@ -631,13 +624,11 @@ function updateMaxR(width, height) {
   liveNodesArray = [];
   for (let i=0; i<scaleNodesArray.length; i++) {
     let nodeAmount = scaleNodesArray[i].length;
-    let x,y;
     for (let r=0; r<nodeAmount; r++) {
-      x = i*xsize + xsize/2 + border;
-      if (nodeAmount%2 == 0) {
-        y = height/2 - nodeAmount/2*ysize + ysize/2 + r*ysize;
-      } else {y = height/2 - (nodeAmount-1)/2*ysize + r*ysize}
-      if (scaleNodesArray[i][r] == 1) {liveNodesArray.push([x,y])}
+      if (scaleNodesArray[i][r] == 1) {
+        const [x, y] = getNodePosition(i, r);
+        liveNodesArray.push([x, y]);
+      }
     }
   }
 
@@ -689,46 +680,30 @@ function drawCanvases() {
     return;
   } 
   
-  if (frameCount >= speedAcce && currentNode < nodeSet.length) {
+  if (frameCount >= speedAcce && currentNode < layerNum) {
     currentNode++;
     frameCount = 0;
   }
     
   // draw neural nodes
   for (let i=0; i<currentNode; i++) {
-    let node = nodeSet[i];
     if (fillMode == 1) {
-      nodeColor = strokeColor = gradientFill[node];
+      nodeColor = strokeColor = gradientFill[i];
     } else {
       nodeColor = paperColor;
-      strokeColor = gradientFill[node];
+      strokeColor = gradientFill[i];
     }
-    drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
+    drawNodeSet(i,nodeColor,strokeColor,nodeCanvas);
   }
-
-  // draw input lines
-  if (frameCount >= speedAcce && drewInputLine == false) {
-    drewInputLine = true;
-    frameCount = 0;
-  }
-  if (drewInputLine) drawInputLine(lineCanvas);
 
   // draw neural lines
-  if (frameCount >= speedAcce && currentLine < lineSet.length) {
+  if (frameCount >= speedAcce && currentLine <= layerNum) {
     currentLine++;
     frameCount = 0;
   }  
   for (let i=0; i<currentLine; i++) {
-    let neuline = lineSet[i];
-    drawLineSet(neuline,state,lineCanvas);
-  }
-  
-  // draw output lines
-  if (frameCount >= speedAcce && drewOutputLine == false) {
-    drewOutputLine = true;
-    frameCount = 0;
-  }
-  if (drewOutputLine) drawOutputLine(lineCanvas);    
+    drawLineSet(i);
+  }  
 }
 
 function drawOnMainCanvas() {
@@ -849,63 +824,52 @@ function draw() {
   }
 }
 
-function drawInputLine(canvas) {
+function drawInputLine() {
   for (let i=0; i<inputNodes; i++) {
-    let x1 = (border+(xsize/2-nodeSize/2)+border/4)/2;
-    let x2 = border+xsize/2;
-    let y;
-    if (inputNodes%2 == 0) {
-      y = height/2-inputNodes/2*ysize+ysize/2+i*ysize;
-    } else {y = height/2-(inputNodes-1)/2*ysize+i*ysize}
+    const [x2, y] = getNodePosition(0,i);
+    const x1 = (border+(xsize/2-nodeSize/2)+border/4)/2;
     gradientLine(x1,y,x2,y,newGradientFill[0],newGradientFill[1],lineCanvas,strokeOpacity);
   }
 }
 
-function drawOutputLine(canvas) {
+function drawOutputLine() {
   let outputNum = scaleNodesArray[scaleNodesArray.length-1].length;
   for (let c=0; c<outputNum; c++) { 
-    let x1 = width-(border+(xsize/2-nodeSize/2)+border/4)/2;
-    let x2 = width-(border+xsize/2);
-    let y;
-    if (outputNum%2 == 0) {
-      y = height/2-outputNum/2*ysize+ysize/2+c*ysize;
-    } else {y = height/2-(outputNum-1)/2*ysize+c*ysize}
+    const [x2, y] = getNodePosition(layerNum-1,c);
+    const x1 = width-(border+(xsize/2-nodeSize/2)+border/4)/2;
     gradientLine(x1,y,x2,y,newGradientFill[newGradientFill.length-2],newGradientFill[newGradientFill.length-1],lineCanvas,strokeOpacity);
   }
 }
 
-function drawLineSet(amount,canvas) {
-  let nodeAmount = scaleNodesArray[amount].length;
-  let nextNodesAmount = scaleNodesArray[amount+1].length;
-  let x1,y1,x2,y2;
+function drawLineSet(amount) {
+  if (amount == 0) {
+    drawInputLine();
+    return;
+  }
+  if (amount == layerNum) {
+    drawOutputLine();
+    return;
+  }
+  let nodeAmount = scaleNodesArray[amount-1].length;
+  let nextNodesAmount = scaleNodesArray[amount].length;
   let lineOpacity;
   for (let r=0; r<nodeAmount; r++) {
-    x1 = amount*xsize + xsize/2 + border;
-    x2 = x1 + xsize;
-    if (nodeAmount%2 == 0) {
-      y1 = height/2 - nodeAmount/2*ysize + ysize/2 + r*ysize;
-    } else {y1 = height/2 -(nodeAmount-1)/2*ysize + r*ysize}
+    const [x1, y1] = getNodePosition(amount-1, r);
     for (let n=0; n<nextNodesAmount; n++) {
-      if (nextNodesAmount%2 == 0) {
-        y2 = height/2 - nextNodesAmount/2*ysize + ysize/2 + n*ysize;
-      } else {y2 = y2 = height/2 - (nextNodesAmount-1)/2*ysize + n*ysize}
-      lineOpacity = map(min(scaleNodesArray[amount][r],scaleNodesArray[amount+1][n]),0,1,0,0.5);
-      gradientLine(x1,y1,x2,y2,gradientFill[amount],gradientFill[amount+1],lineCanvas,lineOpacity);
+      const [x2, y2] = getNodePosition(amount, n);
+      lineOpacity = map(min(scaleNodesArray[amount-1][r],scaleNodesArray[amount][n]),0,1,0,0.5);
+      gradientLine(x1,y1,x2,y2,gradientFill[amount-1],gradientFill[amount],lineCanvas,lineOpacity);
     }
   }
 }
 
 function drawNodeSet(amount,nodeColor,strokeColor,canvas) {
   let nodeAmount = scaleNodesArray[amount].length;
-  let x,y;
   let shapeOpacity;
   let shapeDashByOpacity;
   let shapeDashBySize;
   for (let r=0; r<nodeAmount; r++) {
-    x = amount*xsize + xsize/2 + border;
-    if (nodeAmount%2 == 0) {
-      y = height/2 - nodeAmount/2*ysize + ysize/2 + r*ysize;
-    } else {y = height/2 - (nodeAmount-1)/2*ysize + r*ysize}
+    const [x, y] = getNodePosition(amount, r);
     shapeOpacity = scaleNodesArray[amount][r];
     shapeDashBySize = map(strokeRatio, 1/30, 1, 3, 10);
     shapeDashByOpacity = map(scaleNodesArray[amount][r],0,1,shapeDashBySize*2,0) * maxR;
@@ -1355,5 +1319,5 @@ function makeButton(text, x, y, w, h, onClick) {
   button.size(w, h);
   button.style('opacity','0');
   button.mouseClicked(onClick);
-  return button
+  return button;
 }
