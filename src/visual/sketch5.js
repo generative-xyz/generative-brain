@@ -314,16 +314,8 @@ function resultWindow() {
   drewResultWindow = true;
   finishedNumber = false;
   finishedText = false;
-  tryButton = createButton('Try Again');
-  tryButton.position(width/2-155*maxR,height/2+165*maxR);
-  tryButton.size(150*maxR,40*maxR);
-  tryButton.style('opacity','0');
-  tryButton.mouseClicked(tryAgain);
-  closeResultButton = createButton('Close');
-  closeResultButton.position(width/2+5*maxR,height/2+165*maxR);
-  closeResultButton.size(150*maxR,40*maxR);
-  closeResultButton.style('opacity','0');
-  closeResultButton.mouseClicked(closeResult);
+  tryButton = makeButton('Try Again', width/2-155*maxR, height/2+165*maxR, 150*maxR, 40*maxR, tryAgain);
+  closeResultButton = makeButton('Close', width/2+5*maxR, height/2+165*maxR, 150*maxR, 40*maxR, closeResult);
 }
 
 function tryAgain() {
@@ -370,16 +362,8 @@ function settingPopup() {
   blockApiResult = null;
   modelInscriptionResult = null;
 
-  submitButton = createButton('Submit');
-  submitButton.position(width/2-155*maxR,height/2+115*maxR);
-  submitButton.size(150*maxR,40*maxR);
-  submitButton.style('opacity','0');
-  submitButton.mouseClicked(submit);
-  closeSettingButton = createButton('Close');
-  closeSettingButton.position(width/2+5*maxR,height/2+115*maxR);
-  closeSettingButton.size(150*maxR,40*maxR);
-  closeSettingButton.style('opacity','0');
-  closeSettingButton.mouseClicked(closeSetting);
+  submitButton = makeButton('Submit', width/2-155*maxR, height/2+115*maxR, 150*maxR, 40*maxR, submit);
+  closeSettingButton = makeButton('Close', width/2+5*maxR, height/2+115*maxR, 150*maxR, 40*maxR, closeSetting);
   bitcoin = createInput();
   bitcoin.position(width/2-252.5*maxR,height/2-40*maxR);
   bitcoin.size(500*maxR,25*maxR);
@@ -431,11 +415,7 @@ async function startEndpointsCheck() {
 function drawCheckingWindow() {
   checkCanvas.textFont('Trebuchet MS');
   checkCanvas.noStroke();
-  checkCanvas.fill(0,0,0,75);
-  checkCanvas.rect(width/2,height/2,width,height);
-  checkCanvas.stroke(patternColor);
-  checkCanvas.fill(paperColor);
-  checkCanvas.rect(width/2,height/2,600*maxR,200*maxR,25*maxR);
+  drawPopup(checkCanvas,600*maxR,200*maxR);
   checkCanvas.strokeWeight(1*maxR);
   checkCanvas.stroke(startColor);
   checkCanvas.fill(startColor);
@@ -709,38 +689,23 @@ function drawCanvases() {
     return;
   } 
   
+  if (frameCount >= speedAcce && currentNode < nodeSet.length) {
+    currentNode++;
+    frameCount = 0;
+  }
+    
   // draw neural nodes
   for (let i=0; i<currentNode; i++) {
     let node = nodeSet[i];
     if (fillMode == 1) {
       nodeColor = strokeColor = gradientFill[node];
-    } else if (fillMode == 2) {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
     } else {
       nodeColor = paperColor;
       strokeColor = gradientFill[node];
     }
     drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
   }
-  
-  if (frameCount >= speedAcce && currentNode < nodeSet.length) {
-    let node = nodeSet[currentNode];
-    if (fillMode == 1) {
-      nodeColor = strokeColor = gradientFill[node];
-    } else if (fillMode == 2) {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
-    } else {
-      nodeColor = paperColor;
-      strokeColor = gradientFill[node];
-    }
-    drawNodeSet(node,nodeColor,strokeColor,nodeCanvas);
 
-    currentNode++;
-    frameCount = 0;
-  }
-  
   // draw input lines
   if (frameCount >= speedAcce && drewInputLine == false) {
     drewInputLine = true;
@@ -749,16 +714,14 @@ function drawCanvases() {
   if (drewInputLine) drawInputLine(lineCanvas);
 
   // draw neural lines
+  if (frameCount >= speedAcce && currentLine < lineSet.length) {
+    currentLine++;
+    frameCount = 0;
+  }  
   for (let i=0; i<currentLine; i++) {
     let neuline = lineSet[i];
     drawLineSet(neuline,state,lineCanvas);
   }
-  if (frameCount >= speedAcce && currentLine < lineSet.length) {
-    let neuline = lineSet[currentLine];
-    drawLineSet(neuline,state,lineCanvas);
-    currentLine++;
-    frameCount = 0;
-  }  
   
   // draw output lines
   if (frameCount >= speedAcce && drewOutputLine == false) {
@@ -1017,11 +980,7 @@ function createPattern(pattern) {
 function drawResultWindow() {
   popupCanvas.textFont('Trebuchet MS');
   popupCanvas.noStroke();
-  popupCanvas.fill(0,0,0,75);
-  popupCanvas.rect(width/2,height/2,width,height);
-  popupCanvas.stroke(patternColor);
-  popupCanvas.fill(paperColor);
-  popupCanvas.rect(width/2,height/2,700*maxR,300*maxR,25*maxR);
+  drawPopup(popupCanvas,700*maxR,300*maxR);
   popupCanvas.strokeWeight(6*maxR);
   popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR,240*maxR);
   popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
@@ -1201,11 +1160,7 @@ function drawInfoWindow() {
 function drawSetting() {
   settingCanvas.textFont('Trebuchet MS');
   settingCanvas.noStroke();
-  settingCanvas.fill(0,0,0,75);
-  settingCanvas.rect(width/2,height/2,width,height);
-  settingCanvas.stroke(patternColor);
-  settingCanvas.fill(paperColor);
-  settingCanvas.rect(width/2,height/2,600*maxR,200*maxR,25*maxR);
+  drawPopup(settingCanvas,600*maxR,200*maxR);
   
   drawButton(settingCanvas, width/2-155*maxR, width/2-5*maxR, height/2+115*maxR, height/2+155*maxR, 'UPDATE');
   drawButton(settingCanvas, width/2+5*maxR, width/2+155*maxR, height/2+115*maxR, height/2+155*maxR, 'CLOSE');
@@ -1298,12 +1253,12 @@ function getGradientColorAtPosition(colors,position) {
 }
 
 function hexToRgb(hex) {
-    hex = hex.replace('#', '');
-    var bigint = parseInt(hex, 16);
-    var r = (bigint >> 16) & 255;
-    var g = (bigint >> 8) & 255;
-    var b = bigint & 255;
-    return color(r, g, b);
+  hex = hex.replace('#', '');
+  var bigint = parseInt(hex, 16);
+  var r = (bigint >> 16) & 255;
+  var g = (bigint >> 8) & 255;
+  var b = bigint & 255;
+  return color(r, g, b);
 }
 
 function gradientLine(x1,y1,x2,y2,color1,color2,canvas,opacity) {
@@ -1368,7 +1323,15 @@ function drawButton(canvas, x1, x2, y1, y2, text) {
   canvas.noStroke();
   canvas.textSize(20*maxR);
   canvas.fill(textColor);
-  canvas.text(text,(x1+x2)/2,(y1+y2)/2);
+  canvas.text(text,(x1+x2)/2,(y1*46+y2*54)/100);
+}
+
+function drawPopup(canvas, w, h) {
+  canvas.fill(0,0,0,75);
+  canvas.rect(width/2,height/2,width,height);
+  canvas.stroke(patternColor);
+  canvas.fill(paperColor);
+  canvas.rect(width/2,height/2,w,h,25*maxR);
 }
 
 function resizeAllCanvas(w, h) {
@@ -1384,4 +1347,13 @@ function resizeAllCanvas(w, h) {
   settingCanvas.resizeCanvas(w, h, true);
   checkCanvas.resizeCanvas(w, h, true);
   mainCanvas.resizeCanvas(w, h, true);
+}
+
+function makeButton(text, x, y, w, h, onClick) {
+  const button = createButton(text);
+  button.position(x, y);
+  button.size(w, h);
+  button.style('opacity','0');
+  button.mouseClicked(onClick);
+  return button
 }

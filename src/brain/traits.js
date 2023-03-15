@@ -86,7 +86,7 @@ function getTraits(trainingTraits) {
   // Visual traits
   const pattern = getRandomItem(Pattern);
   // const hardwareAcceleration = getRandomItem(HardwareAcceleration);
-  const hardwareAcceleration = 'Advanced' // DEBUG
+  const hardwareAcceleration = 'Standard' // DEBUG
   const nodeFill = getRandomItem(NodeFill);
   const nodeShape = getRandomItem(NodeShape);
   const colorPalette = getRandomItem(ColorPalette);
