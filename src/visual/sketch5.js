@@ -10,7 +10,7 @@ let drewResultWindow = false;
 let drewInfoWindow = false;
 let drewAnim = true;
 let drewSetting = false;
-let isProcessPhase;
+let isProcessPhase = false;
 let processingLayer;
 let progress;
 let animationLoopCount;
@@ -72,7 +72,7 @@ let screenshotMode = false;
 let totalAnimSteps;
 
 async function setup() {
-  let w = windowHeight; 
+  let w = windowWidth; 
   let h = windowHeight;
   createCanvas(w,h);
 
@@ -358,7 +358,7 @@ function keyTyped() {
     if ((key === 'k' || key === 'K')) {
       save4KCanvasAtCurrentTime();
     }
-    if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false) {
+    if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false && isProcessPhase === false) {
       settingPopup();
       drewInfoWindow = false;
     }
@@ -1200,7 +1200,7 @@ function drawInfoWindow() {
   infoCanvas.text('SCALE:',width/2-285*maxR,height-120*maxR);
   infoCanvas.text('NUMBER OF CLASSES:',width/2-285*maxR,height-105*maxR);
   infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-90*maxR);
-  infoCanvas.text('MAXIMUM NEURONS PER HIDDEN LAYER:',width/2-285*maxR,height-75*maxR);
+  infoCanvas.text('MAX NEURONS PER HIDDEN LAYER:',width/2-285*maxR,height-75*maxR);
   infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-60*maxR);
   infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-45*maxR);
   infoCanvas.text('PAPER PATTERN:',width/2-285*maxR,height-30*maxR);
