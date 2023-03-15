@@ -1,5 +1,4 @@
-// const modelSeed = '1';
-const modelSeed = Date.now();
+const modelSeed = '1';
 
 new Q5("global");
 
@@ -20,7 +19,7 @@ let satFee,activeAmount,sparkRate;
 let percentage,finishedNumber,finishedText,defaultSize,startTime;
 
 let xsize,ysize,nodeSize;
-let layerNum,maxNodes,compareArray,realMaxNodes,realCompareArray;
+let layerNum,maxNodes,compareArray,realMaxNodes,realCompareArray,realHiddenLayerMaxNodes;
 let nodesArray,scaleNodesArray,scaleRatio,scaleToggle,liveNodesArray,animArray,animSet;
 let state,shape; 
 let shapeStroke,lineStroke,strokeRatio;
@@ -130,35 +129,33 @@ async function setupModel() {
   brain.updateAge(date);
   setupRandom();
 
-  // TODO: Change default traits to inscription training traits
+  traits.training = inscription.training_traits;
 
   classes_name = inscription.classes_name.map(e => e.toUpperCase());
 }
 
 function initialize() {
-    document.body.onfocus = checkIt;
-    console.log('initializing');
+  document.body.onfocus = checkIt;
 }
       
 // Define a function to check if
 // the user failed to upload file
 function checkIt() {
-    // Check if the number of files
-    // is not zero   
-     setTimeout(()=>{
-       const [file] = fileInput.files 
-      if (file) {
-          console.log('___2')
-        img = null
-        wrapInput.style.display = 'none'
-        handleFile(URL.createObjectURL(file));
-        oldFile = file;
-      }  else {
-        wrapInput.style.display = 'block'
-      }
+  // Check if the number of files
+  // is not zero   
+  setTimeout(()=>{
+    const [file] = fileInput.files 
+    if (file) {
+      img = null;
+      wrapInput.style.display = 'none';
+      handleFile(URL.createObjectURL(file));
+      oldFile = file;
+    } else {
+      wrapInput.style.display = 'block';
+    }
     document.body.onfocus = null;
-     }, 100)
-}  
+  }, 100)
+}
 
 function preloadingSetup() {
   maxR = min(width,height)/1024;
@@ -223,17 +220,15 @@ function installCustomUploadIfle(){
     } else {return}
   })
   
-  fileInput.addEventListener('change', ()=>{
-    
-    const [file] = fileInput.files 
-
+  fileInput.addEventListener('change', ()=>{    
+    const [file] = fileInput.files;
     if (file) {
-      img = null
-      wrapInput.style.display = 'none'
+      img = null;
+      wrapInput.style.display = 'none';
       handleFile(URL.createObjectURL(file));
       oldFile = file;
-    }  else{
-        wrapInput.style.display = 'block'
+    } else {
+      wrapInput.style.display = 'block';
     }
   })
 }
@@ -274,9 +269,9 @@ function customDoubleClicked() {
 }
 
 function handleFile(fileSrc) {
-    img = createImg(fileSrc,'');
-    img.hide();
-    customDoubleClicked();
+  img = createImg(fileSrc,'');
+  img.hide();
+  customDoubleClicked();
 }
 
 function processPhase() {
@@ -489,7 +484,6 @@ function setupSketch() {
   fillMode = dataSet.indexOf(traits.visual.nodeFill);
   pattern = paper.indexOf(traits.visual.pattern);
 
-  // console.log(shape);
   satFee = Math.tanh(Math.log10(stats.avgfeerate));
   satFee = map(satFee, 0, 1, 0.2, 0.8);
   
@@ -522,6 +516,7 @@ function setupSketch() {
   }
   realMaxNodes = max(...realCompareArray);
   scaleRatio = ceil(realMaxNodes/30);
+  realHiddenLayerMaxNodes = max(...realCompareArray.slice(0, -1));
   
   if (scaleToggle == 0) {
     for (let i=0; i<nodesArray.length; i++) {
@@ -536,8 +531,9 @@ function setupSketch() {
         newNode = 0;
       }
     }
-    // console.log(scaleToggle,maxNodes,scaleRatio)
-  } else {scaleNodesArray = nodesArray}
+  } else {
+    scaleNodesArray = nodesArray;
+  }
   scaleNodesArray.unshift(inputArray);
   
   if (state == 1) {
@@ -582,7 +578,6 @@ function setupSketch() {
   sparkRate = getClosestDivisibleFraction(totalFrames, 2, sparkRateExact);
 
   totalAnimSteps = round(totalFrames/sparkRate);
-  console.log(sparkRateExact, sparkRate, totalFrames/sparkRate);
 
   activeAmount = floor(liveNodesArray.length*satFee);
   animSet = [];
@@ -640,7 +635,6 @@ function setupSketch() {
   }
 
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
-  // console.log(scaledTotalNeurons);
   particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape, maxR);
 }
 
@@ -1206,7 +1200,7 @@ function drawInfoWindow() {
   infoCanvas.text('SCALE:',width/2-285*maxR,height-120*maxR);
   infoCanvas.text('NUMBER OF CLASSES:',width/2-285*maxR,height-105*maxR);
   infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-90*maxR);
-  infoCanvas.text('MAXIMUM NEURONS PER LAYER:',width/2-285*maxR,height-75*maxR);
+  infoCanvas.text('MAXIMUM NEURONS PER HIDDEN LAYER:',width/2-285*maxR,height-75*maxR);
   infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-60*maxR);
   infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-45*maxR);
   infoCanvas.text('PAPER PATTERN:',width/2-285*maxR,height-30*maxR);
@@ -1225,7 +1219,7 @@ function drawInfoWindow() {
   infoCanvas.text('1:'+scaleRatio,width/2-10*maxR,height-120*maxR);
   infoCanvas.text(classNum,width/2-10*maxR,height-105*maxR);
   infoCanvas.text(layerNum-2,width/2-10*maxR,height-90*maxR);
-  infoCanvas.text(realMaxNodes,width/2-10*maxR,height-75*maxR);
+  infoCanvas.text(realHiddenLayerMaxNodes,width/2-10*maxR,height-75*maxR);
   infoCanvas.text(epochs,width/2-10*maxR,height-60*maxR);
   infoCanvas.text(paletteName[paletteType],width/2-10*maxR,height-45*maxR);
   infoCanvas.text(paper[pattern],width/2-10*maxR,height-30*maxR);
@@ -1407,16 +1401,16 @@ save4KCanvasAtCurrentTime = () => {
   const newW = 4096, newH = h * 4096/w;
 
   resizeCanvas(newW, newH, true);
-  lineCanvas.resizeCanvas(newW,newH, true);
-  nodeCanvas.resizeCanvas(newW,newH, true);
-  patternCanvas.resizeCanvas(newW,newH, true);
-  popupCanvas.resizeCanvas(newW,newH, true);
-  infoCanvas.resizeCanvas(newW,newH, true);
-  deadCanvas.resizeCanvas(newW,newH, true);
-  loadingCanvas.resizeCanvas(newW,newH, true);
-  warningCanvas.resizeCanvas(newW,newH, true);
-  settingCanvas.resizeCanvas(newW,newH, true);
-  checkCanvas.resizeCanvas(newW,newH, true);
+  lineCanvas.resizeCanvas(newW, newH, true);
+  nodeCanvas.resizeCanvas(newW, newH, true);
+  patternCanvas.resizeCanvas(newW, newH, true);
+  popupCanvas.resizeCanvas(newW, newH, true);
+  infoCanvas.resizeCanvas(newW, newH, true);
+  deadCanvas.resizeCanvas(newW, newH, true);
+  loadingCanvas.resizeCanvas(newW, newH, true);
+  warningCanvas.resizeCanvas(newW, newH, true);
+  settingCanvas.resizeCanvas(newW, newH, true);
+  checkCanvas.resizeCanvas(newW, newH, true);
   mainCanvas.resizeCanvas(newW, newH, true);
 
   screenshotMode = true;
@@ -1429,17 +1423,17 @@ save4KCanvasAtCurrentTime = () => {
   saveCanvas(mainCanvas, filename);
 
   resizeCanvas(w, h, true);
-  lineCanvas.resizeCanvas(w,h, true);
-  nodeCanvas.resizeCanvas(w,h, true);
-  patternCanvas.resizeCanvas(w,h, true);
-  popupCanvas.resizeCanvas(w,h, true);
-  infoCanvas.resizeCanvas(w,h, true);
-  deadCanvas.resizeCanvas(w,h, true);
-  loadingCanvas.resizeCanvas(w,h, true);
-  warningCanvas.resizeCanvas(w,h, true);
-  settingCanvas.resizeCanvas(w,h, true);
-  checkCanvas.resizeCanvas(w,h, true);
-  mainCanvas.resizeCanvas(w,h, true);
+  lineCanvas.resizeCanvas(w, h, true);
+  nodeCanvas.resizeCanvas(w, h, true);
+  patternCanvas.resizeCanvas(w, h, true);
+  popupCanvas.resizeCanvas(w, h, true);
+  infoCanvas.resizeCanvas(w, h, true);
+  deadCanvas.resizeCanvas(w, h, true);
+  loadingCanvas.resizeCanvas(w, h, true);
+  warningCanvas.resizeCanvas(w, h, true);
+  settingCanvas.resizeCanvas(w, h, true);
+  checkCanvas.resizeCanvas(w, h, true);
+  mainCanvas.resizeCanvas(w, h, true);
 
   updateMaxR(w, h);  
   screenshotMode = false;

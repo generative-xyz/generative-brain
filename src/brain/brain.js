@@ -35,8 +35,6 @@ class Brain {
     const ts1 = new Date(parseInt(visualTraits.birthYear), 0, 1).getTime();
     const ts2 = new Date(parseInt(visualTraits.birthYear) + 1, 0, 1).getTime();
     this.birthDate = new Date(Math.floor((ts1 + ts2) / 2));
-
-    console.log(this.birthDate);
     
     const lifeCycle = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
     this.growSpeed = 365.0 / lifeCycle;
@@ -46,7 +44,6 @@ class Brain {
 
   updateAge(time) {
     const deltaTimestamp = time.getTime() - this.birthDate.getTime();
-    console.log(deltaTimestamp);
     const deltaYear = deltaTimestamp / (1000 * 60 * 60 * 24 * 365);
     const age = deltaYear * this.growSpeed;
     this.iteration = Math.floor(age / CYCLE_END);        

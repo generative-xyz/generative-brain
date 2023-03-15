@@ -178,7 +178,6 @@ function createButton(label, value) {
 
 function createFileInput(callback) {
   var multiple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  // _main.default._validateParameters('createFileInput', arguments);
   var handleFileSelect = function handleFileSelect(event) {
     var _iteratorNormalCompletion8 = true;
     var _didIteratorError8 = false;
@@ -215,7 +214,6 @@ function createFileInput(callback) {
 };
 
 createImg = function () {
-  // _main.default._validateParameters('createImg', arguments);
   var elt = document.createElement('img');
   var args = arguments;
   var self;

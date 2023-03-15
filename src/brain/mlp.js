@@ -55,13 +55,8 @@ class tfake {
     return res;
   }
 
-  static mul(a, b) {
-    return tfake.__apply_binary_op(a, b, tfake.__mul);
-  }
-
-  static add(a, b) {
-    return tfake.__apply_binary_op(a, b, tfake.__add);
-  }
+  static mul = (a, b) => tfake.__apply_binary_op(a, b, tfake.__mul);
+  static add = (a, b) => tfake.__apply_binary_op(a, b, tfake.__add);
 
   static matMul(a, b) {
     const res = new Tensor([], a.n, b.m);
@@ -142,8 +137,6 @@ class MultilayerPerceptron {
     const neurons = clone(this.totalNeurons);
     const sumNeurons = neurons.reduce((a, b) => a + b);
 
-    console.log("updateNeurons:", t, iteration);
-
     const sumInactiveNeurons = sumNeurons * (1 - t);
     for(let iter = 0; iter < sumInactiveNeurons; ++iter) {
       const ratio = neurons.map((x, i) => (x-1) / this.totalNeurons[i]);
@@ -186,7 +179,6 @@ class MultilayerPerceptron {
       x = layer.forward(x);
       const life = new Tensor(this.neuronsLife[i], 1, x.m);
       x = tfake.mul(x, life);
-      // console.log(x);
     }
     x = this.outputLayer.forward(x);
     return tfake.softmax(x);
@@ -226,7 +218,6 @@ function loadModel(layersConfig, weights_b64) {
       preprocessLayers.push(new RescaleLayer(info.config.scale, info.config.offset))
     } else if (info.class_name == "Flatten") {
       dim = [dim.reduce((a, b) => a * b)]
-      // preprocessLayers.push(new FlattenLayer())
     } else if (info.class_name == "Dense") {
       const nxt_dim = [info.config.units];
       const w_size = dim[0] * nxt_dim[0];
