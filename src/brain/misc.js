@@ -42,3 +42,20 @@ function isNullOrEmpty(str) {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+function getClosestDivisibleFraction(a, b, x0) {
+  let res = 0;
+  for(let p = 1; p <= 1000; ++p) {
+    for(let q = 1; q <= 1000; ++q) {
+      // a/b divisible by p/q 
+      // a*q divisible by b*p 
+      if ((a*q)%(b*p) == 0) {
+        let x = 1.0 * p / q;
+        if (abs(x - x0) < abs(res - x0)) {
+          res = x;
+        }
+      }
+    }
+  }
+  return res;
+}

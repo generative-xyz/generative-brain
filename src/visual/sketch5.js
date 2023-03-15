@@ -15,7 +15,7 @@ let isProcessPhase;
 let processingLayer;
 let progress;
 let animationLoopCount;
-let processingSpeed;
+let processingFrames;
 let satFee,activeAmount,sparkRate;
 let percentage,finishedNumber,finishedText,defaultSize,startTime;
 
@@ -280,7 +280,7 @@ function handleFile(fileSrc) {
 
 function processPhase() {
   if (!screenshotMode) {
-    progress += (width-border*2-xsize/2)/(processingSpeed*2*layerNum) / maxR;
+    progress += (width-border*2-xsize/2)/(processingFrames*2*layerNum) / maxR;
   }
 
   setEraseMode(lineCanvas);
@@ -289,7 +289,7 @@ function processPhase() {
 
   if (frameCount >= sparkRate && drewAnim == true) {
     drewAnim = false;
-    frameCount = 0;
+    frameCount -= sparkRate;
   } 
   if (drewAnim) {
     setEraseMode(nodeCanvas);
@@ -299,9 +299,9 @@ function processPhase() {
   }
   if (frameCount >= sparkRate && drewAnim == false) {
     drewAnim = true;
-    frameCount = 0;
+    frameCount -= sparkRate;
     processingLayer += 1;
-    if (processingLayer == ceil(layerNum*processingSpeed/sparkRate)) {
+    if (processingLayer == round(layerNum*processingFrames/sparkRate)) {
       ++animationLoopCount;
       processingLayer = 0;
       progress = border / maxR;
@@ -470,11 +470,11 @@ function setupSketch() {
   
   drawSpeed = acceleration.indexOf(traits.visual.hardwareAcceleration);
   if (drawSpeed == 1) {
-    speedAcce = 40; processingSpeed = 40;
+    speedAcce = 40; processingFrames = 40;
   } else if (drawSpeed == 2) {
-    speedAcce = 15; processingSpeed = 20;
+    speedAcce = 15; processingFrames = 20;
   } else {
-    speedAcce = 2; processingSpeed = 10;
+    speedAcce = 2; processingFrames = 10;
   }
 
   const brainStatus = brain.getBrainStatus();
@@ -488,7 +488,7 @@ function setupSketch() {
   fillMode = dataSet.indexOf(traits.visual.nodeFill);
   pattern = paper.indexOf(traits.visual.pattern);
 
-  console.log(shape);
+  // console.log(shape);
 
   satFee = Math.tanh(Math.log10(stats.avgfeerate));
   satFee = map(satFee, 0, 1, 0.2, 0.8);
@@ -575,11 +575,15 @@ function setupSketch() {
       if (scaleNodesArray[i][r] == 1) {liveNodesArray.push([x,y])}
     }
   }
+
+  const sparkRateExact = map(satFee,0.2,0.8,15,2);
+  sparkRate = getClosestDivisibleFraction(layerNum*processingFrames, 2, sparkRateExact)
+  console.log(sparkRateExact, sparkRate, 1.0 * layerNum*processingFrames/sparkRate);
+
   activeAmount = floor(liveNodesArray.length*satFee);
   animSet = [];
   animArray = [];
-  sparkRate = floor(map(satFee,0.2,0.8,15,2));
-  for (let k=0; k<ceil(layerNum*processingSpeed/sparkRate); k++) {
+  for (let k=0; k<round(layerNum*processingFrames/sparkRate); k++) {
     for (let i=0; i<activeAmount; i++) {
       let j = floor(random(1.0)*liveNodesArray.length);
       animArray.push(liveNodesArray.slice(j,j+1)[0]);
@@ -632,7 +636,7 @@ function setupSketch() {
   }
 
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
-  console.log(scaledTotalNeurons);
+  // console.log(scaledTotalNeurons);
   particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape, maxR);
 }
 
@@ -663,7 +667,7 @@ function updateMaxR(width, height) {
   animSet = [];
   animArray = [];
   sparkRate = floor(map(satFee,0.2,0.8,15,2));
-  for (let k=0; k<ceil(layerNum*processingSpeed/sparkRate); k++) {
+  for (let k=0; k<round(layerNum*processingFrames/sparkRate); k++) {
     for (let i=0; i<activeAmount; i++) {
       let j = floor(random(1.0)*liveNodesArray.length);
       animArray.push(liveNodesArray.slice(j,j+1)[0]);
@@ -1156,7 +1160,6 @@ function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
       canvas.text(line2,x,y+textHeight/2);
     }
   }
-  console.log('sie: '+newSize)
 }
 
 function divideLines(size,textBoxWidth,currentWidth,words1,words2,wordsArray,line1,line2,canvas) {
