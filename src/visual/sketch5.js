@@ -1,4 +1,4 @@
-const modelSeed = '1';
+const modelSeed = '9';
 
 new Q5("global");
 
@@ -832,7 +832,7 @@ function drawOnMainCanvas() {
   settingCanvas.background(255);
   settingCanvas.rectMode(CENTER);
   eraseCanvas(settingCanvas);
-  settingCanvas.textAlign(CENTER);
+  settingCanvas.textAlign(CENTER,CENTER);
   settingCanvas.textStyle(BOLD);
   settingCanvas.stroke(patternColor);
   settingCanvas.strokeWeight(8*maxR);
@@ -1026,60 +1026,35 @@ function drawResultWindow() {
   popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR,240*maxR);
   popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
   
-  popupCanvas.strokeWeight(1*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(startColor);
-  } else {
-    popupCanvas.fill(paperColor);
-  }
-  popupCanvas.rect(width/2-80*maxR,height/2+185*maxR,150*maxR,40*maxR,5*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(startColor);
-  } else {
-    popupCanvas.fill(paperColor);
-  }
-  popupCanvas.rect(width/2+80*maxR,height/2+185*maxR,150*maxR,40*maxR,5*maxR);
-  
   popupCanvas.noStroke();
   popupCanvas.fill(startColor);
-  if (!finishedNumber) {
-    popupCanvas.textSize(100*maxR);
-    percentage = random(10,100);
-    popupCanvas.text(percentage.toFixed(2)+'%',width/2+130*maxR,height/2-35*maxR);
+  popupCanvas.textSize(100*maxR);
+  let prediction_str;
+  if (!finishedNumber) {    
+    prediction_str = random(10,100).toFixed(2);
   } else {
-    popupCanvas.textSize(100*maxR);
-    let prediction_str = (predictions[0][0] * 100).toFixed(2);
+    prediction_str = (predictions[0][0] * 100).toFixed(2);
     if (prediction_str == "100.00") {
       prediction_str = "100";
     }
-    popupCanvas.text(prediction_str + '%',width/2+130*maxR,height/2-35*maxR);
   }
+  popupCanvas.text(prediction_str + '%',width/2+130*maxR,height/2-35*maxR);
   
   example = predictions.map(e => e[1]);
   defaultSize = popupCanvas.textWidth('"FIDENZA"');
   defaultPhrase = popupCanvas.textWidth('"PERPENDICULAR INHABITATION"');
-  if (!finishedText) {
-    let name = random(example);
-    const numWords = name.split(" ").length;
-    if (numWords === 1) {
-      let newSize = 75*defaultSize/popupCanvas.textWidth('"'+name+'"');
-      if (newSize > 75) {newSize = 75}
-      popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+name+'"',width/2+130*maxR,height/2+65*maxR);       
-    } else {
-      writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,name,popupCanvas);
-    }
+  
+  const textToPrint = finishedText ? example[0] : random(example);
+  const numWords = textToPrint.split(" ").length;
+  if (numWords === 1) {
+    let newSize = 75*defaultSize/popupCanvas.textWidth('"'+textToPrint+'"');
+    if (newSize > 75) {newSize = 75}
+    popupCanvas.textSize(newSize*maxR);
+    popupCanvas.text('"'+textToPrint+'"',width/2+130*maxR,height/2+65*maxR);       
   } else {
-    const numWords = example[0].split(" ").length;
-    if (numWords === 1) {
-      let newSize = 75*defaultSize/popupCanvas.textWidth('"'+example[0]+'"');
-      if (newSize > 75) {newSize = 75}
-      popupCanvas.textSize(newSize*maxR);
-      popupCanvas.text('"'+example[0]+'"',width/2+130*maxR,height/2+65*maxR);   
-    } else {
-      writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,example[0],popupCanvas);
-    }
-  }
+    writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,textToPrint,popupCanvas);
+  }  
+
   if (millis()-startTime > 1000) {
     finishedNumber = true;
   }
@@ -1087,19 +1062,8 @@ function drawResultWindow() {
     finishedText = true;
   }
 
-  popupCanvas.textSize(20*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
-    popupCanvas.fill(startColor);
-  }
-  popupCanvas.text('TRY AGAIN',width/2-80*maxR,height/2+186.5*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+165*maxR && mouseY<height/2+205*maxR) {
-    popupCanvas.fill(paperColor);
-  } else {
-    popupCanvas.fill(startColor);
-  }
-  popupCanvas.text('CLOSE',width/2+80*maxR,height/2+186.5*maxR);
+  drawButton(popupCanvas, width/2-155*maxR, width/2-5*maxR, height/2+165*maxR, height/2+205*maxR, 'TRY AGAIN');
+  drawButton(popupCanvas, width/2+5*maxR, width/2+155*maxR, height/2+165*maxR, height/2+205*maxR, 'CLOSE');
 }
 
 function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
@@ -1191,46 +1155,50 @@ function drawInfoWindow() {
   infoCanvas.rect(width/2-175*maxR,height-170*maxR,250*maxR,30*maxR)
   infoCanvas.noStroke();
   infoCanvas.fill(paperColor);
+
+  const labelLeft = width/2-285*maxR, labelRight = width/2+10*maxR;
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
-  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
+  infoCanvas.text('TECHNICAL INFORMATION',labelLeft,height-165*maxR);
   infoCanvas.fill(startColor);
   infoCanvas.textSize(12*maxR);
-  infoCanvas.text('NAME:',width/2-285*maxR,height-135*maxR);
-  infoCanvas.text('SCALE:',width/2-285*maxR,height-120*maxR);
-  infoCanvas.text('NUMBER OF CLASSES:',width/2-285*maxR,height-105*maxR);
-  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',width/2-285*maxR,height-90*maxR);
-  infoCanvas.text('MAX NEURONS PER HIDDEN LAYER:',width/2-285*maxR,height-75*maxR);
-  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',width/2-285*maxR,height-60*maxR);
-  infoCanvas.text('COLOR PALETTE:',width/2-285*maxR,height-45*maxR);
-  infoCanvas.text('PAPER PATTERN:',width/2-285*maxR,height-30*maxR);
-  infoCanvas.text('NETWORK ARCHITECTURE:',width/2+10*maxR,height-135*maxR);
-  infoCanvas.text('ACTIVATION FUNCTION:',width/2+10*maxR,height-120*maxR);
-  infoCanvas.text('DATA SET:',width/2+10*maxR,height-105*maxR);
-  infoCanvas.text('DEEP LEARNING FRAMEWORK: ',width/2+10*maxR,height-90*maxR);
-  infoCanvas.text('HARDWARE ACCELERATION:',width/2+10*maxR,height-75*maxR);
-  infoCanvas.text('BIRTH YEAR:',width/2+10*maxR,height-60*maxR);
-  infoCanvas.text('LIFE CYCLE:',width/2+10*maxR,height-45*maxR);
-  infoCanvas.text('STATE:',width/2+10*maxR,height-30*maxR);
+  infoCanvas.text('NAME:',labelLeft,height-135*maxR);
+  infoCanvas.text('SCALE:',labelLeft,height-120*maxR);
+  infoCanvas.text('NUMBER OF CLASSES:',labelLeft,height-105*maxR);
+  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',labelLeft,height-90*maxR);
+  infoCanvas.text('MAX NEURONS PER HIDDEN LAYER:',labelLeft,height-75*maxR);
+  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',labelLeft,height-60*maxR);
+  infoCanvas.text('COLOR PALETTE:',labelLeft,height-45*maxR);
+  infoCanvas.text('PAPER PATTERN:',labelLeft,height-30*maxR);
+  infoCanvas.text('NETWORK ARCHITECTURE:',labelRight,height-135*maxR);
+  infoCanvas.text('ACTIVATION FUNCTION:',labelRight,height-120*maxR);
+  infoCanvas.text('DATA SET:',labelRight,height-105*maxR);
+  infoCanvas.text('DEEP LEARNING FRAMEWORK: ',labelRight,height-90*maxR);
+  infoCanvas.text('HARDWARE ACCELERATION:',labelRight,height-75*maxR);
+  infoCanvas.text('BIRTH YEAR:',labelRight,height-60*maxR);
+  infoCanvas.text('LIFE CYCLE:',labelRight,height-45*maxR);
+  infoCanvas.text('STATE:',labelRight,height-30*maxR);
+
+  const valueLeft = width/2-10*maxR, valueRight = width/2+285*maxR;
   infoCanvas.textStyle(ITALIC);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textSize(12*maxR);
-  infoCanvas.text('Perceptron #'+seed,width/2-10*maxR,height-135*maxR);
-  infoCanvas.text('1:'+scaleRatio,width/2-10*maxR,height-120*maxR);
-  infoCanvas.text(classNum,width/2-10*maxR,height-105*maxR);
-  infoCanvas.text(layerNum-2,width/2-10*maxR,height-90*maxR);
-  infoCanvas.text(realHiddenLayerMaxNodes,width/2-10*maxR,height-75*maxR);
-  infoCanvas.text(epochs,width/2-10*maxR,height-60*maxR);
-  infoCanvas.text(paletteName[paletteType],width/2-10*maxR,height-45*maxR);
-  infoCanvas.text(paper[pattern],width/2-10*maxR,height-30*maxR);
-  infoCanvas.text(architecture,width/2+285*maxR,height-135*maxR);
-  infoCanvas.text(activationFunction,width/2+285*maxR,height-120*maxR);
-  infoCanvas.text(dataSet[fillMode],width/2+285*maxR,height-105*maxR);
-  infoCanvas.text(framework[shape],width/2+285*maxR,height-90*maxR);
-  infoCanvas.text(acceleration[drawSpeed],width/2+285*maxR,height-75*maxR);
-  infoCanvas.text(birthYear,width/2+285*maxR,height-60*maxR);
-  infoCanvas.text(lifeCycle,width/2+285*maxR,height-45*maxR);
-  infoCanvas.text(liveState[state],width/2+285*maxR,height-30*maxR);
+  infoCanvas.text('Perceptron #'+seed,valueLeft,height-135*maxR);
+  infoCanvas.text('1:'+scaleRatio,valueLeft,height-120*maxR);
+  infoCanvas.text(classNum,valueLeft,height-105*maxR);
+  infoCanvas.text(layerNum-2,valueLeft,height-90*maxR);
+  infoCanvas.text(realHiddenLayerMaxNodes,valueLeft,height-75*maxR);
+  infoCanvas.text(epochs,valueLeft,height-60*maxR);
+  infoCanvas.text(paletteName[paletteType],valueLeft,height-45*maxR);
+  infoCanvas.text(paper[pattern],valueLeft,height-30*maxR);
+  infoCanvas.text(architecture,valueRight,height-135*maxR);
+  infoCanvas.text(activationFunction,valueRight,height-120*maxR);
+  infoCanvas.text(dataSet[fillMode],valueRight,height-105*maxR);
+  infoCanvas.text(framework[shape],valueRight,height-90*maxR);
+  infoCanvas.text(acceleration[drawSpeed],valueRight,height-75*maxR);
+  infoCanvas.text(birthYear,valueRight,height-60*maxR);
+  infoCanvas.text(lifeCycle,valueRight,height-45*maxR);
+  infoCanvas.text(liveState[state],valueRight,height-30*maxR);
 }
 
 function drawSetting() {
@@ -1242,34 +1210,9 @@ function drawSetting() {
   settingCanvas.fill(paperColor);
   settingCanvas.rect(width/2,height/2,600*maxR,200*maxR,25*maxR);
   
-  settingCanvas.strokeWeight(1*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
-    settingCanvas.fill(startColor);
-  } else {
-    settingCanvas.fill(paperColor);
-  }
-  settingCanvas.rect(width/2-80*maxR,height/2+135*maxR,150*maxR,40*maxR,5*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
-    settingCanvas.fill(startColor);
-  } else {
-    settingCanvas.fill(paperColor);
-  }
-  settingCanvas.rect(width/2+80*maxR,height/2+135*maxR,150*maxR,40*maxR,5*maxR);
+  drawButton(settingCanvas, width/2-155*maxR, width/2-5*maxR, height/2+115*maxR, height/2+155*maxR, 'UPDATE');
+  drawButton(settingCanvas, width/2+5*maxR, width/2+155*maxR, height/2+115*maxR, height/2+155*maxR, 'CLOSE');
   
-  settingCanvas.noStroke();
-  settingCanvas.textSize(20*maxR);
-  if (mouseX>width/2-155*maxR && mouseX<width/2-5*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
-    settingCanvas.fill(paperColor);
-  } else {
-    settingCanvas.fill(startColor);
-  }
-  settingCanvas.text('UPDATE',width/2-80*maxR,height/2+142*maxR);
-  if (mouseX>width/2+5*maxR && mouseX<width/2+155*maxR && mouseY>height/2+115*maxR && mouseY<height/2+155*maxR) {
-    settingCanvas.fill(paperColor);
-  } else {
-    settingCanvas.fill(startColor);
-  }
-  settingCanvas.text('CLOSE',width/2+80*maxR,height/2+142*maxR);
   settingCanvas.textAlign(LEFT);
   settingCanvas.fill(startColor);
   settingCanvas.text('UPDATE BITCOIN FULL NODE ADDRESS',width/2-252.5*maxR,height/2-50*maxR);
@@ -1437,4 +1380,29 @@ save4KCanvasAtCurrentTime = () => {
 
   updateMaxR(w, h);  
   screenshotMode = false;
+}
+
+function isMouseInside(x1, x2, y1, y2) {
+  return mouseX>x1 && mouseX<x2 && mouseY>y1 && mouseY<y2;
+}
+
+function drawButton(canvas, x1, x2, y1, y2, text, xt, yt) {
+  canvas.strokeWeight(1*maxR);
+  canvas.stroke(patternColor);
+  
+  const [backgroundColor, textColor] = isMouseInside(x1, x2, y1, y2) ? [startColor, paperColor] : [paperColor, startColor];
+  canvas.fill(backgroundColor);
+  canvas.push();
+  canvas.rectMode(CORNERS);
+  canvas.rect(x1,y1,x2,y2,5*maxR);
+  canvas.pop();
+  
+  canvas.noStroke();
+  canvas.textSize(20*maxR);
+  canvas.fill(textColor);
+  canvas.text(text,(x1+x2)/2,(y1+y2)/2);
+}
+
+function resizeAllCanvas(w, h) {
+
 }
