@@ -1,2 +1,0 @@
-- Script to change "Reflection" trait name to "Symmetric"
-- Reduce file size
