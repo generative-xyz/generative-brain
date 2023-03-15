@@ -1,4 +1,4 @@
-const modelSeed = '9';
+const modelSeed = '1';
 
 new Q5("global");
 
@@ -1155,50 +1155,47 @@ function drawInfoWindow() {
   infoCanvas.rect(width/2-175*maxR,height-170*maxR,250*maxR,30*maxR)
   infoCanvas.noStroke();
   infoCanvas.fill(paperColor);
-
-  const labelLeft = width/2-285*maxR, labelRight = width/2+10*maxR;
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
-  infoCanvas.text('TECHNICAL INFORMATION',labelLeft,height-165*maxR);
-  infoCanvas.fill(startColor);
-  infoCanvas.textSize(12*maxR);
-  infoCanvas.text('NAME:',labelLeft,height-135*maxR);
-  infoCanvas.text('SCALE:',labelLeft,height-120*maxR);
-  infoCanvas.text('NUMBER OF CLASSES:',labelLeft,height-105*maxR);
-  infoCanvas.text('NUMBER OF HIDDEN LAYERS:',labelLeft,height-90*maxR);
-  infoCanvas.text('MAX NEURONS PER HIDDEN LAYER:',labelLeft,height-75*maxR);
-  infoCanvas.text('NUMBER OF TRAINING EPOCHS:',labelLeft,height-60*maxR);
-  infoCanvas.text('COLOR PALETTE:',labelLeft,height-45*maxR);
-  infoCanvas.text('PAPER PATTERN:',labelLeft,height-30*maxR);
-  infoCanvas.text('NETWORK ARCHITECTURE:',labelRight,height-135*maxR);
-  infoCanvas.text('ACTIVATION FUNCTION:',labelRight,height-120*maxR);
-  infoCanvas.text('DATA SET:',labelRight,height-105*maxR);
-  infoCanvas.text('DEEP LEARNING FRAMEWORK: ',labelRight,height-90*maxR);
-  infoCanvas.text('HARDWARE ACCELERATION:',labelRight,height-75*maxR);
-  infoCanvas.text('BIRTH YEAR:',labelRight,height-60*maxR);
-  infoCanvas.text('LIFE CYCLE:',labelRight,height-45*maxR);
-  infoCanvas.text('STATE:',labelRight,height-30*maxR);
+  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
 
-  const valueLeft = width/2-10*maxR, valueRight = width/2+285*maxR;
-  infoCanvas.textStyle(ITALIC);
-  infoCanvas.textAlign(RIGHT);
-  infoCanvas.textSize(12*maxR);
-  infoCanvas.text('Perceptron #'+seed,valueLeft,height-135*maxR);
-  infoCanvas.text('1:'+scaleRatio,valueLeft,height-120*maxR);
-  infoCanvas.text(classNum,valueLeft,height-105*maxR);
-  infoCanvas.text(layerNum-2,valueLeft,height-90*maxR);
-  infoCanvas.text(realHiddenLayerMaxNodes,valueLeft,height-75*maxR);
-  infoCanvas.text(epochs,valueLeft,height-60*maxR);
-  infoCanvas.text(paletteName[paletteType],valueLeft,height-45*maxR);
-  infoCanvas.text(paper[pattern],valueLeft,height-30*maxR);
-  infoCanvas.text(architecture,valueRight,height-135*maxR);
-  infoCanvas.text(activationFunction,valueRight,height-120*maxR);
-  infoCanvas.text(dataSet[fillMode],valueRight,height-105*maxR);
-  infoCanvas.text(framework[shape],valueRight,height-90*maxR);
-  infoCanvas.text(acceleration[drawSpeed],valueRight,height-75*maxR);
-  infoCanvas.text(birthYear,valueRight,height-60*maxR);
-  infoCanvas.text(lifeCycle,valueRight,height-45*maxR);
-  infoCanvas.text(liveState[state],valueRight,height-30*maxR);
+  data = [
+    ['NAME', 'Perceptron #'+seed],
+    ['SCALE', '1:'+scaleRatio],
+    ['NUMBER OF CLASSES', classNum],
+    ['NUMBER OF HIDDEN LAYERS', layerNum-2],
+    ['MAX NEURONS PER HIDDEN LAYER', realHiddenLayerMaxNodes],
+    ['NUMBER OF TRAINING EPOCHS', epochs],
+    ['COLOR PALETTE', paletteName[paletteType]],
+    ['PAPER PATTERN', paper[pattern]],
+    ['NETWORK ARCHITECTURE', architecture],
+    ['ACTIVATION FUNCTION', activationFunction],
+    ['DATA SET', dataSet[fillMode]],
+    ['DEEP LEARNING FRAMEWORK', framework[shape]],
+    ['HARDWARE ACCELERATION', acceleration[drawSpeed]],
+    ['BIRTH YEAR', birthYear],
+    ['LIFE CYCLE', lifeCycle],
+    ['STATE', liveState[state]],
+  ];
+
+  infoCanvas.fill(startColor);
+  const half = data.length / 2;
+  for (let i = 0; i < data.length; ++i) {
+    const isLeft = i < half;
+    const xLabel = isLeft ? width/2-285*maxR : width/2+10*maxR;
+    const xValue = isLeft ? width/2-10*maxR : width/2+285*maxR;
+    const y = height-(135-15*(i%half))*maxR;
+
+    infoCanvas.textStyle(BOLD);
+    infoCanvas.textAlign(LEFT);
+    infoCanvas.textSize(12*maxR);
+    infoCanvas.text(data[i][0],xLabel,y);
+
+    infoCanvas.textStyle(ITALIC);
+    infoCanvas.textAlign(RIGHT);
+    infoCanvas.textSize(12*maxR);
+    infoCanvas.text(data[i][1],xValue,y);
+  }
 }
 
 function drawSetting() {
@@ -1333,51 +1330,22 @@ function addAlpha(colorString, opacity) {
 }
 
 saveCanvasAtCurrentTime = () => {
-  let offset = new Date().getTimezoneOffset() * 60 * 1000;
-  let localTimeStr = new Date(Date.now() - offset).toISOString().slice(0, -1);
-  let filename = localTimeStr;
-  save(filename);
+  save(getLocalTimeStr());
 }
 
 save4KCanvasAtCurrentTime = () => {
   const w = width, h = height;
   const newW = 4096, newH = h * 4096/w;
 
-  resizeCanvas(newW, newH, true);
-  lineCanvas.resizeCanvas(newW, newH, true);
-  nodeCanvas.resizeCanvas(newW, newH, true);
-  patternCanvas.resizeCanvas(newW, newH, true);
-  popupCanvas.resizeCanvas(newW, newH, true);
-  infoCanvas.resizeCanvas(newW, newH, true);
-  deadCanvas.resizeCanvas(newW, newH, true);
-  loadingCanvas.resizeCanvas(newW, newH, true);
-  warningCanvas.resizeCanvas(newW, newH, true);
-  settingCanvas.resizeCanvas(newW, newH, true);
-  checkCanvas.resizeCanvas(newW, newH, true);
-  mainCanvas.resizeCanvas(newW, newH, true);
-
+  resizeAllCanvas(newW, newH);
   screenshotMode = true;
   updateMaxR(newW, newH);  
   drawOnMainCanvas();
 
-  let offset = new Date().getTimezoneOffset() * 60 * 1000;
-  let localTimeStr = new Date(Date.now() - offset).toISOString().slice(0, -1);
-  let filename = '4K_' + localTimeStr + '.png';
+  let filename = '4K_' + getLocalTimeStr() + '.png';
   saveCanvas(mainCanvas, filename);
 
-  resizeCanvas(w, h, true);
-  lineCanvas.resizeCanvas(w, h, true);
-  nodeCanvas.resizeCanvas(w, h, true);
-  patternCanvas.resizeCanvas(w, h, true);
-  popupCanvas.resizeCanvas(w, h, true);
-  infoCanvas.resizeCanvas(w, h, true);
-  deadCanvas.resizeCanvas(w, h, true);
-  loadingCanvas.resizeCanvas(w, h, true);
-  warningCanvas.resizeCanvas(w, h, true);
-  settingCanvas.resizeCanvas(w, h, true);
-  checkCanvas.resizeCanvas(w, h, true);
-  mainCanvas.resizeCanvas(w, h, true);
-
+  resizeAllCanvas(w, h);
   updateMaxR(w, h);  
   screenshotMode = false;
 }
@@ -1386,7 +1354,7 @@ function isMouseInside(x1, x2, y1, y2) {
   return mouseX>x1 && mouseX<x2 && mouseY>y1 && mouseY<y2;
 }
 
-function drawButton(canvas, x1, x2, y1, y2, text, xt, yt) {
+function drawButton(canvas, x1, x2, y1, y2, text) {
   canvas.strokeWeight(1*maxR);
   canvas.stroke(patternColor);
   
@@ -1404,5 +1372,16 @@ function drawButton(canvas, x1, x2, y1, y2, text, xt, yt) {
 }
 
 function resizeAllCanvas(w, h) {
-
+  resizeCanvas(w, h, true);
+  lineCanvas.resizeCanvas(w, h, true);
+  nodeCanvas.resizeCanvas(w, h, true);
+  patternCanvas.resizeCanvas(w, h, true);
+  popupCanvas.resizeCanvas(w, h, true);
+  infoCanvas.resizeCanvas(w, h, true);
+  deadCanvas.resizeCanvas(w, h, true);
+  loadingCanvas.resizeCanvas(w, h, true);
+  warningCanvas.resizeCanvas(w, h, true);
+  settingCanvas.resizeCanvas(w, h, true);
+  checkCanvas.resizeCanvas(w, h, true);
+  mainCanvas.resizeCanvas(w, h, true);
 }

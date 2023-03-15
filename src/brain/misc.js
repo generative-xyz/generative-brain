@@ -58,3 +58,8 @@ function getClosestDivisibleFraction(a, b, x0) {
   }
   return res;
 }
+
+function getLocalTimeStr() {
+  let offset = new Date().getTimezoneOffset() * 60 * 1000;
+  return new Date(Date.now() - offset).toISOString().slice(0, -1);
+}
