@@ -306,17 +306,14 @@ XML = function (DOM) {
 }
 
 function eraseCanvas(canvas) {
-  canvas.push();
-  canvas.fill(255, 255, 255, 255);
-  canvas.blendMode(REMOVE);
+  setEraseMode(canvas);
 
   const curMode = canvas._rectMode;
   canvas.rectMode(CORNER);
   canvas.rect(0, 0, canvas.width, canvas.height);
   canvas.rectMode(curMode);
   
-  canvas.blendMode(BLEND);
-  canvas.pop();
+  setNoEraseMode(canvas);
 }
 
 function setEraseMode(canvas) {
