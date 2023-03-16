@@ -1,4 +1,16 @@
-const modelSeed = '2022';
+const visualSeed = 2022; // Any number
+const modelSeed = 0; // 0-499
+/**
+ * Modify trait: Line 87-93 in traits.js
+ * Modify parameter for each trait:
+ * a) Color pallete: Line 162-189
+ * b) Paper pattern: Line 922-945
+ * c) Node fill mode (Dataset): Line 692-700, 893-895
+ * d) Node shape (DL framework): Line 896-920
+ * e) Animation speed (Hardware acceleration): Line 446-453
+ */
+
+const ___default_inscription = ___all_inscriptions[modelSeed];
 
 new Q5("global");
 
@@ -90,9 +102,8 @@ async function setup() {
 }
 
 function setupRandom() {
-  seed = parseInt(modelSeed);
-  randomSeed(seed);
-  noiseSeed(seed);
+  randomSeed(visualSeed);
+  noiseSeed(visualSeed);
 }
 
 function setupTraits() {
@@ -865,6 +876,8 @@ function drawNodeSet(amount,nodeColor,strokeColor,canvas) {
     shapeOpacity = scaleNodesArray[amount][r];
     shapeDashBySize = map(strokeRatio, 1/30, 1, 3, 10);
     shapeDashByOpacity = map(scaleNodesArray[amount][r],0,1,shapeDashBySize*2,0) * maxR;
+    if (shapeDashByOpacity < 1 * maxR) 
+      shapeDashByOpacity = 0;
     drawNode(x,y,nodeSize,shape,nodeColor,strokeColor,shapeDashByOpacity,shapeOpacity,canvas);
   }
 }
@@ -1080,7 +1093,7 @@ function drawInfoWindow() {
   infoCanvas.text('NAME:',width/2+10*maxR,height-165*maxR);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textStyle(ITALIC);
-  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
+  infoCanvas.text('Perceptron #'+visualSeed,width/2+285*maxR,height-165*maxR);
   
   data = [
     ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160)],
