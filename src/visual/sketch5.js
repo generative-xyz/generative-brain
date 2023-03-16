@@ -48,6 +48,7 @@ let oldFile = null;
 
 let setupFinished = false;
 let inputDim;
+let model_name;
 let classes_name;
 let stats;
 let traits;
@@ -117,6 +118,7 @@ async function setupModel() {
 
   traits.training = inscription.training_traits;
 
+  model_name = inscription.model_name;
   classes_name = inscription.classes_name.map(e => e.toUpperCase());
 }
 
@@ -1081,7 +1083,7 @@ function drawInfoWindow() {
   infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
   
   data = [
-    ['MODEL NAME:', 'example'],
+    ['MODEL NAME:', fitStrToWidth(12*maxR, model_name, 150)],
     ['SCALE:', '1:'+scaleRatio],
     ['NUMBER OF CLASSES:', classNum],
     ['NUMBER OF HIDDEN LAYERS:', layerNum-2],

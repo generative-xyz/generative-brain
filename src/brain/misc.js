@@ -63,3 +63,22 @@ function getLocalTimeStr() {
   let offset = new Date().getTimezoneOffset() * 60 * 1000;
   return new Date(Date.now() - offset).toISOString().slice(0, -1);
 }
+
+function fitStrToWidth(tSize, str, w) {
+  push();
+  textSize(tSize);
+  let res;
+  if (textWidth(str) <= w) {
+    res = str;
+  } else {
+    for(let i = 0; i < str.length; ++i) {
+      const p = str.slice(0, i+1) + '...';
+      if (textWidth(p) > w) {
+        res = p;
+        break;
+      }
+    }
+  }
+  pop();
+  return res;
+}
