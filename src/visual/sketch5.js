@@ -1,4 +1,4 @@
-const modelSeed = '1';
+const modelSeed = '2022';
 
 new Q5("global");
 
@@ -1065,30 +1065,38 @@ function drawInfoWindow() {
   infoCanvas.fill(paperColor);
   infoCanvas.rect(width/2,height-87.5*maxR,600*maxR,135*maxR);
   infoCanvas.fill(patternColor);
-  infoCanvas.rect(width/2-175*maxR,height-170*maxR,250*maxR,30*maxR)
+  infoCanvas.rect(width/2-150*maxR,height-170*maxR,300*maxR,30*maxR);
+  infoCanvas.fill(paperColor);
+  infoCanvas.rect(width/2+150*maxR,height-170*maxR,300*maxR,30*maxR);
   infoCanvas.noStroke();
   infoCanvas.fill(paperColor);
+  
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
   infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
-
+  infoCanvas.fill(startColor);
+  infoCanvas.text('ARTWORK NAME:',width/2+10*maxR,height-165*maxR);
+  infoCanvas.textAlign(RIGHT);
+  infoCanvas.textStyle(ITALIC);
+  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
+  
   data = [
-    ['NAME', 'Perceptron #'+seed],
-    ['SCALE', '1:'+scaleRatio],
-    ['NUMBER OF CLASSES', classNum],
-    ['NUMBER OF HIDDEN LAYERS', layerNum-2],
-    ['MAX NEURONS PER HIDDEN LAYER', realHiddenLayerMaxNodes],
-    ['NUMBER OF TRAINING EPOCHS', epochs],
-    ['COLOR PALETTE', ColorPalette[paletteType][0]],
-    ['PAPER PATTERN', Pattern[pattern-1][0]],
-    ['NETWORK ARCHITECTURE', architecture],
-    ['ACTIVATION FUNCTION', activationFunction],
-    ['DATA SET', NodeFill[fillMode-1][0]],
-    ['DEEP LEARNING FRAMEWORK', NodeShape[shape-1][0]],
-    ['HARDWARE ACCELERATION', HardwareAcceleration[drawSpeed-1][0]],
-    ['BIRTH YEAR', birthYear],
-    ['LIFE CYCLE', lifeCycle],
-    ['STATE', liveState[state]],
+    ['MODEL NAME:', 'example'],
+    ['SCALE:', '1:'+scaleRatio],
+    ['NUMBER OF CLASSES:', classNum],
+    ['NUMBER OF HIDDEN LAYERS:', layerNum-2],
+    ['MAX NEURONS PER HIDDEN LAYER:', realHiddenLayerMaxNodes],
+    ['NUMBER OF TRAINING EPOCHS:', epochs],
+    ['COLOR PALETTE:', ColorPalette[paletteType][0]],
+    ['PAPER PATTERN:', Pattern[pattern-1][0]],
+    ['NETWORK ARCHITECTURE:', architecture],
+    ['ACTIVATION FUNCTION:', activationFunction],
+    ['DATA SET:', NodeFill[fillMode-1][0]],
+    ['DEEP LEARNING FRAMEWORK:', NodeShape[shape-1][0]],
+    ['HARDWARE ACCELERATION:', HardwareAcceleration[drawSpeed-1][0]],
+    ['BIRTH YEAR:', birthYear],
+    ['LIFE CYCLE:', lifeCycle],
+    ['STATE:', liveState[state]],
   ];
 
   infoCanvas.fill(startColor);
@@ -1121,13 +1129,13 @@ function drawSetting() {
   
   settingCanvas.textAlign(LEFT);
   settingCanvas.fill(startColor);
-  settingCanvas.text('UPDATE BITCOIN FULL NODE ADDRESS',width/2-252.5*maxR,height/2-50*maxR);
-  settingCanvas.text('UPDATE MODEL ADDRESS',width/2-252.5*maxR,height/2+25*maxR);
+  settingCanvas.text('UPDATE BITCOIN FULL NODE ADDRESS',width/2-252.5*maxR,height/2-55*maxR);
+  settingCanvas.text('UPDATE MODEL ADDRESS',width/2-252.5*maxR,height/2+20*maxR);
   settingCanvas.textAlign(RIGHT);
   settingCanvas.textStyle(ITALIC);
   settingCanvas.textSize(15*maxR);
-  if (blockApiResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2-50*maxR)}
-  if (modelInscriptionResult == false) {settingCanvas.text('(*) Invalid Model',width/2+252.5*maxR,height/2+25*maxR)}
+  if (blockApiResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2-52*maxR)}
+  if (modelInscriptionResult == false) {settingCanvas.text('(*) Invalid Model',width/2+252.5*maxR,height/2+23*maxR)}
 }
 
 function drawLoadingScreen() {
