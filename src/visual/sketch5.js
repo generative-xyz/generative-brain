@@ -1077,13 +1077,13 @@ function drawInfoWindow() {
   infoCanvas.textStyle(BOLD);
   infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
   infoCanvas.fill(startColor);
-  infoCanvas.text('ARTWORK NAME:',width/2+10*maxR,height-165*maxR);
+  infoCanvas.text('NAME:',width/2+10*maxR,height-165*maxR);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textStyle(ITALIC);
   infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
   
   data = [
-    ['MODEL NAME:', fitStrToWidth(12*maxR, model_name, 150)],
+    ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160)],
     ['SCALE:', '1:'+scaleRatio],
     ['NUMBER OF CLASSES:', classNum],
     ['NUMBER OF HIDDEN LAYERS:', layerNum-2],
