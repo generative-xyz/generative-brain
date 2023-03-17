@@ -197,10 +197,10 @@ function installCustomUploadIfle(){
     if (drewSetting) return;
     if (drewCheckingWindow) return;
 
-    if (isNeuronsConnected(nodesArray) && currentLine > layerNum) {
+    if (isNeuronsConnected(nodesArray) && currentLine == layerNum-1) {
       fileInput.click();
       initialize();
-    } else if (state == 4 || state == 5 || (!isNeuronsConnected(nodesArray) && currentLine > layerNum)) {
+    } else if (state == 4 || state == 5 || (!isNeuronsConnected(nodesArray) && currentLine == layerNum-1)) {
       drewWarningScreen = true;
       drewWarningText = true;
       warningCount = 0;
@@ -455,8 +455,8 @@ function setupSketch() {
   satFee = Math.tanh(Math.log10(stats.avgfeerate));
   satFee = map(satFee, 0, 1, 0.2, 0.8);
   
-  inputNodes = 3;
-  classNum = classes_name.length;
+  inputNodes = 1;
+  classNum = 1;
   classArray = [];
   inputArray = [];
   
@@ -689,7 +689,7 @@ function drawCanvases() {
   }
 
   // draw neural lines
-  if (frameCount >= speedAcce && currentLine <= layerNum) {
+  if (frameCount >= speedAcce && currentLine < layerNum-1) {
     currentLine++;
     frameCount = 0;
   }  
@@ -816,41 +816,16 @@ function draw() {
   }
 }
 
-function drawInputLine() {
-  for (let i=0; i<inputNodes; i++) {
-    const [x2, y] = getNodePosition(0,i);
-    const x1 = (border+(xsize/2-nodeSize/2)+border/4)/2;
-    gradientLine(x1,y,x2,y,newGradientFill[0],newGradientFill[1],lineCanvas,strokeOpacity);
-  }
-}
-
-function drawOutputLine() {
-  let outputNum = scaleNodesArray[scaleNodesArray.length-1].length;
-  for (let c=0; c<outputNum; c++) { 
-    const [x2, y] = getNodePosition(layerNum-1,c);
-    const x1 = width-(border+(xsize/2-nodeSize/2)+border/4)/2;
-    gradientLine(x1,y,x2,y,newGradientFill[newGradientFill.length-2],newGradientFill[newGradientFill.length-1],lineCanvas,strokeOpacity);
-  }
-}
-
 function drawLineSet(amount) {
-  if (amount == 0) {
-    drawInputLine();
-    return;
-  }
-  if (amount == layerNum) {
-    drawOutputLine();
-    return;
-  }
-  let nodeAmount = scaleNodesArray[amount-1].length;
-  let nextNodesAmount = scaleNodesArray[amount].length;
+  let nodeAmount = scaleNodesArray[amount].length;
+  let nextNodesAmount = scaleNodesArray[amount+1].length;
   let lineOpacity;
   for (let r=0; r<nodeAmount; r++) {
-    const [x1, y1] = getNodePosition(amount-1, r);
+    const [x1, y1] = getNodePosition(amount, r);
     for (let n=0; n<nextNodesAmount; n++) {
-      const [x2, y2] = getNodePosition(amount, n);
-      lineOpacity = map(min(scaleNodesArray[amount-1][r],scaleNodesArray[amount][n]),0,1,0,0.5);
-      gradientLine(x1,y1,x2,y2,gradientFill[amount-1],gradientFill[amount],lineCanvas,lineOpacity);
+      const [x2, y2] = getNodePosition(amount+1, n);
+      lineOpacity = map(min(scaleNodesArray[amount][r],scaleNodesArray[amount+1][n]),0,1,0,0.5);
+      gradientLine(x1,y1,x2,y2,gradientFill[amount],gradientFill[amount+1],lineCanvas,lineOpacity);
     }
   }
 }
@@ -865,6 +840,7 @@ function drawNodeSet(amount,nodeColor,strokeColor,canvas) {
     shapeOpacity = scaleNodesArray[amount][r];
     shapeDashBySize = map(strokeRatio, 1/30, 1, 3, 10);
     shapeDashByOpacity = map(scaleNodesArray[amount][r],0,1,shapeDashBySize*2,0) * maxR;
+    if (shapeDashByOpacity < 1 * maxR) shapeDashByOpacity = 0;
     drawNode(x,y,nodeSize,shape,nodeColor,strokeColor,shapeDashByOpacity,shapeOpacity,canvas);
   }
 }
