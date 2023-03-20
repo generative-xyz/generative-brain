@@ -1,6 +1,6 @@
-const modelSeed = '2022';
-
 new Q5("global");
+
+const modelSeed = getRandomInt(1,10000).toString();
 
 let border;  // screen padding
 let maxR;
@@ -64,7 +64,7 @@ let screenshotMode = false;
 let totalAnimSteps;
 
 async function setup() {
-  let w = windowWidth; 
+  let w = windowHeight; 
   let h = windowHeight;
   createCanvas(w,h);
 
@@ -153,26 +153,26 @@ function preloadingSetup() {
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3
                   ['#949494','#231f20','#231f20'],                                                  // 4
                   ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5 
-                  ['#0a141d','#043c3d','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#043c3d'],  // 6
+                  ['#0a141d','#226462','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#226462'],  // 6
                   ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 7
                   ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 8
-                  ['#1e2834','#566e58','#CC7A41','#566e58','#CC7A41'],                          // 9
-                  ['#453a46','#57d4e4','#57d4e4','#f17b6e','#57d4e4'],                          // 10
-                  ['#cccab5','#53afae','#53afae','#343243','#53afae'],                          // 11
-                  ['#f177b4','#63f9fe','#f8bbda','#63f9fe','#f8bbda'],                          // 12
-                  ['#f6b941','#41332d','#634233','#41332d','#634233'],                          // 13
-                  ['#6D2B2D','#C74146','#C33B41','#CE2C31','#C33B41'],                          // 14  
-                  ['#E7E7E7','#a6d4ec','#2c83c6','#c33726'],                                      // 15
-                  ['#53afae','#1f4b5a','#afd39f','#f1e8d1','#afd39f'],                          // 16
-                  ['#010101','#25f4ee','#25f4ee','#fe2c56','#ffffff'],                          // 17
-                  ['#B5CEDA','#00457c','#00457c','#0079c0','#012269'],                          // 18
-                  ['#fbfaff','#8b31ce','#f04bb1','#fac373','#82cef0'],                          // 19
-                  ['#34333e','#191820','#f6b941','#ca4b17'],                                      // 20
-                  ['#476930','#c8b88a','#86b049','#c8b88a','#FFFDC7'],                          // 21   
-                  ['#704f38','#52392f','#e9ccaf','#f0bd90','#e9ccaf'],                          // 22
+                  ['#8f5b62','#bac9b6','#bac9b6'],                                                  // 9
+                  ['#453a46','#57d4e4','#57d4e4'],                                                  // 10
+                  ['#eae4cb','#508cac','#508cac'],                                                  // 11
+                  ['#f6b941','#634233','#634233'],                                                  // 12
+                  ['#6D2B2D','#C74146','#C33B41'],                                                  // 13  
+                  ['#E7E7E7','#2c83c6','#2c83c6','#c33726'],                                      // 14
+                  ['#030706','#77c4d9','#77c4d9','#77c4d9','#ffffff','#ffffff','#e72020','#e72020'], // 15
+                  ['#fbfaff','#f04bb1','#f04bb1','#fac373','#82cef0'],                          // 16
+                  ['#34333e','#ffe373','#ffe373','#fc9c54','#fd5e53'],                          // 17
+                  ['#f177b4','#63f9fe','#63f9fe'],                                                  // 18
+                  ['#45daaa','#012221','#012221'],                                                  // 19
+                  ['#B5CEDA','#00457c','#00457c'],                                                  // 20
+                  ['#476930','#c8b88a','#c8b88a'],                                                  // 21   
+                  ['#704f38','#f0bd90','#f0bd90'],                                                  // 22
                   ['#3d1460','#df678c','#df678c'],                                                  // 23
-                  ['#00b8ff','#9be8ff','#fffbba','#feff50','#fffbba'],                          // 24
-                  ['#ffc6cc','#ffffff','#cc313d'],                                                  // 25
+                  ['#00b8ff','#feff50','#feff50'],                                                  // 24
+                  ['#ffc6cc','#cc313d','#cc313d'],                                                  // 25
                   ['#ec642a','#ffff8b','#ffff8b'],                                                  // 26
                   ['#1c1c1a','#ce4980','#ce4980'],                                                  // 27
                   ['#8dc63f','#078513','#078513']];                                                 // 28
@@ -523,7 +523,7 @@ function setupSketch() {
   }
   maxNodes = max(...compareArray);
   layerNum = scaleNodesArray.length;
-  xsize = (width - border*2) / layerNum;
+  xsize = (width - border) / layerNum;
   ysize = (height - border*2) / maxNodes;
   nodeSize = min(xsize,ysize)/2;
   
@@ -598,7 +598,7 @@ function setupSketch() {
 
 function getNodePosition(i, r) {
   let nodeAmount = scaleNodesArray[i].length;
-  const x = i*xsize + xsize/2 + border;
+  const x = i*xsize + xsize/2 + border/2;
   const y = height/2 - (nodeAmount-1)/2*ysize + r*ysize;
   return [x, y];
 }
@@ -609,7 +609,7 @@ function updateMaxR(width, height) {
   border = 100*maxR;
   spacing = 50*maxR;
   
-  xsize = (width - border*2) / layerNum;
+  xsize = (width - border) / layerNum;
   ysize = (height - border*2) / maxNodes;
   nodeSize = min(xsize,ysize)/2;
   
@@ -723,7 +723,6 @@ function drawOnMainCanvas() {
   nodeCanvas.background(255);
   nodeCanvas.rectMode(CENTER);
   eraseCanvas(nodeCanvas);
-  nodeCanvas.strokeWeight(shapeStroke);
   
   lineCanvas.background(255);
   eraseCanvas(lineCanvas);
@@ -854,6 +853,7 @@ function drawNodeAnim(amount,size,nodeColor,strokeColor,canvas) {
 function drawNode(x,y,size,shape,nodeColor,strokeColor,dash,opacity,canvas) {
   canvas.stroke(addAlpha(strokeColor,map(opacity,0,1,0.25,1)));
   canvas.fill(addAlpha(nodeColor,map(opacity,0,1,0.15,1)));
+  canvas.strokeWeight(shapeStroke);
   setLineDash([dash],canvas);
   if (fillMode == 3) {
     canvas.fill(addAlpha(nodeColor,0));
@@ -869,7 +869,7 @@ function drawNode(x,y,size,shape,nodeColor,strokeColor,dash,opacity,canvas) {
     canvas.vertex(x+size*4/7,y);
     canvas.vertex(x,y+size*4/7);
     canvas.endShape(CLOSE);
-  } else {
+  } else if (shape == 4) {
     let n = 4;
     let theta = TAU/n;
     let innerRadius = size/5;
@@ -881,6 +881,26 @@ function drawNode(x,y,size,shape,nodeColor,strokeColor,dash,opacity,canvas) {
       canvas.vertex(x+cos((i+0.5)*theta+rotation)*innerRadius, y+sin((i+0.5)*theta+rotation)*innerRadius);
     }
     canvas.endShape(CLOSE);
+  } else {
+    let n = 3;
+    let theta = TAU/n;
+    let innerRadius = size*3/5;
+    let outerRadius = size*3/5;  
+    let rotation = PI/2;
+    canvas.beginShape();
+    for (let i=0; i<n; i++) {
+      canvas.vertex(x+cos(i*theta+rotation)*outerRadius, y+sin(i*theta+rotation)*outerRadius);
+      canvas.vertex(x+cos((i+0.5)*theta+rotation)*innerRadius, y+sin((i+0.5)*theta+rotation)*innerRadius);
+    }
+    canvas.endShape(CLOSE);
+    if (fillMode == 1) {
+      if (opacity < 0.7) {canvas.stroke(strokeColor,map(opacity,0,1,0.25,1))}
+      else {canvas.stroke(addAlpha(paperColor,map(opacity,0,1,0.25,1)))}
+    } else {canvas.stroke(strokeColor,map(opacity,0,1,0.25,1))}
+    canvas.strokeWeight(shapeStroke*2/3);
+    for (let i=0; i<n; i++) {
+      canvas.line(x, y, x+cos(i*theta+rotation)*outerRadius, y+sin(i*theta+rotation)*outerRadius);  
+    }
   }
 }
 

@@ -45,10 +45,11 @@ const NodeFill = [
 ];
 
 const NodeShape = [
-  ['Theano', 50], // ellipse
+  ['Theano', 45], // ellipse
   ['Torch', 15], // square
   ['TensorFlow', 30], // diamond
   ['Caffe', 5],  // star
+  ['Keras', 5], // cube
 ];
 
 const ColorPalette = [ 
@@ -68,7 +69,7 @@ const ColorPalette = [
   ['Chilli Sauce', 1],
   ['American Dream', 5],
   ['Broken Beach', 5],
-  ['Nightlife', 5],
+  ['Fingerprints', 5],
   ['Nautical Adventure', 5],
   ['Cotton Candy', 1],
   ['Golden Hour', 5],
@@ -84,13 +85,19 @@ const ColorPalette = [
 
 function getTraits(trainingTraits) {
   // Visual traits
-  const pattern = getRandomItem(Pattern);
-  const hardwareAcceleration = getRandomItem(HardwareAcceleration);
-  const nodeFill = getRandomItem(NodeFill);
-  const nodeShape = getRandomItem(NodeShape);
-  const colorPalette = getRandomItem(ColorPalette);
-  const lifeCycle = getRandomItem(LifeCycle);
-  const birthYear = getRandomItem(BirthYear);
+  let pattern = getRandomItem(Pattern);
+  let hardwareAcceleration = getRandomItem(HardwareAcceleration);
+  let nodeFill = getRandomItem(NodeFill);
+  let nodeShape = getRandomItem(NodeShape);
+  let colorPalette = getRandomItem(ColorPalette);
+  let lifeCycle = getRandomItem(LifeCycle);
+  let birthYear = getRandomItem(BirthYear);
+  
+  // nodeShape = "Keras";
+  nodeShape = 'Theano';
+  nodeFill = 'MNIST';
+  colorPalette = 'Barbie World';
+  hardwareAcceleration = 'Advanced';
   
   const traits = {
     visual: {
