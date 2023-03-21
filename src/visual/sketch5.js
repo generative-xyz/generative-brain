@@ -837,7 +837,7 @@ function drawNodeSet(amount,nodeColor,strokeColor,canvas) {
     shapeOpacity = scaleNodesArray[amount][r];
     shapeDashBySize = map(strokeRatio, 1/30, 1, 3, 10);
     shapeDashByOpacity = map(scaleNodesArray[amount][r],0,1,shapeDashBySize*2,0) * maxR;
-    if (shapeDashByOpacity < 1 * maxR) shapeDashByOpacity = 0;
+    if (shapeDashByOpacity < 1.5 * maxR) shapeDashByOpacity = 0;
     drawNode(x,y,nodeSize,shape,nodeColor,strokeColor,shapeDashByOpacity,shapeOpacity,canvas);
   }
 }
@@ -1079,7 +1079,7 @@ function drawInfoWindow() {
   data = [
     ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160*maxR)],
     ['SCALE:', '1:'+scaleRatio],
-    ['NUMBER OF CLASSES:', classNum],
+    ['NUMBER OF CLASSES:', classes_name.length],
     ['NUMBER OF HIDDEN LAYERS:', layerNum-2],
     ['MAX NEURONS PER HIDDEN LAYER:', realHiddenLayerMaxNodes],
     ['NUMBER OF TRAINING EPOCHS:', epochs],
