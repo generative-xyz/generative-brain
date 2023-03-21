@@ -54,25 +54,25 @@ const ColorPalette = [
   ['White Paper', 1],
   ['Blackboard', 1],
   ['Blueprint', 1],
-  ['Main Sequence', 5],
+  ['Thermal Dynamics', 5],
+  ['Nuclear Fusion', 5],
+  ['Radioactive', 5],
+  ['Superfluid', 5],
+  ['Energy Burst', 5],
+  ['Void', 5],
+  ['Gamma Ray', 5],
+  ['Tannin', 6],
   ['Strange Quark', 6],
   ['Cyborg', 6],
-  ['Holo-Glow', 6],
-  ['Alien', 6],
-  ['Time Paradox', 6],
-  ['Ruins', 5],
-  ['Brown Dwaft', 6],
-  ['Plasma Beam', 5],
-  ['Binary Burst', 5],
-  ['Utopia', 5],
-  ['Nuclear Fusion', 5],
-  ['Virtual Eclipse', 5],
+  ['Redshift', 6],
   ['Chlorophyll', 6],
-  ['Twilight Zone', 4],
-  ['Red Giant', 4],
+  ['Time Paradox', 6],
+  ['Olivine', 6],
+  ['Twilight', 4],
+  ['Sunset', 4],
   ['Aurora', 4],
-  ['Comet', 3],
-  ['Transformer', 3],
+  ['Liminal Space', 3],
+  ['Déjà Vu', 3],
   ['Lucid Dream', 3],
   ['Parallel', 2],
   ['Multiverse', 2],
@@ -90,7 +90,7 @@ function getTraits(trainingTraits) {
   
   // nodeShape = 'Theano';
   // nodeFill = 'MNIST';
-  colorPalette = 'Main Sequence';
+  // colorPalette = 'Redshift';
   hardwareAcceleration = 'Advanced'
   
   const traits = {
