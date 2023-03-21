@@ -45,42 +45,37 @@ const NodeFill = [
 ];
 
 const NodeShape = [
-  ['Theano', 45], // ellipse
-  ['Torch', 15], // square
-  ['TensorFlow', 30], // diamond
-  ['Caffe', 5],  // star
-  ['Keras', 5], // cube
+  ['Theano', 60], // ellipse
+  ['Torch', 30], // square
+  ['TensorFlow', 10], // diamond
 ];
 
 const ColorPalette = [ 
-  ['Monochrome', 1],
+  ['White Paper', 1],
   ['Blackboard', 1],
   ['Blueprint', 1],
-  ['Industrial Steel', 5],
-  ['Spectrum', 5],
-  ['Mariana Trench', 5],
-  ['Twilight', 5],
-  ['Gaia', 5],
-  ['Autumn Harvest', 5],
-  ['Bubblegum', 1],
-  ['Sleek Neutrals', 5],
-  ['Barbie World', 5],
-  ['Warning Zone', 5],
-  ['Chilli Sauce', 1],
-  ['American Dream', 5],
-  ['Broken Beach', 5],
-  ['Fingerprints', 5],
-  ['Nautical Adventure', 5],
-  ['Cotton Candy', 1],
-  ['Golden Hour', 5],
-  ['Matcha Latte', 1],
-  ['Hot Cocoa', 1],
-  ['Midnight Blossoms', 5],
-  ['Lemonade', 1],
-  ['Strawberry Milk', 1],
-  ['Campfire', 5],
-  ['Black Pink', 5],
-  ['Chlorophyll', 5],
+  ['Main Sequence', 5],
+  ['Strange Quark', 6],
+  ['Cyborg', 6],
+  ['Holo-Glow', 6],
+  ['Alien', 6],
+  ['Time Paradox', 6],
+  ['Ruins', 5],
+  ['Brown Dwaft', 6],
+  ['Plasma Beam', 5],
+  ['Binary Burst', 5],
+  ['Utopia', 5],
+  ['Nuclear Fusion', 5],
+  ['Virtual Eclipse', 5],
+  ['Chlorophyll', 6],
+  ['Twilight Zone', 4],
+  ['Red Giant', 4],
+  ['Aurora', 4],
+  ['Comet', 3],
+  ['Transformer', 3],
+  ['Lucid Dream', 3],
+  ['Parallel', 2],
+  ['Multiverse', 2],
 ];
 
 function getTraits(trainingTraits) {
@@ -93,11 +88,10 @@ function getTraits(trainingTraits) {
   let lifeCycle = getRandomItem(LifeCycle);
   let birthYear = getRandomItem(BirthYear);
   
-  // nodeShape = "Keras";
-  nodeShape = 'Theano';
-  nodeFill = 'MNIST';
-  colorPalette = 'Barbie World';
-  hardwareAcceleration = 'Advanced';
+  // nodeShape = 'Theano';
+  // nodeFill = 'MNIST';
+  colorPalette = 'Main Sequence';
+  hardwareAcceleration = 'Advanced'
   
   const traits = {
     visual: {

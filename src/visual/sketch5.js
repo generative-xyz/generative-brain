@@ -66,6 +66,7 @@ let totalAnimSteps;
 async function setup() {
   let w = windowHeight; 
   let h = windowHeight;
+  // let w = 1600, h = 900;
   createCanvas(w,h);
 
   mainCanvas = createGraphics(w,h);
@@ -151,31 +152,28 @@ function preloadingSetup() {
   colorPalette = [['#ffffff','#231f20','#231f20'],                                                  // 1
                   ['#231f20','#ffffff','#ffffff'],                                                  // 2
                   ['#104da8','#ffffff','#ffffff'],                                                  // 3
-                  ['#949494','#231f20','#231f20'],                                                  // 4
-                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff'], // 5 
-                  ['#0a141d','#226462','#226462','#2A9ECF','#0ab6a8','#2A9ECF','#226462'],  // 6
-                  ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 7
-                  ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 8
-                  ['#8f5b62','#bac9b6','#bac9b6'],                                                  // 9
-                  ['#453a46','#57d4e4','#57d4e4'],                                                  // 10
-                  ['#eae4cb','#508cac','#508cac'],                                                  // 11
-                  ['#f6b941','#634233','#634233'],                                                  // 12
-                  ['#6D2B2D','#C74146','#C33B41'],                                                  // 13  
-                  ['#E7E7E7','#2c83c6','#2c83c6','#c33726'],                                      // 14
-                  ['#030706','#77c4d9','#77c4d9','#77c4d9','#ffffff','#ffffff','#e72020','#e72020'], // 15
-                  ['#fbfaff','#f04bb1','#f04bb1','#fac373','#82cef0'],                          // 16
-                  ['#34333e','#ffe373','#ffe373','#fc9c54','#fd5e53'],                          // 17
-                  ['#f177b4','#63f9fe','#63f9fe'],                                                  // 18
-                  ['#45daaa','#012221','#012221'],                                                  // 19
-                  ['#B5CEDA','#00457c','#00457c'],                                                  // 20
-                  ['#476930','#c8b88a','#c8b88a'],                                                  // 21   
-                  ['#704f38','#f0bd90','#f0bd90'],                                                  // 22
-                  ['#3d1460','#df678c','#df678c'],                                                  // 23
-                  ['#00b8ff','#feff50','#feff50'],                                                  // 24
-                  ['#ffc6cc','#cc313d','#cc313d'],                                                  // 25
-                  ['#ec642a','#ffff8b','#ffff8b'],                                                  // 26
-                  ['#1c1c1a','#ce4980','#ce4980'],                                                  // 27
-                  ['#8dc63f','#078513','#078513']];                                                 // 28
+                  ['#f6b941','#634233','#634233'],                                                  // 4
+                  ['#8f5b62','#ead0d0','#ead0d0'],                                                  // 5
+                  ['#eae4cb','#508cac','#508cac'],                                                  // 6
+                  ['#f177b4','#63f9fe','#63f9fe'],                                                  // 7
+                  ['#45daaa','#012221','#012221'],                                                  // 8
+                  ['#B5CEDA','#00457c','#00457c'],                                                  // 9
+                  ['#476930','#c8b88a','#c8b88a'],                                                  // 10
+                  ['#704f38','#f0bd90','#f0bd90'],                                                  // 11
+                  ['#3d1460','#df678c','#df678c'],                                                  // 12
+                  ['#00b8ff','#feff50','#feff50'],                                                  // 13
+                  ['#ffc6cc','#cc313d','#cc313d'],                                                  // 14
+                  ['#ec642a','#ffff8b','#ffff8b'],                                                  // 15
+                  ['#1c1c1a','#ce4980','#ce4980'],                                                  // 16
+                  ['#8dc63f','#078513','#078513'],                                                  // 17
+                  ['#2a2634','#5b6988','#cb78a2','#5b6988'],                                      // 18
+                  ['#811336','#fd5e53','#fd5e53','#ffe373'],                                      // 19
+                  ['#0a141d','#57d4e4','#328195','#2A9ECF','#0ab6a8','#57d4e4'],              // 20
+                  ['#3a2d28','#d5c2ac','#df6338','#3d9895','#d5c2ac'],                          // 21
+                  ['#030706','#77c4d9','#77c4d9','#77c4d9','#ffffff','#ffffff','#e72020','#e72020'], // 22
+                  ['#3a4664','#92f5ff','#f9ff94','#eaa0a2','#55dde0'],                          // 23
+                  ['#fbfaff','#f04bb1','#f04bb1','#fac373','#82cef0','#8b31ce'],              // 24
+                  ['#000000','#ffffff','#ff0002','#f26522','#fdff00','#00ff03','#01fffe','#0000ff','#ff00ff']]; // 25
                 // paperColor,patternColor,startColor,colorStops,endColor
 
   for(let i = 0; i < colorPalette.length; ++i) {
@@ -1079,7 +1077,7 @@ function drawInfoWindow() {
   infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
   
   data = [
-    ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160)],
+    ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160*maxR)],
     ['SCALE:', '1:'+scaleRatio],
     ['NUMBER OF CLASSES:', classNum],
     ['NUMBER OF HIDDEN LAYERS:', layerNum-2],
@@ -1132,7 +1130,7 @@ function drawSetting() {
   settingCanvas.textAlign(RIGHT);
   settingCanvas.textStyle(ITALIC);
   settingCanvas.textSize(15*maxR);
-  if (blockApiResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2-52*maxR)}
+  if (blockApiResult == false) {settingCanvas.text('(*) Invalid Address',width/2+252.5*maxR,height/2-53*maxR)}
   if (modelInscriptionResult == false) {settingCanvas.text('(*) Invalid Model',width/2+252.5*maxR,height/2+23*maxR)}
 }
 

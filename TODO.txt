@@ -1,6 +1,1 @@
-- Limit visual number of hidden layers
-- Reduce visual number of maximum neurons per hidden layer
-? Replace star shaped nodes
-? Add cube nodes
-
-- Reduce file size
+- Fix number of classes in property board
