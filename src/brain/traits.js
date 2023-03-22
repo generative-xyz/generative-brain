@@ -51,31 +51,31 @@ const NodeShape = [
 ];
 
 const ColorPalette = [ 
-  ['White Paper', 1],
-  ['Blackboard', 1],
-  ['Blueprint', 1],
-  ['Thermal Dynamics', 5],
-  ['Nuclear Fusion', 5],
-  ['Radioactive', 5],
-  ['Superfluid', 5],
-  ['Energy Burst', 5],
-  ['Void', 5],
-  ['Gamma Ray', 5],
-  ['Tannin', 6],
-  ['Strange Quark', 6],
-  ['Cyborg', 6],
-  ['Redshift', 6],
-  ['Chlorophyll', 6],
-  ['Time Paradox', 6],
-  ['Olivine', 6],
-  ['Twilight', 4],
-  ['Sunset', 4],
-  ['Aurora', 4],
+  ['Whitepaper', 2],
+  ['Blackboard', 2],
+  ['Blueprint', 2],
+  ['Thermal Dynamics', 74/14],
+  ['Nuclear Fusion', 74/14],
+  ['Radioactive', 74/14],
+  ['Superfluid', 74/14],
+  ['Energy Burst', 74/14],
+  ['Void', 74/14],
+  ['Gamma Ray', 74/14],
+  ['Tannin', 74/14],
+  ['Strange Quark', 74/14],
+  ['Cyborg', 74/14],
+  ['Redshift', 74/14],
+  ['Chlorophyll', 74/14],
+  ['Time Paradox', 74/14],
+  ['Olivine', 74/14],
+  ['Twilight', 3],
+  ['Sunset', 3],
+  ['Aurora', 3],
   ['Liminal Space', 3],
   ['Déjà Vu', 3],
   ['Lucid Dream', 3],
-  ['Parallel', 2],
-  ['Multiverse', 2],
+  ['Parallel', 1],
+  ['Multiverse', 1],
 ];
 
 function getTraits(trainingTraits) {
@@ -91,7 +91,7 @@ function getTraits(trainingTraits) {
   // nodeShape = 'Theano';
   // nodeFill = 'MNIST';
   // colorPalette = 'Redshift';
-  hardwareAcceleration = 'Advanced'
+  // hardwareAcceleration = 'Advanced'
   
   const traits = {
     visual: {

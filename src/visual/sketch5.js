@@ -557,7 +557,7 @@ function setupSketch() {
   
   strokeRatio = min(1 / layerNum, 1 / maxNodes);
   shapeStroke = map(strokeRatio,1/30,1,2,4) * maxR;
-  lineStroke = map(strokeRatio,1/30,1,0.75,4) * maxR;
+  lineStroke = map(strokeRatio,1/30,1,1,10) * maxR;
   strokeOpacity = 0.7;
 
   startColor = colorPalette[paletteType][2];
@@ -637,7 +637,7 @@ function updateMaxR(width, height) {
 
   strokeRatio = min(1 / layerNum, 1 / maxNodes);
   shapeStroke = map(strokeRatio,1/30,1,2,4) * maxR;
-  lineStroke = map(strokeRatio,1/30,1,0.75,4) * maxR;
+  lineStroke = map(strokeRatio,1/30,1,1,10) * maxR;
 
   gradientColors = getGradientColors(startColor,endColor,colorStops,width);
   gradientFill = [];
