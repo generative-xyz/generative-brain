@@ -55,18 +55,6 @@ class Node {
       canvas.vertex(x+size*4/7,y);
       canvas.vertex(x,y+size*4/7);
       canvas.endShape(CLOSE);
-    } else {
-      let n = 4;
-      let theta = TAU/n;
-      let innerRadius = size/5;
-      let outerRadius = size*4/7;
-      let rotation = PI;
-      canvas.beginShape();
-      for (let i=0; i<n; i++) {
-        canvas.vertex(x+cos(i*theta+rotation)*outerRadius, y+sin(i*theta+rotation)*outerRadius);
-        canvas.vertex(x+cos((i+0.5)*theta+rotation)*innerRadius, y+sin((i+0.5)*theta+rotation)*innerRadius);
-      }
-      canvas.endShape(CLOSE);
     }
   }
 }

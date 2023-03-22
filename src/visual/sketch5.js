@@ -868,38 +868,6 @@ function drawNode(x,y,size,shape,nodeColor,strokeColor,dash,opacity,canvas) {
     canvas.vertex(x+size*4/7,y);
     canvas.vertex(x,y+size*4/7);
     canvas.endShape(CLOSE);
-  } else if (shape == 4) {
-    let n = 4;
-    let theta = TAU/n;
-    let innerRadius = size/5;
-    let outerRadius = size*4/7;
-    let rotation = PI;
-    canvas.beginShape();
-    for (let i=0; i<n; i++) {
-      canvas.vertex(x+cos(i*theta+rotation)*outerRadius, y+sin(i*theta+rotation)*outerRadius);
-      canvas.vertex(x+cos((i+0.5)*theta+rotation)*innerRadius, y+sin((i+0.5)*theta+rotation)*innerRadius);
-    }
-    canvas.endShape(CLOSE);
-  } else {
-    let n = 3;
-    let theta = TAU/n;
-    let innerRadius = size*3/5;
-    let outerRadius = size*3/5;  
-    let rotation = PI/2;
-    canvas.beginShape();
-    for (let i=0; i<n; i++) {
-      canvas.vertex(x+cos(i*theta+rotation)*outerRadius, y+sin(i*theta+rotation)*outerRadius);
-      canvas.vertex(x+cos((i+0.5)*theta+rotation)*innerRadius, y+sin((i+0.5)*theta+rotation)*innerRadius);
-    }
-    canvas.endShape(CLOSE);
-    if (fillMode == 1) {
-      if (opacity < 0.7) {canvas.stroke(strokeColor,map(opacity,0,1,0.25,1))}
-      else {canvas.stroke(addAlpha(paperColor,map(opacity,0,1,0.25,1)))}
-    } else {canvas.stroke(strokeColor,map(opacity,0,1,0.25,1))}
-    canvas.strokeWeight(shapeStroke*2/3);
-    for (let i=0; i<n; i++) {
-      canvas.line(x, y, x+cos(i*theta+rotation)*outerRadius, y+sin(i*theta+rotation)*outerRadius);  
-    }
   }
 }
 

@@ -37,6 +37,12 @@ class tfake {
     }
     return res;
   }
+
+  static linear = (a) => tfake.__apply_unary_op(a, tfake.__linear);
+  static relu = (a) => tfake.__apply_unary_op(a, tfake.__relu);
+  static leaky_relu = (a) => tfake.__apply_unary_op(a, tfake.__leaky_relu);
+  static sigmoid = (a) => tfake.__apply_unary_op(a, tfake.__sigmoid);
+  static tanh = (a) => tfake.__apply_unary_op(a, tfake.__tanh);
   
   static __add = (a, b) => a + b;
   static __mul = (a, b) => a * b;
@@ -70,16 +76,8 @@ class tfake {
     return res;
   }
 
-  static linear = (a) => tfake.__apply_unary_op(a, tfake.__linear);
-  static relu = (a) => tfake.__apply_unary_op(a, tfake.__relu);
-  static leaky_relu = (a) => tfake.__apply_unary_op(a, tfake.__leaky_relu);
-  static sigmoid = (a) => tfake.__apply_unary_op(a, tfake.__sigmoid);
-  static tanh = (a) => tfake.__apply_unary_op(a, tfake.__tanh);
-
   static softmax(a) {
-    const res = a.copy();
-    res.mat = res.mat.map(row => row.map(x => Math.exp(x)));
-
+    const res = tfake.__apply_unary_op(a, x => Math.exp(x));
     const sum_e = res.mat.flat().reduce((a, b) => a + b);
     for(let i = 0; i < a.n; ++i) {
       for(let j = 0; j < a.m; ++j) {
@@ -245,7 +243,7 @@ function loadModel(layersConfig, weights_b64) {
   return { model, inputDim };
 }
 
-// Copied from https://gist.github.com/sketchpunk/f5fa58a56dcfe6168a9328e7c32a4fd4
+// Modified from https://gist.github.com/sketchpunk/f5fa58a56dcfe6168a9328e7c32a4fd4
 function base64ToFloatArray(base64) {
   // Base64 string converted to a char array
   const blob	= window.atob(base64);
@@ -260,10 +258,9 @@ function base64ToFloatArray(base64) {
 
   for(let j=0; j < fLen; j++){
     p = j * 4;
-    dView.setUint8(0,blob.charCodeAt(p));
-    dView.setUint8(1,blob.charCodeAt(p+1));
-    dView.setUint8(2,blob.charCodeAt(p+2));
-    dView.setUint8(3,blob.charCodeAt(p+3));
+    for(let b = 0; b < 4; ++b) {
+      dView.setUint8(b,blob.charCodeAt(p+b));
+    }
     fAry[j] = dView.getFloat32(0,true);
   }
   return fAry;
