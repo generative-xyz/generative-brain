@@ -54,20 +54,20 @@ const ColorPalette = [
   ['Whitepaper', 2],
   ['Blackboard', 2],
   ['Blueprint', 2],
-  ['Thermal Dynamics', 74/14],
-  ['Nuclear Fusion', 74/14],
-  ['Radioactive', 74/14],
-  ['Superfluid', 74/14],
-  ['Energy Burst', 74/14],
-  ['Void', 74/14],
-  ['Gamma Ray', 74/14],
-  ['Tannin', 74/14],
-  ['Strange Quark', 74/14],
-  ['Cyborg', 74/14],
-  ['Redshift', 74/14],
-  ['Chlorophyll', 74/14],
-  ['Time Paradox', 74/14],
-  ['Olivine', 74/14],
+  ['Nak', 74/14],
+  ['Jims', 74/14],
+  ['Level 10', 74/14],
+  ['Flips', 74/14],
+  ['Level 14', 74/14],
+  ['III', 74/14],
+  ['XMB', 74/14],
+  ['Info', 74/14],
+  ['Adventure', 74/14],
+  ['Marigold', 74/14],
+  ['Phoenix', 74/14],
+  ['Love', 74/14],
+  ['Cachet', 74/14],
+  ['Human', 74/14],
   ['Twilight', 3],
   ['Sunset', 3],
   ['Aurora', 3],
@@ -88,10 +88,11 @@ function getTraits(trainingTraits) {
   let lifeCycle = getRandomItem(LifeCycle);
   let birthYear = getRandomItem(BirthYear);
   
-  // nodeShape = 'Theano';
-  // nodeFill = 'MNIST';
-  // colorPalette = 'Redshift';
-  // hardwareAcceleration = 'Advanced'
+  nodeShape = 'Theano';
+  nodeFill = 'CIFAR';
+  colorPalette = 'Multiverse';
+  pattern = 'Plain'
+  hardwareAcceleration = 'Advanced'
   
   const traits = {
     visual: {
