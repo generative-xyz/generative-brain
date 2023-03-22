@@ -559,7 +559,8 @@ function setupSketch() {
   shapeStroke = map(strokeRatio,1/30,1,2,4) * maxR;
   lineStroke = map(strokeRatio,1/30,1,1,10) * maxR;
   strokeOpacity = 0.7;
-
+  
+  colorStops = [];
   startColor = colorPalette[paletteType][2];
   endColor = colorPalette[paletteType][colorPalette[paletteType].length-1];
   for (let i=3; i<colorPalette[paletteType].length-1; i++) {
