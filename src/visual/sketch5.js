@@ -61,7 +61,7 @@ let drewCheckingWindow = false;
 let blockEndpoint, inscriptionEndpoint;
 let blockApiResult = null, modelInscriptionResult = null;
 let screenshotMode = false;
-let totalAnimSteps;
+let totalAnimSteps, totalFrames;
 
 async function setup() {
   let w = windowHeight; 
@@ -239,7 +239,7 @@ function customDoubleClicked() {
   processingLayer = 0;
   animationLoopCount = 0;
   drewLineAnim = true;
-  progress = border / maxR;
+  progress = (border/2 + xsize/2) / maxR;
 
   loadImage(img.elt.src, q5img => {
     const [w_img, h_img, c_img] = inputDim;
@@ -262,7 +262,7 @@ function handleFile(fileSrc) {
 
 function processPhase() {
   if (!screenshotMode) {
-    progress += (width-border*2-xsize/2)/(processingFrames*2*layerNum) / maxR;
+    progress += (width-border-xsize)/totalFrames / maxR;
   }
 
   setEraseMode(lineCanvas);
@@ -286,7 +286,7 @@ function processPhase() {
     if (processingLayer == totalAnimSteps) {
       ++animationLoopCount;
       processingLayer = 0;
-      progress = border / maxR;
+      progress = (border/2 + xsize/2) / maxR;
       if (animationLoopCount == 1) {
         isProcessPhase = false;
         resultWindow();
@@ -536,12 +536,12 @@ function setupSketch() {
     }
   }
   
-  const totalFrames = (layerNum + 1) * processingFrames;
+  totalFrames = 2 * (layerNum - 1) * processingFrames;
   
   const sparkRateExact = map(satFee,0.2,0.8,15,2);
-  sparkRate = getClosestDivisibleFraction(totalFrames, 2, sparkRateExact);
+  sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact) / 2;
 
-  totalAnimSteps = round(totalFrames/sparkRate);
+  totalAnimSteps = round(totalFrames/(2*sparkRate));
 
   activeAmount = floor(liveNodesArray.length*satFee);
   animSet = [];
