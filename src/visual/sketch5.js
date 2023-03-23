@@ -123,29 +123,6 @@ async function setupModel() {
   classes_name = inscription.classes_name.map(e => e.toUpperCase());
 }
 
-function initialize() {
-  document.body.onfocus = checkIt;
-}
-      
-// Define a function to check if
-// the user failed to upload file
-function checkIt() {
-  // Check if the number of files
-  // is not zero   
-  setTimeout(()=>{
-    const [file] = fileInput.files 
-    if (file) {
-      img = null;
-      wrapInput.style.display = 'none';
-      handleFile(URL.createObjectURL(file));
-      oldFile = file;
-    } else {
-      wrapInput.style.display = 'block';
-    }
-    document.body.onfocus = null;
-  }, 100)
-}
-
 function preloadingSetup() {
   maxR = min(width,height)/1024;
   paletteType = ColorPalette.findIndex(e => e[0] === traits.visual.colorPalette);
@@ -197,7 +174,6 @@ function installCustomUploadIfle(){
 
     if (isNeuronsConnected(nodesArray) && currentLine == layerNum-1) {
       fileInput.click();
-      initialize();
     } else if (state == 4 || state == 5 || (!isNeuronsConnected(nodesArray) && currentLine == layerNum-1)) {
       drewWarningScreen = true;
       drewWarningText = true;
@@ -309,7 +285,6 @@ function tryAgain() {
   tryButton.hide();
   closeResultButton.hide();
   fileInput.click();
-  initialize();
 }
 
 function closeResult() {
