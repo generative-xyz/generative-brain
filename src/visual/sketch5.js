@@ -432,7 +432,7 @@ function setupSketch() {
   
   drawSpeed = HardwareAcceleration.findIndex(e => e[0] == traits.visual.hardwareAcceleration) + 1;
   if (drawSpeed == 1) {
-    speedAcce = 40; processingFrames = 40;
+    speedAcce = 30; processingFrames = 40;
   } else if (drawSpeed == 2) {
     speedAcce = 15; processingFrames = 20;
   } else {
@@ -542,7 +542,7 @@ function setupSketch() {
   sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact) / 2;
 
   totalAnimSteps = round(totalFrames/(2*sparkRate));
-
+  
   activeAmount = floor(liveNodesArray.length*satFee);
   animSet = [];
   animArray = [];
