@@ -28,6 +28,7 @@ let nodeColor,strokeColor,strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
 let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
+let bitcoin,address;
 let bitcoinNode,modelAddress;
 
 let seed,architecture,birthYear,lifeCycle,epochs,activationFunction;
@@ -298,20 +299,20 @@ function closeResult() {
 }
 
 function keyTyped() {
-  if (setupFinished && drewSetting === false && drewCheckingWindow === false) {
+  if (setupFinished && drewCheckingWindow === false && isInputFocused() === false) {
     if ((key === 'i' || key === 'I')) {
       drewInfoWindow = !drewInfoWindow;
     }
     if ((key === 'b' || key === 'B')) {
       drewBorder = !drewBorder;
     }
-    if ((key === 's' || key === 'S')) {
+    if ((key === 's' || key === 'S') && drewSetting === false) {
       saveCanvasAtCurrentTime();
     }  
-    if ((key === 'k' || key === 'K')) {
+    if ((key === 'k' || key === 'K') && drewSetting === false) {
       save4KCanvasAtCurrentTime();
     }
-    if ((key === 'u' || key === 'U') && drewResultWindow === false && drewWarningScreen === false && isProcessPhase === false) {
+    if ((key === 'u' || key === 'U') && drewSetting === false && drewResultWindow === false && drewWarningScreen === false && isProcessPhase === false) {
       settingPopup();
       drewInfoWindow = false;
     }
@@ -1259,4 +1260,8 @@ function makeButton(text, x, y, w, h, onClick) {
   button.style('opacity','0');
   button.mouseClicked(onClick);
   return button;
+}
+
+function isInputFocused() {
+  return (bitcoin != null && bitcoin.isFocused()) || (address != null && address?.isFocused());
 }

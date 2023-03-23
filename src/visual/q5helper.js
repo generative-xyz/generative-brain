@@ -142,6 +142,10 @@ class q5Element {
     return this;
   };
 
+  isFocused() {
+    return document.activeElement === this.elt;
+  }
+
   // General handler for event attaching and detaching
   _adjustListener(ev, fxn, ctx) {
     if (fxn === false) {
