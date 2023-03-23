@@ -63,6 +63,7 @@ let blockEndpoint, inscriptionEndpoint;
 let blockApiResult = null, modelInscriptionResult = null;
 let screenshotMode = false;
 let totalAnimSteps, totalFrames;
+let startTs, lastUpdateTs;
 
 async function setup() {
   let w = windowWidth; 
@@ -112,10 +113,8 @@ async function setupModel() {
     getModelInscription(inscriptionEndpoint),
   ]);
 
-  const date = new Date(stats.time * 1000);
-
   brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64);
-  brain.updateAge(date);
+  brain.updateAge(new Date());
   setupRandom();
 
   traits.training = inscription.training_traits;
@@ -397,6 +396,8 @@ function closeSetting() {
 
 function setupSketch() {
   setupRandom();
+  startTs = Date.now();
+  lastUpdateTs = Date.now();
   finishedNumber = false;
   finishedText = false;
     
@@ -628,6 +629,119 @@ function updateMaxR(width, height) {
   newGradientFill.push(gradientFill[gradientFill.length-1]);
 }
 
+function updateBrainStatus() {
+  const brainStatus = brain.getBrainStatus();
+  inputDim = brainStatus.inputDim;
+  stageRatio = brainStatus.stageRatio;  
+  state = brainStatus.stage;
+  
+  inputNodes = 1;
+  classNum = 1;
+  classArray = [];
+  inputArray = [];
+  
+  nodesArray = brainStatus.neuronsLife;
+  scaleNodesArray = [];
+  scaleToggle = 1;
+  
+  for (let i=0; i<classNum; i++) {
+    classArray.push(1);
+  }
+  for (let i=0; i<inputNodes; i++) {
+    inputArray.push(1);
+  }
+  nodesArray.push(classArray)
+  
+  for (let i=0; i<nodesArray.length; i++) {
+    if (nodesArray[i].length > 30) {
+      scaleToggle = scaleToggle*0;
+    } else {scaleToggle = scaleToggle*1}
+  }
+  
+  realCompareArray = [];
+  for (let i=0; i<nodesArray.length; i++) {
+    realCompareArray.push(nodesArray[i].length);
+  }
+  realMaxNodes = max(...realCompareArray);
+  scaleRatio = ceil(realMaxNodes/30);
+  realHiddenLayerMaxNodes = max(...realCompareArray.slice(0, -1));
+  
+  if (scaleToggle == 0) {
+    for (let i=0; i<nodesArray.length; i++) {
+      scaleNodesArray[i] = [];
+      for (let j=0; j<nodesArray[i].length; j+=scaleRatio) {
+        let newNode = 0;
+        let r = min(nodesArray[i].length-j,scaleRatio);
+        for (let k=0; k<r; k++) {
+          newNode += nodesArray[i][j+k]/r;
+        }
+        scaleNodesArray[i].push(newNode);
+        newNode = 0;
+      }
+    }
+  } else {
+    scaleNodesArray = nodesArray;
+  }
+  scaleNodesArray.unshift(inputArray);
+  
+  if (state == 1) {
+    for (let i=0; i<scaleNodesArray.length; i++) {
+      let arr = [];
+      for (let j=0; j<scaleNodesArray[i].length; j++) {
+        if (scaleNodesArray[i][j] != 0) arr.push(scaleNodesArray[i][j]);
+      }
+      scaleNodesArray[i] = arr;
+    }
+    for (let i=0; i<scaleNodesArray.length; i++) {
+      if (scaleNodesArray[i].length == 0) {scaleNodesArray[i].push(0)}
+    }
+  }
+  
+  compareArray = [];
+  for (let i=0; i<scaleNodesArray.length; i++) {
+    compareArray.push(scaleNodesArray[i].length);
+  }
+  maxNodes = max(...compareArray);
+  layerNum = scaleNodesArray.length;
+  xsize = (width - border) / layerNum;
+  ysize = (height - border*2) / maxNodes;
+  nodeSize = min(xsize,ysize)/2;
+  
+  liveNodesArray = [];
+  for (let i=0; i<scaleNodesArray.length; i++) {
+    let nodeAmount = scaleNodesArray[i].length;
+    for (let r=0; r<nodeAmount; r++) {
+      if (scaleNodesArray[i][r] == 1) {
+        const [x, y] = getNodePosition(i, r);
+        liveNodesArray.push([x, y]);
+      }
+    }
+  }
+  
+  totalFrames = 2 * (layerNum - 1) * processingFrames;
+  
+  const sparkRateExact = map(satFee,0.2,0.8,15,2);
+  sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact) / 2;
+
+  totalAnimSteps = round(totalFrames/(2*sparkRate));
+  
+  activeAmount = floor(liveNodesArray.length*satFee);
+  animSet = [];
+  animArray = [];
+  for (let k=0; k<totalAnimSteps; k++) {
+    for (let i=0; i<activeAmount; i++) {
+      let j = floor(random(1.0)*liveNodesArray.length);
+      animArray.push(liveNodesArray.slice(j,j+1)[0]);
+    }
+    animSet.push(animArray);
+    animArray = [];
+  }
+  
+  strokeRatio = min(1 / layerNum, 1 / maxNodes);
+  shapeStroke = map(strokeRatio,1/30,1,2,4) * maxR;
+  lineStroke = map(strokeRatio,1/30,1,1,10) * maxR;
+}
+
 function drawDeadAnimation() {
   particleSystem.update();
   const drawRatio = (state == 4) ? 0 : stageRatio;
@@ -782,6 +896,14 @@ function drawOnMainCanvas() {
 }
 
 function draw() {
+  const currentTs = Date.now();
+  if (setupFinished && currentTs - lastUpdateTs >= 60000) {
+    lastUpdateTs = currentTs;
+    brain.updateAge(new Date(currentTs));
+    // brain.updateAge(new Date(startTs + (currentTs - startTs) * 3600 * 24 * 30 * 6));
+    updateBrainStatus();
+  }
+
   drawOnMainCanvas();
   image(mainCanvas, 0, 0);
 
