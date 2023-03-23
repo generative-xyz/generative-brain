@@ -88,10 +88,10 @@ function getTraits(trainingTraits) {
   let lifeCycle = getRandomItem(LifeCycle);
   let birthYear = getRandomItem(BirthYear);
   
-  nodeShape = 'Theano';
-  nodeFill = 'CIFAR';
-  colorPalette = 'Multiverse';
-  pattern = 'Plain'
+  // nodeShape = 'Theano';
+  // nodeFill = 'MNIST';
+  colorPalette = 'Twilight';
+  // pattern = 'Plain'
   hardwareAcceleration = 'Advanced'
   
   const traits = {
@@ -116,12 +116,12 @@ function reportTraits(traits) {
   window.$generativeTraits = {
     "Network Architecture": traits.training.structure_gen,
     "Hidden Layers": traits.training.n_layers,
-    "Max Neurons Per Layer": traits.training.max_nodes,
+    "Max Neurons Per Hidden Layer": traits.training.max_nodes,
     "Activation Function": traits.training.activation_func,
     "Training Epochs": traits.training.epoch_num,
-    "Dataset (Fill Mode)": traits.visual.nodeFill,
-    "Deep Learning Framework (Shape)": traits.visual.nodeShape,
-    "Hardware Acceleration (animation speed)": traits.visual.hardwareAcceleration,
+    "Dataset": traits.visual.nodeFill,
+    "Deep Learning Framework": traits.visual.nodeShape,
+    "Hardware Acceleration": traits.visual.hardwareAcceleration,
     "Paper Pattern": traits.visual.pattern,
     "Life Cycle": traits.visual.lifeCycle,
     "Birth Year": traits.visual.birthYear,
