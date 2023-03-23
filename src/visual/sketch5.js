@@ -64,7 +64,7 @@ let screenshotMode = false;
 let totalAnimSteps, totalFrames;
 
 async function setup() {
-  let w = windowHeight; 
+  let w = windowWidth; 
   let h = windowHeight;
   // let w = 1600, h = 900;
   createCanvas(w,h);
@@ -1217,7 +1217,8 @@ saveCanvasAtCurrentTime = () => {
 
 save4KCanvasAtCurrentTime = () => {
   const w = width, h = height;
-  const newW = 4096, newH = h * 4096/w;
+  const scale = min(4096 / min(w, h), 10000 / max(w, h));
+  const newW = w * scale, newH = h * scale;
 
   resizeAllCanvas(newW, newH);
   screenshotMode = true;
