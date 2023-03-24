@@ -129,9 +129,27 @@ class MultilayerPerceptron {
     this.outputLayer = outputLayer;
 
     this.totalNeurons = this.hiddenLayers.map(e => e.out_dim);
+    this.currentOrders = [];
+    this.currentIteration = null;
   }
 
-  updateNeurons(t, iteration) {
+  updateNeurons(t, iteration) {    
+    if (iteration != this.currentIteration) {
+      this.currentOrders = [];
+      for(let i = 0; i < this.totalNeurons.length; ++i) {
+        const seed = (iteration + 1) * 100 + i;
+        randomSeed(seed);
+        
+        const order = [];
+        for(let j = 0; j < this.totalNeurons[i]; ++j) {
+          order.push(j);
+        }
+        shuffle(order);
+        this.currentOrders.push(order);
+      }
+      this.currentIteration = iteration;
+    }
+
     const neurons = clone(this.totalNeurons);
     const sumNeurons = neurons.reduce((a, b) => a + b);
 
@@ -144,15 +162,7 @@ class MultilayerPerceptron {
 
     this.neuronsLife = [];
     for(let i = 0; i < neurons.length; ++i) {
-      const seed = (iteration + 1) * 100 + i;
-      randomSeed(seed);
-      
-      const order = [];
-      for(let j = 0; j < this.totalNeurons[i]; ++j) {
-        order.push(j);
-      }
-      shuffle(order);
-  
+      const order = this.currentOrders[i];
       const life = Array(this.totalNeurons[i]).fill(0);
       for(let j = 0; j < neurons[i]; ++j) {
         life[order[j]] = Math.min(neurons[i] - j, 1);

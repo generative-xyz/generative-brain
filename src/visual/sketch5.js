@@ -63,7 +63,7 @@ let blockEndpoint, inscriptionEndpoint;
 let blockApiResult = null, modelInscriptionResult = null;
 let screenshotMode = false;
 let totalAnimSteps, totalFrames;
-let startTs, lastUpdateTs;
+let startTs;
 
 async function setup() {
   let w = windowWidth; 
@@ -313,7 +313,6 @@ function keyTyped() {
     }
     if ((key === 'u' || key === 'U') && drewSetting === false && drewResultWindow === false && drewWarningScreen === false && isProcessPhase === false) {
       settingPopup();
-      drewInfoWindow = false;
     }
   }
 }
@@ -397,7 +396,6 @@ function closeSetting() {
 function setupSketch() {
   setupRandom();
   startTs = Date.now();
-  lastUpdateTs = Date.now();
   finishedNumber = false;
   finishedText = false;
     
@@ -897,10 +895,9 @@ function drawOnMainCanvas() {
 
 function draw() {
   const currentTs = Date.now();
-  if (setupFinished && currentTs - lastUpdateTs >= 60000) {
-    lastUpdateTs = currentTs;
+  if (setupFinished) {
     brain.updateAge(new Date(currentTs));
-    // brain.updateAge(new Date(startTs + (currentTs - startTs) * 3600 * 24 * 30 * 6));
+    // brain.updateAge(new Date(startTs + (currentTs - startTs) * 3600 * 24 * 30));
     updateBrainStatus();
   }
 
@@ -1385,5 +1382,5 @@ function makeButton(text, x, y, w, h, onClick) {
 }
 
 function isInputFocused() {
-  return (bitcoin != null && bitcoin.isFocused()) || (address != null && address?.isFocused());
+  return (bitcoin != null && bitcoin?.isFocused()) || (address != null && address?.isFocused());
 }
