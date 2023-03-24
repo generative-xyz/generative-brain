@@ -88,12 +88,6 @@ function getTraits(trainingTraits) {
   let lifeCycle = getRandomItem(LifeCycle);
   let birthYear = getRandomItem(BirthYear);
   
-  // nodeShape = 'Theano';
-  // nodeFill = 'MNIST';
-  colorPalette = 'Twilight';
-  // pattern = 'Plain'
-  hardwareAcceleration = 'Advanced'
-  
   const traits = {
     visual: {
       pattern,
@@ -106,8 +100,6 @@ function getTraits(trainingTraits) {
     },
     training: trainingTraits,
   };
-
-  console.log(traits);
 
   return traits;
 }

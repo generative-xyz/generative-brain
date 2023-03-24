@@ -68,7 +68,6 @@ let startTs;
 async function setup() {
   let w = windowWidth; 
   let h = windowHeight;
-  // let w = 1600, h = 900;
   createCanvas(w,h);
 
   mainCanvas = createGraphics(w,h);
@@ -564,8 +563,6 @@ function setupSketch() {
     yBottom: height - border/8,
   }
 
-  console.log(scaleNodesArray);
-
   const scaledTotalNeurons = scaleNodesArray.map(x => x.length);
   particleSystem = new ParticleSystem(gradientFill, scaledTotalNeurons, wall, shape, maxR);
 }
@@ -897,7 +894,6 @@ function draw() {
   const currentTs = Date.now();
   if (setupFinished) {
     brain.updateAge(new Date(currentTs));
-    // brain.updateAge(new Date(startTs + (currentTs - startTs) * 3600 * 24 * 30));
     updateBrainStatus();
   }
 
