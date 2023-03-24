@@ -511,9 +511,8 @@ function setupSketch() {
   }
   
   totalFrames = 2 * (layerNum - 1) * processingFrames;
-  
   const sparkRateExact = map(satFee,0.2,0.8,15,2);
-  sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact) / 2;
+  sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact);
 
   totalAnimSteps = round(totalFrames/(2*sparkRate));
   
@@ -714,9 +713,8 @@ function updateBrainStatus() {
   }
   
   totalFrames = 2 * (layerNum - 1) * processingFrames;
-  
   const sparkRateExact = map(satFee,0.2,0.8,15,2);
-  sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact) / 2;
+  sparkRate = getClosestDivisibleFraction(totalFrames/2, 1, sparkRateExact);
 
   totalAnimSteps = round(totalFrames/(2*sparkRate));
   
