@@ -426,6 +426,8 @@ function setupSketch() {
   border = 100*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
+  window.$state = state;
+
   shape = NodeShape.findIndex(e => e[0] == traits.visual.nodeShape) + 1;
   fillMode = NodeFill.findIndex(e => e[0] == traits.visual.nodeFill) + 1;
   pattern = Pattern.findIndex(e => e[0] == traits.visual.pattern) + 1;
@@ -634,7 +636,8 @@ function updateBrainStatus() {
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;  
   state = brainStatus.stage;
-  
+  window.$state = state;
+
   inputNodes = 1;
   classNum = 1;
   classArray = [];
