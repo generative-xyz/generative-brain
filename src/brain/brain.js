@@ -49,7 +49,7 @@ class Brain {
     const age = deltaYear * this.growSpeed;
     this.iteration = Math.floor(age / CYCLE_END);        
     const cycleTime = age - this.iteration * CYCLE_END;
-    this.ageTs = cycleTime / CYCLE_END * this.cycleLength;
+    this.age = cycleTime;
 
     let growth = 0;
     if (cycleTime < GROW_END) {
@@ -85,7 +85,7 @@ class Brain {
       stage: this.stage,
       inputDim: this.inputDim,
       stageRatio: this.stageRatio,
-      ageTs: this.ageTs,
+      age: this.age,
     };
   }
   
