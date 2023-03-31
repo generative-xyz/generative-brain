@@ -3,6 +3,7 @@ const LifeCycle = [
   ['60 Months', 40, 30],
   ['60 Weeks', 37, 7],
   ['60 Days', 20, 1],
+  ['12 Hours', 0, 1.0 / 120],
 ];
 
 const BirthYear = [
@@ -79,6 +80,8 @@ const ColorPalette = [
 ];
 
 function getTraits(trainingTraits) {
+  for(let i = 0; i < 100; ++i) random(1.0);
+
   // Visual traits
   let pattern = getRandomItem(Pattern);
   let hardwareAcceleration = getRandomItem(HardwareAcceleration);
@@ -87,7 +90,14 @@ function getTraits(trainingTraits) {
   let colorPalette = getRandomItem(ColorPalette);
   let lifeCycle = getRandomItem(LifeCycle);
   let birthYear = getRandomItem(BirthYear);
-  
+
+  nodeShape = 'Theano';
+  nodeFill = 'MNIST';
+  colorPalette = 'Aurora';
+  pattern = 'Plain';
+  hardwareAcceleration = 'Advanced';
+  lifeCycle = '12 Hours';
+
   const traits = {
     visual: {
       pattern,

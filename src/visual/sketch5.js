@@ -1,6 +1,7 @@
 new Q5("global");
 
-const modelSeed = getRandomInt(1,10000).toString();
+// const modelSeed = getRandomInt(1,10000).toString();
+const modelSeed = '1';
 
 let border;  // screen padding
 let maxR;
@@ -889,9 +890,11 @@ function drawOnMainCanvas() {
 }
 
 function draw() {
-  const currentTs = Date.now();
+  const currentTs = Date.now() + (parseInt(modelSeed) % 3) * 4 * 3600 * 1000;
   if (setupFinished) {
     brain.updateAge(new Date(currentTs));
+    // const startDate = new Date("2023/05/24");
+    // brain.updateAge(new Date(startDate.getTime() + (currentTs - startTs) * 3600));
     updateBrainStatus();
   }
 
