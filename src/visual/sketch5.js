@@ -180,8 +180,13 @@ function installCustomUploadIfle(){
       frameCount = 0;
     } else {return}
   })
+
+  fileInput.addEventListener('click', () => {
+    fileInput.value = null;
+    wrapInput.style.display = 'block';
+  });
   
-  fileInput.addEventListener('change', ()=>{    
+  fileInput.addEventListener('change', () => {
     const [file] = fileInput.files;
     if (file) {
       img = null;
@@ -191,7 +196,7 @@ function installCustomUploadIfle(){
     } else {
       wrapInput.style.display = 'block';
     }
-  })
+  });
 }
 
 function isNeuronsConnected(nodesArray) {
