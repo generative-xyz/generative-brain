@@ -38,6 +38,7 @@ class Brain {
     
     const lifeCycle = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
     this.growSpeed = 365.0 / lifeCycle;
+    this.cycleLength = lifeCycle * 60 * 24 * 3600 * 1000;
 
     this.growthFunc = getGrowthFunc(0.4, 0.8);
   }
@@ -48,6 +49,7 @@ class Brain {
     const age = deltaYear * this.growSpeed;
     this.iteration = Math.floor(age / CYCLE_END);        
     const cycleTime = age - this.iteration * CYCLE_END;
+    this.ageTs = cycleTime / CYCLE_END * this.cycleLength;
 
     let growth = 0;
     if (cycleTime < GROW_END) {
@@ -83,6 +85,7 @@ class Brain {
       stage: this.stage,
       inputDim: this.inputDim,
       stageRatio: this.stageRatio,
+      ageTs: this.ageTs,
     };
   }
   

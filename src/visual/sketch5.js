@@ -427,6 +427,8 @@ function setupSketch() {
   spacing = 50*maxR;
   state = brainStatus.stage;
   window.$state = state;
+  window.$lifeCycle = lifeCycle;
+  window.$age = brainStatus.ageTs / (3600 * 1000);
 
   shape = NodeShape.findIndex(e => e[0] == traits.visual.nodeShape) + 1;
   fillMode = NodeFill.findIndex(e => e[0] == traits.visual.nodeFill) + 1;
@@ -637,6 +639,8 @@ function updateBrainStatus() {
   stageRatio = brainStatus.stageRatio;  
   state = brainStatus.stage;
   window.$state = state;
+  window.$lifeCycle = lifeCycle;
+  window.$age = brainStatus.ageTs / (3600 * 1000);
 
   inputNodes = 1;
   classNum = 1;
