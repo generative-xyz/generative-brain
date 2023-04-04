@@ -24,17 +24,17 @@ function getGrowthFunc(px, py) {
 }
 
 class Brain {
-  constructor(visualTraits, layersConfig, weights_b64) {
+  constructor(visualTraits, layersConfig, weights_b64, modelSeed) {
     const { model, inputDim } = loadModel(layersConfig, weights_b64);
     this.model = model;
     this.inputDim = inputDim;
   
     this.iteration = 0;
-    this.stage = 0;    
+    this.stage = 0;
 
     const ts1 = new Date(parseInt(visualTraits.birthYear), 0, 1).getTime();
     const ts2 = new Date(parseInt(visualTraits.birthYear) + 1, 0, 1).getTime();
-    this.birthDate = new Date(Math.floor((ts1 + ts2) / 2));
+    this.birthDate = new Date(Math.floor((ts1 + ts2) / 2) + (parseInt(modelSeed) % 3) * 4 * 3600 * 1000);
     
     const lifeCycle = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
     this.growSpeed = 365.0 / lifeCycle;
@@ -75,6 +75,11 @@ class Brain {
       this.stageRatio = map(cycleTime, DEAD_END, CYCLE_END, 0, 1);
     }
 
+    let cycleTillNextStable = (GROW_END - cycleTime) / CYCLE_END;
+    if (cycleTillNextStable < 0) cycleTillNextStable += 1;
+    this.nextStableTimestamp = Math.round(time.getTime() + this.cycleLength * cycleTillNextStable);
+
+    this.growth = growth;
     this.model.updateNeurons(growth, this.iteration);
   }
 
@@ -86,6 +91,8 @@ class Brain {
       inputDim: this.inputDim,
       stageRatio: this.stageRatio,
       age: this.age,
+      growth: this.growth,
+      nextStableTimestamp: this.nextStableTimestamp,
     };
   }
   

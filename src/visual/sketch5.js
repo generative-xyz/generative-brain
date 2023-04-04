@@ -1,7 +1,7 @@
 new Q5("global");
 
 // const modelSeed = getRandomInt(1,10000).toString();
-const modelSeed = '1';
+const modelSeed = '3';
 
 let border;  // screen padding
 let maxR;
@@ -31,6 +31,7 @@ let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 let bitcoin,address;
 let bitcoinNode,modelAddress;
+let age;
 
 let seed,architecture,birthYear,lifeCycle,epochs,activationFunction;
 const liveState = [' ','Growing','Stable','Decaying','Dead','Rebirth'];
@@ -65,6 +66,9 @@ let blockApiResult = null, modelInscriptionResult = null;
 let screenshotMode = false;
 let totalAnimSteps, totalFrames;
 let startTs;
+let growth;
+let nextStableTimestamp;
+let nextStableDate;
 
 async function setup() {
   let w = windowWidth; 
@@ -113,7 +117,7 @@ async function setupModel() {
     getModelInscription(inscriptionEndpoint),
   ]);
 
-  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64);
+  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64, modelSeed);
   brain.updateAge(new Date());
   setupRandom();
 
@@ -422,12 +426,17 @@ function setupSketch() {
   const brainStatus = brain.getBrainStatus();
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;
+  growth = brainStatus.growth;
+  nextStableTimestamp = brainStatus.nextStableTimestamp;
+  // const d = new Date(nextStableTimestamp);
+  // nextStableDate = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`;
   
   border = 100*maxR;
   spacing = 50*maxR;
   state = brainStatus.stage;
+  age = brainStatus.age;
   window.$state = state;
-  window.$age = `${brainStatus.age.toFixed(2)} years`;
+  window.$age = `${age.toFixed(2)} years`;
 
   shape = NodeShape.findIndex(e => e[0] == traits.visual.nodeShape) + 1;
   fillMode = NodeFill.findIndex(e => e[0] == traits.visual.nodeFill) + 1;
@@ -637,8 +646,11 @@ function updateBrainStatus() {
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;  
   state = brainStatus.stage;
+  growth = brainStatus.growth;
+  nextStableTimestamp = brainStatus.nextStableTimestamp;
+  age = brainStatus.age;
   window.$state = state;
-  window.$age = `${brainStatus.age.toFixed(2)} years`;
+  window.$age = `${age.toFixed(2)} years`;
 
   inputNodes = 1;
   classNum = 1;
@@ -900,7 +912,7 @@ function drawOnMainCanvas() {
 }
 
 function draw() {
-  const currentTs = Date.now() + (parseInt(modelSeed) % 3) * 4 * 3600 * 1000;
+  const currentTs = Date.now();
   if (setupFinished) {
     brain.updateAge(new Date(currentTs));
     // const startDate = new Date("2023/05/24");
@@ -1006,6 +1018,25 @@ function drawResultWindow() {
   popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR,240*maxR);
   popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
   
+  const yInfo = -200*maxR;
+  popupCanvas.fill(patternColor);
+  popupCanvas.noStroke();
+  popupCanvas.rect(width/2,height/2+yInfo,700*maxR,60*maxR);
+
+  popupCanvas.noStroke();
+  popupCanvas.fill(paperColor);
+  popupCanvas.textSize(16*maxR);
+
+  const line1 = `Your Perceptron is ${age.toFixed(2)} years old.`;
+  let line2;
+  if (state == 2) {
+    line2 = `It has reached its peak performance`;
+  } else {
+    line2 = `Wait until ${new Date(nextStableTimestamp).toLocaleString('en-US')} for your Perceptron to reach its peak performance.`;
+  }   
+  popupCanvas.text(line1, width/2,height/2 + yInfo - 10*maxR);
+  popupCanvas.text(line2, width/2,height/2 + yInfo + 10*maxR);
+
   popupCanvas.noStroke();
   popupCanvas.fill(startColor);
   popupCanvas.textSize(100*maxR);
@@ -1033,7 +1064,7 @@ function drawResultWindow() {
     popupCanvas.text('"'+textToPrint+'"',width/2+130*maxR,height/2+65*maxR);       
   } else {
     writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,textToPrint,popupCanvas);
-  }  
+  }
 
   if (millis()-startTime > 1000) {
     finishedNumber = true;
@@ -1126,45 +1157,61 @@ function divideLines(size,textBoxWidth,currentWidth,words1,words2,wordsArray,lin
 }
   
 function drawInfoWindow() {
+  const y0 = 30*maxR;
   infoCanvas.textFont('Tahoma');
   infoCanvas.stroke(patternColor);
   infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
-  infoCanvas.rect(width/2,height-87.5*maxR,600*maxR,135*maxR);
+  infoCanvas.rect(width/2,y0/2+height-87.5*maxR,600*maxR,105*maxR);
   infoCanvas.fill(patternColor);
-  infoCanvas.rect(width/2-150*maxR,height-170*maxR,300*maxR,30*maxR);
+  infoCanvas.rect(width/2-150*maxR,y0+height-170*maxR,300*maxR,30*maxR);
   infoCanvas.fill(paperColor);
-  infoCanvas.rect(width/2+150*maxR,height-170*maxR,300*maxR,30*maxR);
+  infoCanvas.rect(width/2+150*maxR,y0+height-170*maxR,300*maxR,30*maxR);
   infoCanvas.noStroke();
   infoCanvas.fill(paperColor);
   
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
-  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
+  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,y0+height-165*maxR);
   infoCanvas.fill(startColor);
-  infoCanvas.text('NAME:',width/2+10*maxR,height-165*maxR);
+  infoCanvas.text('NAME:',width/2+10*maxR,y0+height-165*maxR);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textStyle(ITALIC);
-  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
-  
+  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,y0+height-165*maxR);
+
+  const [lifeCycleLength, lifeCycleUnit] = lifeCycle.split(' ');
+  let timeScale;
+  if (lifeCycle === '60 Years') {
+    timeScale = '1 Year';
+  } else if (lifeCycle === '60 Months') {
+    timeScale = '1 Month';
+  } else if (lifeCycle === '60 Weeks') {
+    timeScale = '1 Week';
+  } else if (lifeCycle === '60 Days') {
+    timeScale = '1 Day';
+  } else if (lifeCycle === '12 Hours') {
+    timeScale = '12 Minutes';
+  }
+
   data = [
     ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160*maxR)],
     ['SCALE:', '1:'+scaleRatio],
     ['NUMBER OF CLASSES:', classes_name.length],
-    ['NUMBER OF HIDDEN LAYERS:', layerNum-2],
     ['MAX NEURONS PER HIDDEN LAYER:', realHiddenLayerMaxNodes],
     ['NUMBER OF TRAINING EPOCHS:', epochs],
-    ['COLOR PALETTE:', ColorPalette[paletteType][0]],
-    ['PAPER PATTERN:', Pattern[pattern-1][0]],
-    ['NETWORK ARCHITECTURE:', architecture],
     ['ACTIVATION FUNCTION:', activationFunction],
-    ['DATA SET:', NodeFill[fillMode-1][0]],
-    ['DEEP LEARNING FRAMEWORK:', NodeShape[shape-1][0]],
-    ['HARDWARE ACCELERATION:', HardwareAcceleration[drawSpeed-1][0]],
     ['BIRTH YEAR:', birthYear],
-    ['LIFE CYCLE:', lifeCycle],
+    ['AGE:', `${age.toFixed(2)} Perceptron Years`],
+    ['ONE PERCEPTRON YEAR:', `${timeScale}`],
     ['STATE:', liveState[state]],
+    ['ACTIVE NEURONS:', `${(growth * 100).toFixed(2)}%`],
   ];
+
+  if (state == 2) {
+    data.push([`PERCEPTRON REACHED PEAK PERFORMANCE`, ``]);
+  } else {
+    data.push(['NEXT STABLE TIME:', new Date(nextStableTimestamp).toLocaleString('en-US')]);
+  }
 
   infoCanvas.fill(startColor);
   const half = data.length / 2;
@@ -1172,7 +1219,7 @@ function drawInfoWindow() {
     const isLeft = i < half;
     const xLabel = isLeft ? width/2-285*maxR : width/2+10*maxR;
     const xValue = isLeft ? width/2-10*maxR : width/2+285*maxR;
-    const y = height-(135-15*(i%half))*maxR;
+    const y = y0+height-(135-15*(i%half))*maxR;
 
     infoCanvas.textStyle(BOLD);
     infoCanvas.textAlign(LEFT);
