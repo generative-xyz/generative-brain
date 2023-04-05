@@ -1,7 +1,7 @@
 new Q5("global");
 
 // const modelSeed = getRandomInt(1,10000).toString();
-const modelSeed = '3';
+const modelSeed = '1';
 
 let border;  // screen padding
 let maxR;
@@ -69,6 +69,8 @@ let startTs;
 let growth;
 let nextStableTimestamp;
 let nextStableDate;
+let totNeurons;
+let rebirthCount;
 
 async function setup() {
   let w = windowWidth; 
@@ -427,6 +429,7 @@ function setupSketch() {
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;
   growth = brainStatus.growth;
+  rebirthCount = brainStatus.rebirthCount;
   nextStableTimestamp = brainStatus.nextStableTimestamp;
   // const d = new Date(nextStableTimestamp);
   // nextStableDate = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`;
@@ -454,6 +457,7 @@ function setupSketch() {
   scaleNodesArray = [];
   scaleToggle = 1;
   
+  totNeurons = nodesArray.map(x => x.length).reduce((a, b) => a + b);
   for (let i=0; i<classNum; i++) {
     classArray.push(1);
   }
@@ -647,6 +651,7 @@ function updateBrainStatus() {
   stageRatio = brainStatus.stageRatio;  
   state = brainStatus.stage;
   growth = brainStatus.growth;
+  rebirthCount = brainStatus.rebirthCount;
   nextStableTimestamp = brainStatus.nextStableTimestamp;
   age = brainStatus.age;
   window.$state = state;
@@ -661,6 +666,7 @@ function updateBrainStatus() {
   scaleNodesArray = [];
   scaleToggle = 1;
   
+  totNeurons = nodesArray.map(x => x.length).reduce((a, b) => a + b);
   for (let i=0; i<classNum; i++) {
     classArray.push(1);
   }
@@ -1157,12 +1163,12 @@ function divideLines(size,textBoxWidth,currentWidth,words1,words2,wordsArray,lin
 }
   
 function drawInfoWindow() {
-  const y0 = 30*maxR;
+  const y0 = 45*maxR;
   infoCanvas.textFont('Tahoma');
   infoCanvas.stroke(patternColor);
   infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
-  infoCanvas.rect(width/2,y0/2+height-87.5*maxR,600*maxR,105*maxR);
+  infoCanvas.rect(width/2,y0/2+height-87.5*maxR,600*maxR,90*maxR);
   infoCanvas.fill(patternColor);
   infoCanvas.rect(width/2-150*maxR,y0+height-170*maxR,300*maxR,30*maxR);
   infoCanvas.fill(paperColor);
@@ -1174,7 +1180,7 @@ function drawInfoWindow() {
   infoCanvas.textStyle(BOLD);
   infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,y0+height-165*maxR);
   infoCanvas.fill(startColor);
-  infoCanvas.text('NAME:',width/2+10*maxR,y0+height-165*maxR);
+  infoCanvas.text('ARTWORK NAME:',width/2+10*maxR,y0+height-165*maxR);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textStyle(ITALIC);
   infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,y0+height-165*maxR);
@@ -1194,17 +1200,17 @@ function drawInfoWindow() {
   }
 
   data = [
-    ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160*maxR)],
+    ['AI MODEL NAME:', fitStrToWidth(12*maxR, model_name, 140*maxR)],
     ['SCALE:', '1:'+scaleRatio],
     ['NUMBER OF CLASSES:', classes_name.length],
-    ['MAX NEURONS PER HIDDEN LAYER:', realHiddenLayerMaxNodes],
-    ['NUMBER OF TRAINING EPOCHS:', epochs],
-    ['ACTIVATION FUNCTION:', activationFunction],
+    // ['NUMBER OF TRAINING EPOCHS:', epochs],
+    // ['ACTIVATION FUNCTION:', activationFunction],
     ['BIRTH YEAR:', birthYear],
+    ['NUMBER OF REBIRTHS:', rebirthCount.toString()],
     ['AGE:', `${age.toFixed(2)} Perceptron Years`],
     ['ONE PERCEPTRON YEAR:', `${timeScale}`],
     ['STATE:', liveState[state]],
-    ['ACTIVE NEURONS:', `${(growth * 100).toFixed(2)}%`],
+    ['ACTIVE NEURONS:', `${ceil(totNeurons * growth)} / ${totNeurons}`],
   ];
 
   if (state == 2) {

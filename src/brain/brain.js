@@ -93,6 +93,7 @@ class Brain {
       age: this.age,
       growth: this.growth,
       nextStableTimestamp: this.nextStableTimestamp,
+      rebirthCount: this.iteration,
     };
   }
   
