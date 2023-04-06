@@ -97,7 +97,6 @@ function getTraits(trainingTraits) {
   pattern = 'Plain';
   hardwareAcceleration = 'Advanced';
   lifeCycle = '12 Hours';
-  birthYear = '2022';
 
   const traits = {
     visual: {

@@ -67,8 +67,8 @@ let screenshotMode = false;
 let totalAnimSteps, totalFrames;
 let startTs;
 let growth;
+let nextStateTimestamp;
 let nextStableTimestamp;
-let nextStableDate;
 let totNeurons;
 let rebirthCount;
 
@@ -428,19 +428,23 @@ function setupSketch() {
   const brainStatus = brain.getBrainStatus();
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;
+  state = brainStatus.stage;
   growth = brainStatus.growth;
   rebirthCount = brainStatus.rebirthCount;
+  nextStateTimestamp = brainStatus.nextStateTimestamp;
   nextStableTimestamp = brainStatus.nextStableTimestamp;
-  // const d = new Date(nextStableTimestamp);
-  // nextStableDate = `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`;
-  
-  border = 100*maxR;
-  spacing = 50*maxR;
-  state = brainStatus.stage;
   age = brainStatus.age;
   window.$state = state;
   window.$age = `${age.toFixed(2)} years`;
+  window.$artworkName = `Perceptron #${seed}`;
+  window.$statePercentage = brainStatus.statePercentage;
+  window.$nextState = state % 5 + 1;
+  window.$nextStateTimestamp = nextStateTimestamp;
+  window.$rebirthCount = rebirthCount;
 
+  
+  border = 100*maxR;
+  spacing = 50*maxR;
   shape = NodeShape.findIndex(e => e[0] == traits.visual.nodeShape) + 1;
   fillMode = NodeFill.findIndex(e => e[0] == traits.visual.nodeFill) + 1;
   pattern = Pattern.findIndex(e => e[0] == traits.visual.pattern) + 1;
@@ -652,10 +656,16 @@ function updateBrainStatus() {
   state = brainStatus.stage;
   growth = brainStatus.growth;
   rebirthCount = brainStatus.rebirthCount;
+  nextStateTimestamp = brainStatus.nextStateTimestamp;
   nextStableTimestamp = brainStatus.nextStableTimestamp;
   age = brainStatus.age;
   window.$state = state;
   window.$age = `${age.toFixed(2)} years`;
+  window.$artworkName = `Perceptron #${seed}`;
+  window.$statePercentage = brainStatus.statePercentage;
+  window.$nextState = state % 5 + 1;
+  window.$nextStateTimestamp = nextStateTimestamp;
+  window.$rebirthCount = rebirthCount;
 
   inputNodes = 1;
   classNum = 1;
@@ -1216,7 +1226,7 @@ function drawInfoWindow() {
   if (state == 2) {
     data.push([`PERCEPTRON REACHED PEAK PERFORMANCE`, ``]);
   } else {
-    data.push(['NEXT STABLE TIME:', new Date(nextStableTimestamp).toLocaleString('en-US')]);
+    data.push(['NEXT STATE TIME:', new Date(nextStateTimestamp).toLocaleString('en-US')]);
   }
 
   infoCanvas.fill(startColor);

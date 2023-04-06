@@ -51,29 +51,47 @@ class Brain {
     const cycleTime = age - this.iteration * CYCLE_END;
     this.age = cycleTime;
 
+    let cycleTillNextState;
     let growth = 0;
     if (cycleTime < GROW_END) {
       let x = map(cycleTime, 0, GROW_END, 0, 1);
       growth = this.growthFunc(x);
+      cycleTillNextState = (GROW_END - cycleTime) / CYCLE_END;
       this.stage = 1;
       this.stageRatio = map(cycleTime, 0, GROW_END, 0, 1);
     } else if (cycleTime < STABLE_END) {
       growth = 1;
+      cycleTillNextState = (STABLE_END - cycleTime) / CYCLE_END;
       this.stage = 2;
       this.stageRatio = map(cycleTime, GROW_END, STABLE_END, 0, 1);
     } else if (cycleTime < DECAY_END) {
       growth = map(cycleTime, STABLE_END, DECAY_END, 1, 0);
+      cycleTillNextState = (DECAY_END - cycleTime) / CYCLE_END;
       this.stage = 3;
       this.stageRatio = map(cycleTime, STABLE_END, DECAY_END, 0, 1);
     } else if (cycleTime < DEAD_END) {
       growth = 0;
+      cycleTillNextState = (DEAD_END - cycleTime) / CYCLE_END;
       this.stage = 4;
       this.stageRatio = map(cycleTime, DECAY_END, DEAD_END, 0, 1);
     } else if (cycleTime < CYCLE_END) {
       growth = 0;
+      cycleTillNextState = (CYCLE_END - cycleTime) / CYCLE_END;
       this.stage = 5;
       this.stageRatio = map(cycleTime, DEAD_END, CYCLE_END, 0, 1);
     }
+
+    let statePercentage;
+    if (cycleTime < STABLE_END) {
+      statePercentage = map(cycleTime, 0, STABLE_END, 0, 780/880);
+    } else if (cycleTime < DEAD_END) {
+      statePercentage = map(cycleTime, STABLE_END, DEAD_END, 780/880, 800/880);
+    } else if (cycleTime < CYCLE_END) {
+      statePercentage = map(cycleTime, DEAD_END, CYCLE_END, 800/880, 1);
+    }
+
+    this.nextStateTimestamp = Math.round(time.getTime() + this.cycleLength * cycleTillNextState);
+    this.statePercentage = round(statePercentage * 100);
 
     let cycleTillNextStable = (GROW_END - cycleTime) / CYCLE_END;
     if (cycleTillNextStable < 0) cycleTillNextStable += 1;
@@ -92,8 +110,10 @@ class Brain {
       stageRatio: this.stageRatio,
       age: this.age,
       growth: this.growth,
+      nextStateTimestamp: this.nextStateTimestamp,
       nextStableTimestamp: this.nextStableTimestamp,
       rebirthCount: this.iteration,
+      statePercentage: this.statePercentage,
     };
   }
   
