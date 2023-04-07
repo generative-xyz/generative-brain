@@ -1520,7 +1520,8 @@ function formatDate(date) {
   const day = date.getDate();
   const monthName = date.toLocaleString('en-US', { month: 'long' });
   const year = date.getFullYear();
-  const hour = date.getHours();
+  let hour = date.getHours().toString();
+  if (hour.length == 1) hour = '0' + hour;
   let minute = date.getMinutes().toString();
   if (minute.length == 1) minute = '0' + minute;
   return `${ordinal_suffix_of(day)} ${monthName} ${year} | ${hour}:${minute}`;
