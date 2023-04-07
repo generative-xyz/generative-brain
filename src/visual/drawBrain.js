@@ -1,8 +1,50 @@
+function drawDecay(canvas,scale) {
+  setEraseMode(canvas);
+  canvas.fill(0);
+  canvas.rect(0,0,500,500);
+  setNoEraseMode(canvas);
+  canvas.noStroke();
+  canvas.fill(addAlpha(hexToRgb('#000000'),0.5));
+  // canvas.fill(paperColor);
+  
+  canvas.push();
+  canvas.translate(250,250);
+  canvas.scale(scale);
+  canvas.translate(-250,-250);
+  canvas.beginShape();
+  canvas.vertex(235.2,24.9);
+  canvas.bezierVertex(215,24.6,185,11.4,164.8,11);
+  canvas.bezierVertex(147.20000000000002,10.7,129.3,10.4,112.20000000000002,14.7);
+  canvas.bezierVertex(95.10000000000002,19,78.5,28.5,69.6,43.8);
+  canvas.bezierVertex(57.699999999999996,64.19999999999999,61.599999999999994,90.19999999999999,70.19999999999999,112.2);
+  canvas.bezierVertex(78.79999999999998,134.20000000000002,91.6,154.6,97.19999999999999,177.5);
+  canvas.bezierVertex(102.49999999999999,199.2,100.89999999999999,222.5,92.79999999999998,243.2);
+  canvas.bezierVertex(83,268,64.6,288.3,48.9,310);
+  canvas.bezierVertex(33.2,331.7,24.5,337.5,26.599999999999998,364.1);
+  canvas.bezierVertex(28.2,384.1,61.39999999999999,404.20000000000005,75.7,418.3);
+  canvas.bezierVertex(90,432.40000000000003,73.7,488.20000000000005,91.9,496.70000000000005);
+  canvas.bezierVertex(124.2,511.6,159,472.50000000000006,194.3,468.1);
+  canvas.bezierVertex(211.60000000000002,465.90000000000003,267.4,501.5,283.9,495.90000000000003);
+  canvas.bezierVertex(340.7,476.70000000000005,298.59999999999997,428.90000000000003,355.4,409.70000000000005);
+  canvas.bezierVertex(370.79999999999995,404.50000000000006,454.5,407.6,464.4,394.80000000000007);
+  canvas.bezierVertex(478.59999999999997,376.30000000000007,474.7,349.30000000000007,464.29999999999995,328.4000000000001);
+  canvas.bezierVertex(453.9,307.5000000000001,438.09999999999997,289.5000000000001,428.69999999999993,268.2000000000001);
+  canvas.bezierVertex(412,230,419,182.6,446.1,150.9);
+  canvas.bezierVertex(449.70000000000005,146.70000000000002,453.6,142.70000000000002,455.8,137.6);
+  canvas.bezierVertex(459.40000000000003,129.29999999999998,457.5,119.6,454.8,111);
+  canvas.bezierVertex(443.2,73.4,417.3,40.400000000000006,383.6,20.299999999999997);
+  canvas.bezierVertex(358.1,5,343.2,-0.4,313.5,0);
+  canvas.bezierVertex(287.5,0.4,261.6,25.4,235.2,24.9);
+  canvas.endShape();
+  canvas.pop();
+}
+
 function drawBrain(canvas,backgroundCanvas,patternColor,paperColor,state,age) {
   setEraseMode(backgroundCanvas);
   backgroundCanvas.fill(0);
   backgroundCanvas.rect(0,0,500,500);
   setNoEraseMode(backgroundCanvas);
+  backgroundCanvas.noStroke();
   backgroundCanvas.fill(addAlpha(patternColor,0.5));
   let brainFill,ageMin,ageMax;
   if (state == 1) {ageMin = 0; ageMax = 25; brainFill = map(age,ageMin,ageMax,500,0)}

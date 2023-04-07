@@ -96,9 +96,9 @@ function getTraits(trainingTraits) {
   colorPalette = 'Aurora';
   pattern = 'Plain';
   hardwareAcceleration = 'Advanced';
-  lifeCycle = '60 Years';
-  birthYear = '1970';
-  // lifeCycle = '12 Hours';
+  // lifeCycle = '60 Years';
+  // birthYear = '1970';
+  lifeCycle = '12 Hours';
 
   const traits = {
     visual: {
