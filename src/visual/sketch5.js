@@ -1,7 +1,7 @@
 new Q5("global");
 
 // const modelSeed = getRandomInt(1,10000).toString();
-const modelSeed = '1';
+const modelSeed = '2';
 
 let border;  // screen padding
 let maxR;
@@ -24,7 +24,7 @@ let nodesArray,scaleNodesArray,scaleRatio,scaleToggle,liveNodesArray,animArray,a
 let state,shape; 
 let shapeStroke,lineStroke,strokeRatio;
 let classNum,classArray,inputArray;
-let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas,deadCanvas,mainCanvas;
+let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas,deadCanvas,mainCanvas,brainCanvas,brainBackground;
 let nodeColor,strokeColor,strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
 let paletteType,colorPalette,fillMode;
@@ -88,6 +88,8 @@ async function setup() {
   warningCanvas = createGraphics(w,h);
   settingCanvas = createGraphics(w,h);
   checkCanvas = createGraphics(w,h);
+  brainCanvas = createGraphics(500,500);
+  brainBackground = createGraphics(500,500);
   setupRandom();
   setupTraits();
   preloadingSetup();
@@ -287,8 +289,8 @@ function resultWindow() {
   drewResultWindow = true;
   finishedNumber = false;
   finishedText = false;
-  tryButton = makeButton('Try Again', width/2-155*maxR, height/2+165*maxR, 150*maxR, 40*maxR, tryAgain);
-  closeResultButton = makeButton('Close', width/2+5*maxR, height/2+165*maxR, 150*maxR, 40*maxR, closeResult);
+  tryButton = makeButton('Try Again', width/2-205*maxR, height/2+315*maxR, 250*maxR, 40*maxR, tryAgain);
+  closeResultButton = makeButton('Close', width/2+55*maxR, height/2+315*maxR, 150*maxR, 40*maxR, closeResult);
 }
 
 function tryAgain() {
@@ -1029,68 +1031,90 @@ function createPattern(pattern) {
 function drawResultWindow() {
   popupCanvas.textFont('Trebuchet MS');
   popupCanvas.noStroke();
-  drawPopup(popupCanvas,700*maxR,300*maxR);
-  popupCanvas.strokeWeight(6*maxR);
-  popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR,240*maxR);
-  popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
+  setLineDash([0],popupCanvas);
+  drawPopup(popupCanvas,700*maxR,500*maxR);
+  // popupCanvas.strokeWeight(4*maxR);
+  popupCanvas.noStroke();
+  popupCanvas.fill(addAlpha(patternColor,0.25));
+  popupCanvas.rect(width/2-200*maxR,height/2-100*maxR,240*maxR,240*maxR,10*maxR);
+  popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-(107.5+100)*maxR,215*maxR,215*maxR);
   
-  const yInfo = -200*maxR;
-  popupCanvas.fill(patternColor);
-  popupCanvas.noStroke();
-  popupCanvas.rect(width/2,height/2+yInfo,700*maxR,60*maxR);
-
-  popupCanvas.noStroke();
-  popupCanvas.fill(paperColor);
-  popupCanvas.textSize(16*maxR);
-
-  const line1 = `Your Perceptron is ${age.toFixed(2)} years old.`;
-  let line2;
-  if (state == 2) {
-    line2 = `It has reached its peak performance`;
-  } else {
-    line2 = `Wait until ${new Date(nextStableTimestamp).toLocaleString('en-US')} for your Perceptron to reach its peak performance.`;
-  }   
-  popupCanvas.text(line1, width/2,height/2 + yInfo - 10*maxR);
-  popupCanvas.text(line2, width/2,height/2 + yInfo + 10*maxR);
-
+  let prediction = (predictions[0][0] * 100);
+  // if (!finishedNumber) {    
+  //   prediction = random(10,100);
+  // } else {
+  //   prediction = (predictions[0][0] * 100);
+  // }
+  
   popupCanvas.noStroke();
   popupCanvas.fill(startColor);
-  popupCanvas.textSize(100*maxR);
-  let prediction_str;
-  if (!finishedNumber) {    
-    prediction_str = random(10,100).toFixed(2);
-  } else {
-    prediction_str = (predictions[0][0] * 100).toFixed(2);
-    if (prediction_str == "100.00") {
-      prediction_str = "100";
-    }
+  popupCanvas.textSize(25*maxR);
+  popupCanvas.textStyle(NORMAL);
+  if (finishedText == true) {
+    if (prediction >= 0 && prediction < 20) {popupCanvas.text('I have a feeling',width/2+130*maxR,height/2-180*maxR)}
+    else if (prediction >= 20 && prediction < 40) {popupCanvas.text('I have a hunch',width/2+130*maxR,height/2-180*maxR)}
+    else if (prediction >= 40 && prediction < 60) {popupCanvas.text('I think',width/2+130*maxR,height/2-180*maxR)}
+    else if (prediction >= 60 && prediction < 80) {popupCanvas.text('I am alomost certain',width/2+130*maxR,height/2-180*maxR)}
+    else {popupCanvas.text('I am positive',width/2+130*maxR,height/2-180*maxR)}  
+    popupCanvas.text('this image belongs to',width/2+130*maxR,height/2-155*maxR);
   }
-  popupCanvas.text(prediction_str + '%',width/2+130*maxR,height/2-35*maxR);
+
+  let prediction_str = prediction.toFixed(2);
+  if (prediction_str == "100.00") {
+    prediction_str = "100";
+  }
+  if (finishedText == true) {popupCanvas.text('Confidence level: '+prediction_str + '%',width/2+130*maxR,height/2-20*maxR)}
   
   example = predictions.map(e => e[1]);
   defaultSize = popupCanvas.textWidth('"FIDENZA"');
   defaultPhrase = popupCanvas.textWidth('"PERPENDICULAR INHABITATION"');
   
+  popupCanvas.textStyle(BOLD);
   const textToPrint = finishedText ? example[0] : random(example);
   const numWords = textToPrint.split(" ").length;
   if (numWords === 1) {
     let newSize = 75*defaultSize/popupCanvas.textWidth('"'+textToPrint+'"');
     if (newSize > 75) {newSize = 75}
     popupCanvas.textSize(newSize*maxR);
-    popupCanvas.text('"'+textToPrint+'"',width/2+130*maxR,height/2+65*maxR);       
+    popupCanvas.text('"'+textToPrint+'"',width/2+130*maxR,height/2-85*maxR);       
   } else {
-    writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,textToPrint,popupCanvas);
+    writePhrase(width/2+130*maxR,height/2-85*maxR,360*maxR,110*maxR,textToPrint,popupCanvas);
   }
 
-  if (millis()-startTime > 1000) {
-    finishedNumber = true;
-  }
+  // if (millis()-startTime > 1000) {
+  //   finishedNumber = true;
+  // }
   if (millis()-startTime > 1500) {
     finishedText = true;
   }
-
-  drawButton(popupCanvas, width/2-155*maxR, width/2-5*maxR, height/2+165*maxR, height/2+205*maxR, 'TRY AGAIN');
-  drawButton(popupCanvas, width/2+5*maxR, width/2+155*maxR, height/2+165*maxR, height/2+205*maxR, 'CLOSE');
+  
+  drawBrain(brainCanvas,brainBackground,patternColor,paperColor,state,age);  
+  popupCanvas.image(brainBackground,width/2-265*maxR,height/2+75*maxR,140*maxR,140*maxR);
+  popupCanvas.image(brainCanvas,width/2-265*maxR,height/2+75*maxR,140*maxR,140*maxR);
+  popupCanvas.textSize(40*maxR);
+  popupCanvas.text('INTELLIGENCE INFO',width/2+85*maxR,height/2+105*maxR);
+  popupCanvas.textSize(18*maxR);
+  popupCanvas.textStyle(NORMAL);
+  popupCanvas.text(`Your Perceptron is ${age.toFixed(2)} years old.`,width/2+85*maxR,height/2+140*maxR);
+  let line2,line3,line4;
+  if (state == 1) {
+    line2 = 'It’s growing and getting smarter by the day.'}
+  else if (state == 2) {line2 = 'It’s stable and it has reached peak performance.'}
+  else if (state == 3) {line2 = 'It’s decaying and losing its luster.'}
+  if (state == 2) {line3 = 'The Perceptron remains stable for some time'; line4 = 'before entering the decay phase.'}
+  else {line3 = `Wait until ${new Date(nextStableTimestamp).toLocaleString('en-US')} for your`; line4 = 'Perceptron to reach its peak performance.'}
+  popupCanvas.text(line2,width/2+85*maxR,height/2+160*maxR);
+  popupCanvas.text(line3,width/2+85*maxR,height/2+180*maxR);
+  popupCanvas.text(line4,width/2+85*maxR,height/2+200*maxR);
+  
+  drawButton(popupCanvas, width/2-205*maxR, width/2+45*maxR, height/2+315*maxR, height/2+355*maxR, 'TRY ANOTHER IMAGE');
+  drawButton(popupCanvas, width/2+55*maxR, width/2+205*maxR, height/2+315*maxR, height/2+355*maxR, 'CLOSE');
+  
+  popupCanvas.noFill();
+  popupCanvas.stroke(patternColor);
+  popupCanvas.strokeWeight(6*maxR);
+  setLineDash([10*maxR],popupCanvas);
+  popupCanvas.line(width/2-310*maxR,height/2+45*maxR,width/2+310*maxR,height/2+45*maxR);
 }
 
 function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
