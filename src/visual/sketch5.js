@@ -1102,9 +1102,9 @@ function drawResultWindow() {
   popupCanvas.circle(width/2-360*maxR,height/2+180*maxR,7.5*maxR);
   let line2,line3;
   if (state == 1) {
-    line2 = `Your Perceptron is ${age.toFixed(2)} years old. It’s growing and getting smarter by the day.`}
-  else if (state == 2) {line2 = `Your Perceptron is ${age.toFixed(2)} years old. It’s stable and it has reached peak performance.`}
-  else if (state == 3) {line2 = `Your Perceptron is ${age.toFixed(2)} years old. It’s decaying and losing its luster.`}
+    line2 = `Your Perceptron is ${Math.ceil(age)} years old. It’s growing and getting smarter by the day.`}
+  else if (state == 2) {line2 = `Your Perceptron is ${Math.ceil(age)} years old. It’s stable and it has reached peak performance.`}
+  else if (state == 3) {line2 = `Your Perceptron is ${Math.ceil(age)} years old. It’s decaying and losing its luster.`}
   if (state == 2) {line3 = 'The Perceptron remains stable for some time before entering the decay phase.'}
   else {line3 = `Wait until ${new Date(nextStableTimestamp).toLocaleString('en-US')} for your Perceptron to reach its peak performance.`}
   popupCanvas.text(line2,width/2-350*maxR,height/2+180*maxR);
@@ -1241,7 +1241,7 @@ function drawInfoWindow() {
     // ['ACTIVATION FUNCTION:', activationFunction],
     ['BIRTH YEAR:', birthYear],
     ['NUMBER OF REBIRTHS:', rebirthCount.toString()],
-    ['AGE:', `${age.toFixed(2)} Perceptron Years`],
+    ['AGE:', `${Math.ceil(age)} Perceptron Years`],
     ['ONE PERCEPTRON YEAR:', `${timeScale}`],
     ['STATE:', liveState[state]],
     ['ACTIVE NEURONS:', `${round(totNeurons * growth)} / ${totNeurons}`],
