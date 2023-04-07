@@ -112,7 +112,7 @@ class Brain {
       growth: this.growth,
       nextStateTimestamp: this.nextStateTimestamp,
       nextStableTimestamp: this.nextStableTimestamp,
-      rebirthCount: this.iteration,
+      rebirthCount: max(this.iteration, 0),
       statePercentage: this.statePercentage,
     };
   }
