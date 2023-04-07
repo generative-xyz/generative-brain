@@ -122,7 +122,7 @@ async function setupModel() {
     getModelInscription(inscriptionEndpoint),
   ]);
 
-  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64, modelSeed);
+  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64);
   brain.updateAge(new Date());
   setupRandom();
 

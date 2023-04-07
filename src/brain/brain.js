@@ -24,7 +24,7 @@ function getGrowthFunc(px, py) {
 }
 
 class Brain {
-  constructor(visualTraits, layersConfig, weights_b64, modelSeed) {
+  constructor(visualTraits, layersConfig, weights_b64) {
     const { model, inputDim } = loadModel(layersConfig, weights_b64);
     this.model = model;
     this.inputDim = inputDim;
@@ -34,7 +34,7 @@ class Brain {
 
     const ts1 = new Date(parseInt(visualTraits.birthYear), 0, 1).getTime();
     const ts2 = new Date(parseInt(visualTraits.birthYear) + 1, 0, 1).getTime();
-    this.birthDate = new Date(Math.floor((ts1 + ts2) / 2) + (parseInt(modelSeed) % 3) * 4 * 3600 * 1000);
+    this.birthDate = new Date(Math.floor((ts1 + ts2) / 2));
     
     const lifeCycle = LifeCycle.filter(e => e[0] == visualTraits.lifeCycle)[0][2];
     this.growSpeed = 365.0 / lifeCycle;
