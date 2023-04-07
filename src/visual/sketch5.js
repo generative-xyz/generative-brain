@@ -128,7 +128,7 @@ async function setupModel() {
   traits.training = inscription.training_traits;
 
   model_name = inscription.model_name;
-  classes_name = inscription.classes_name.map(e => e.toUpperCase());
+  classes_name = inscription.classes_name;
 }
 
 function preloadingSetup() {
@@ -238,7 +238,7 @@ function customDoubleClicked() {
 
     const data = graphic.pixels.filter((_, i) => i%4 != 3); 
     const result = brain.classifyImage(data);
-    predictions = zip([result, classes_name])
+    predictions = zip([result, classes_name.map(e => e.toUpperCase())])
       .sort((a, b) => a[0] > b[0] ? -1 : 1);
   });
 }
@@ -437,13 +437,13 @@ function setupSketch() {
   nextStableTimestamp = brainStatus.nextStableTimestamp;
   age = brainStatus.age;
   window.$state = state;
-  window.$age = `${age.toFixed(2)} years`;
+  window.$age = Math.ceil(age);
   window.$artworkName = `Perceptron #${seed}`;
   window.$statePercentage = brainStatus.statePercentage;
   window.$nextState = state % 5 + 1;
-  window.$nextStateTimestamp = nextStateTimestamp;
+  window.$nextStateTimestamp = formatDate(new Date(nextStateTimestamp));
   window.$rebirthCount = rebirthCount;
-
+  window.$introText = getIntroText(state, Math.ceil(age), `Perceptron #${seed}`, classes_name);
   
   border = 100*maxR;
   spacing = 50*maxR;
@@ -662,12 +662,13 @@ function updateBrainStatus() {
   nextStableTimestamp = brainStatus.nextStableTimestamp;
   age = brainStatus.age;
   window.$state = state;
-  window.$age = `${age.toFixed(2)} years`;
+  window.$age = Math.ceil(age);
   window.$artworkName = `Perceptron #${seed}`;
   window.$statePercentage = brainStatus.statePercentage;
   window.$nextState = state % 5 + 1;
-  window.$nextStateTimestamp = nextStateTimestamp;
+  window.$nextStateTimestamp = formatDate(new Date(nextStateTimestamp));
   window.$rebirthCount = rebirthCount;
+  window.$introText = getIntroText(state, Math.ceil(age), `Perceptron #${seed}`, classes_name);
 
   inputNodes = 1;
   classNum = 1;
@@ -1102,7 +1103,7 @@ function drawResultWindow() {
   else if (state == 2) {line2 = 'It’s stable and it has reached peak performance.'}
   else if (state == 3) {line2 = 'It’s decaying and losing its luster.'}
   if (state == 2) {line3 = 'The Perceptron remains stable for some time'; line4 = 'before entering the decay phase.'}
-  else {line3 = `Wait until ${new Date(nextStableTimestamp).toLocaleString('en-US')} for your`; line4 = 'Perceptron to reach its peak performance.'}
+  else {line3 = `Wait until ${formatDate(new Date(nextStableTimestamp))} for your`; line4 = 'Perceptron to reach its peak performance.'}
   popupCanvas.text(line2,width/2+85*maxR,height/2+160*maxR);
   popupCanvas.text(line3,width/2+85*maxR,height/2+180*maxR);
   popupCanvas.text(line4,width/2+85*maxR,height/2+200*maxR);
@@ -1244,14 +1245,9 @@ function drawInfoWindow() {
     ['AGE:', `${age.toFixed(2)} Perceptron Years`],
     ['ONE PERCEPTRON YEAR:', `${timeScale}`],
     ['STATE:', liveState[state]],
-    ['ACTIVE NEURONS:', `${ceil(totNeurons * growth)} / ${totNeurons}`],
+    ['ACTIVE NEURONS:', `${round(totNeurons * growth)} / ${totNeurons}`],
+    ['NEXT STATE TIME:', formatDate(new Date(nextStateTimestamp))],
   ];
-
-  if (state == 2) {
-    data.push([`PERCEPTRON REACHED PEAK PERFORMANCE`, ``]);
-  } else {
-    data.push(['NEXT STATE TIME:', new Date(nextStateTimestamp).toLocaleString('en-US')]);
-  }
 
   infoCanvas.fill(startColor);
   const half = data.length / 2;
@@ -1477,4 +1473,56 @@ function makeButton(text, x, y, w, h, onClick) {
 
 function isInputFocused() {
   return (bitcoin != null && bitcoin?.isFocused()) || (address != null && address?.isFocused());
+}
+
+function getIntroText(state, age, name, classes_name) {
+  let text;
+  
+  if (state <= 3) {
+    text = `Hey ${String.fromCodePoint(0x1F44B)}, I'm ${name}, ${age} years old. I can detect ${classes_name.length} NFT collections: `;
+    let totalClassesLength = 0;
+    for(let i = 0; i < classes_name.length; ++i) {
+      const name = classes_name[i];
+      if (totalClassesLength + name.length > 500) {
+        text += ', etc';
+        break;
+      } else {
+        if (i == classes_name.length - 1) {
+          text += ', and ';
+        } else if (i > 0) {
+          text += ', ';
+        }
+        text += name;
+      }
+      totalClassesLength += name.length;
+    }
+    text += '. ';
+    if (age <= 5) { // Baby
+      text += `However, I am only a baby, so my recognition ability is not accurate. I'm in the state of Growing both looks and intelligence.`;
+    } else if (age <= 13) { // Child
+      text += `I am now a child. My recognition ability is becoming better, but still not very accurate. I'm in the state of Growing both looks and intelligence.`;
+    } else if (age <= 25) { // Teen
+      text += `I have grown up to be a teen. My recognition ability almost reaches the peak, but I will still mess up sometimes. I'm in the state of Growing both looks and intelligence.`;
+    } else if (age <= 50) { // Adult
+      text += `I finally reach adulthood. My recognition is fully functional now. I'm in the Stable state, where I am the most intelligent with all neurons activated.`;
+    } else if (age <= 60) { // Old
+      text += `I am now an old Perceptron, so my recognition ability is no longer the best. I'm in the Decaying state, meaning that my neurons are dying, and my intelligence is decreasing over time.`;
+    }
+  } else if (state == 4) { // Dead
+    text = `${name} is Dead. However, this is not the end to its story...`;
+  } else if (state == 5) { // Rebirth
+    text = `${name} is now in the Rebirth state, and is preparing to start a new life.`;
+  }
+
+  return text;
+}
+
+function formatDate(date) {
+  const day = date.getDate();
+  const monthName = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+  const hour = date.getHours();
+  let minute = date.getMinutes().toString();
+  if (minute.length == 1) minute = '0' + minute;
+  return `${ordinal_suffix_of(day)} ${monthName} ${year} | ${hour}:${minute}`;
 }
