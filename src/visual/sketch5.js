@@ -1,6 +1,7 @@
 new Q5("global");
 
-const modelSeed = getRandomInt(1,10000).toString();
+// const modelSeed = getRandomInt(1,10000).toString();
+const modelSeed = '3';
 
 let border;  // screen padding
 let maxR;
@@ -23,13 +24,14 @@ let nodesArray,scaleNodesArray,scaleRatio,scaleToggle,liveNodesArray,animArray,a
 let state,shape; 
 let shapeStroke,lineStroke,strokeRatio;
 let classNum,classArray,inputArray;
-let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas,deadCanvas,mainCanvas;
+let nodeCanvas,lineCanvas,patternCanvas,popupCanvas,infoCanvas,loadingCanvas,warningCanvas,settingCanvas,checkCanvas,deadCanvas,mainCanvas,brainCanvas,brainBackground,decayCanvas;
 let nodeColor,strokeColor,strokeOpacity;
 let pattern,patternColor,spacing,paperColor; 
 let paletteType,colorPalette,fillMode;
 let startColor,endColor,colorStops,gradientColors,gradientFill,gradientUnit,newGradientFill;
 let bitcoin,address;
 let bitcoinNode,modelAddress;
+let age;
 
 let seed,architecture,birthYear,lifeCycle,epochs,activationFunction;
 const liveState = [' ','Growing','Stable','Decaying','Dead','Rebirth'];
@@ -64,6 +66,11 @@ let blockApiResult = null, modelInscriptionResult = null;
 let screenshotMode = false;
 let totalAnimSteps, totalFrames;
 let startTs;
+let growth;
+let nextStateTimestamp;
+let nextStableTimestamp;
+let totNeurons;
+let rebirthCount;
 
 async function setup() {
   let w = windowWidth; 
@@ -81,6 +88,9 @@ async function setup() {
   warningCanvas = createGraphics(w,h);
   settingCanvas = createGraphics(w,h);
   checkCanvas = createGraphics(w,h);
+  brainCanvas = createGraphics(500,500);
+  brainBackground = createGraphics(500,500);
+  decayCanvas = createGraphics(500,500);
   setupRandom();
   setupTraits();
   preloadingSetup();
@@ -112,14 +122,14 @@ async function setupModel() {
     getModelInscription(inscriptionEndpoint),
   ]);
 
-  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64);
+  brain = new Brain(traits.visual, inscription.layers_config, inscription.weight_b64, modelSeed);
   brain.updateAge(new Date());
   setupRandom();
 
   traits.training = inscription.training_traits;
 
   model_name = inscription.model_name;
-  classes_name = inscription.classes_name.map(e => e.toUpperCase());
+  classes_name = inscription.classes_name;
 }
 
 function preloadingSetup() {
@@ -229,7 +239,7 @@ function customDoubleClicked() {
 
     const data = graphic.pixels.filter((_, i) => i%4 != 3); 
     const result = brain.classifyImage(data);
-    predictions = zip([result, classes_name])
+    predictions = zip([result, classes_name.map(e => e.toUpperCase())])
       .sort((a, b) => a[0] > b[0] ? -1 : 1);
   });
 }
@@ -280,8 +290,8 @@ function resultWindow() {
   drewResultWindow = true;
   finishedNumber = false;
   finishedText = false;
-  tryButton = makeButton('Try Again', width/2-155*maxR, height/2+165*maxR, 150*maxR, 40*maxR, tryAgain);
-  closeResultButton = makeButton('Close', width/2+5*maxR, height/2+165*maxR, 150*maxR, 40*maxR, closeResult);
+  tryButton = makeButton('Try Again', width/2-225*maxR, height/2+265*maxR, 290*maxR, 40*maxR, tryAgain);
+  closeResultButton = makeButton('Close', width/2+75*maxR, height/2+265*maxR, 150*maxR, 40*maxR, closeResult);
 }
 
 function tryAgain() {
@@ -421,10 +431,23 @@ function setupSketch() {
   const brainStatus = brain.getBrainStatus();
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;
+  state = brainStatus.stage;
+  growth = brainStatus.growth;
+  rebirthCount = brainStatus.rebirthCount;
+  nextStateTimestamp = brainStatus.nextStateTimestamp;
+  nextStableTimestamp = brainStatus.nextStableTimestamp;
+  age = brainStatus.age;
+  window.$state = state;
+  window.$age = Math.ceil(age);
+  window.$artworkName = `Perceptron #${seed}`;
+  window.$statePercentage = brainStatus.statePercentage;
+  window.$nextState = state % 5 + 1;
+  window.$nextStateTimestamp = formatDate(new Date(nextStateTimestamp));
+  window.$rebirthCount = rebirthCount;
+  window.$introText = getIntroText(state, Math.ceil(age), `Perceptron #${seed}`, classes_name);
   
   border = 100*maxR;
   spacing = 50*maxR;
-  state = brainStatus.stage;
   shape = NodeShape.findIndex(e => e[0] == traits.visual.nodeShape) + 1;
   fillMode = NodeFill.findIndex(e => e[0] == traits.visual.nodeFill) + 1;
   pattern = Pattern.findIndex(e => e[0] == traits.visual.pattern) + 1;
@@ -441,6 +464,7 @@ function setupSketch() {
   scaleNodesArray = [];
   scaleToggle = 1;
   
+  totNeurons = nodesArray.map(x => x.length).reduce((a, b) => a + b);
   for (let i=0; i<classNum; i++) {
     classArray.push(1);
   }
@@ -633,7 +657,20 @@ function updateBrainStatus() {
   inputDim = brainStatus.inputDim;
   stageRatio = brainStatus.stageRatio;  
   state = brainStatus.stage;
-  
+  growth = brainStatus.growth;
+  rebirthCount = brainStatus.rebirthCount;
+  nextStateTimestamp = brainStatus.nextStateTimestamp;
+  nextStableTimestamp = brainStatus.nextStableTimestamp;
+  age = brainStatus.age;
+  window.$state = state;
+  window.$age = Math.ceil(age);
+  window.$artworkName = `Perceptron #${seed}`;
+  window.$statePercentage = brainStatus.statePercentage;
+  window.$nextState = state % 5 + 1;
+  window.$nextStateTimestamp = formatDate(new Date(nextStateTimestamp));
+  window.$rebirthCount = rebirthCount;
+  window.$introText = getIntroText(state, Math.ceil(age), `Perceptron #${seed}`, classes_name);
+
   inputNodes = 1;
   classNum = 1;
   classArray = [];
@@ -643,6 +680,7 @@ function updateBrainStatus() {
   scaleNodesArray = [];
   scaleToggle = 1;
   
+  totNeurons = nodesArray.map(x => x.length).reduce((a, b) => a + b);
   for (let i=0; i<classNum; i++) {
     classArray.push(1);
   }
@@ -897,6 +935,8 @@ function draw() {
   const currentTs = Date.now();
   if (setupFinished) {
     brain.updateAge(new Date(currentTs));
+    // const startDate = new Date("2023/05/24");
+    // brain.updateAge(new Date(startDate.getTime() + (currentTs - startTs) * 3600));
     updateBrainStatus();
   }
 
@@ -992,65 +1032,104 @@ function createPattern(pattern) {
 
 function drawResultWindow() {
   popupCanvas.textFont('Trebuchet MS');
+  popupCanvas.textAlign(LEFT,CENTER);
   popupCanvas.noStroke();
-  drawPopup(popupCanvas,700*maxR,300*maxR);
-  popupCanvas.strokeWeight(6*maxR);
-  popupCanvas.rect(width/2-200*maxR,height/2-(100+15/2-215/2)*maxR,240*maxR,240*maxR);
-  popupCanvas.image(img.elt,width/2-307.5*maxR,height/2-107.5*maxR,215*maxR,215*maxR);
+  drawPopup(popupCanvas,800*maxR,500*maxR);
+  popupCanvas.noStroke();
+  popupCanvas.fill(addAlpha(patternColor,0.75));
+  popupCanvas.rect(width/2,height/2-100*maxR,800*maxR,300*maxR,25*maxR,25*maxR,0,0);
+  popupCanvas.fill(patternColor);
+  popupCanvas.rect(width/2-250*maxR,height/2-100*maxR,225*maxR,225*maxR);
+  popupCanvas.image(img.elt,width/2-(307.5+50)*maxR,height/2-(107.5+100)*maxR,215*maxR,215*maxR);
   
-  popupCanvas.noStroke();
-  popupCanvas.fill(startColor);
-  popupCanvas.textSize(100*maxR);
-  let prediction_str;
-  if (!finishedNumber) {    
-    prediction_str = random(10,100).toFixed(2);
-  } else {
-    prediction_str = (predictions[0][0] * 100).toFixed(2);
-    if (prediction_str == "100.00") {
-      prediction_str = "100";
-    }
+  let prediction = (predictions[0][0] * 100);
+  
+  popupCanvas.fill(paperColor);
+  popupCanvas.textSize(25*maxR);
+  popupCanvas.textStyle(NORMAL);
+  if (finishedText == true) {
+    if (prediction >= 0 && prediction < 20) {popupCanvas.text('I have a feeling this image belongs to',width/2-100*maxR,height/2-170*maxR)}
+    else if (prediction >= 20 && prediction < 40) {popupCanvas.text('I have a hunch this image belongs to',width/2-100*maxR,height/2-170*maxR)}
+    else if (prediction >= 40 && prediction < 60) {popupCanvas.text('I think this image belongs to',width/2-100*maxR,height/2-170*maxR)}
+    else if (prediction >= 60 && prediction < 80) {popupCanvas.text('I\'m almost certain this image belongs to',width/2-100*maxR,height/2-170*maxR)}
+    else {popupCanvas.text('I\'m positive this image belongs to',width/2-100*maxR,height/2-170*maxR)}  
   }
-  popupCanvas.text(prediction_str + '%',width/2+130*maxR,height/2-35*maxR);
+
+  let prediction_str = prediction.toFixed(2);
+  if (prediction_str == "100.00") {
+    prediction_str = "100";
+  }
+  if (finishedText == true) {
+    popupCanvas.text('I\'m ' + prediction_str + '%' +' confident that I\'m right!',width/2-100*maxR,height/2-25*maxR);
+  }
   
   example = predictions.map(e => e[1]);
-  defaultSize = popupCanvas.textWidth('"FIDENZA"');
+  defaultSize = popupCanvas.textWidth('"FIDENZAAAA"');
   defaultPhrase = popupCanvas.textWidth('"PERPENDICULAR INHABITATION"');
-  
+    
+  popupCanvas.textStyle(BOLD);
   const textToPrint = finishedText ? example[0] : random(example);
+
   const numWords = textToPrint.split(" ").length;
   if (numWords === 1) {
     let newSize = 75*defaultSize/popupCanvas.textWidth('"'+textToPrint+'"');
     if (newSize > 75) {newSize = 75}
     popupCanvas.textSize(newSize*maxR);
-    popupCanvas.text('"'+textToPrint+'"',width/2+130*maxR,height/2+65*maxR);       
+    popupCanvas.text('"'+textToPrint+'"',width/2-100*maxR,height/2-90*maxR);       
   } else {
-    writePhrase(width/2+130*maxR,height/2+65*maxR,360*maxR,110*maxR,textToPrint,popupCanvas);
-  }  
-
-  if (millis()-startTime > 1000) {
-    finishedNumber = true;
+    writePhrase(width/2-100*maxR,height/2-90*maxR,460*maxR,110*maxR,textToPrint,popupCanvas);
   }
+
   if (millis()-startTime > 1500) {
     finishedText = true;
   }
-
-  drawButton(popupCanvas, width/2-155*maxR, width/2-5*maxR, height/2+165*maxR, height/2+205*maxR, 'TRY AGAIN');
-  drawButton(popupCanvas, width/2+5*maxR, width/2+155*maxR, height/2+165*maxR, height/2+205*maxR, 'CLOSE');
+  
+  drawBrain(brainCanvas,brainBackground,patternColor,paperColor,state,age);
+  popupCanvas.image(brainBackground,width/2-370*maxR,height/2+70*maxR,80*maxR,80*maxR);
+  if (state == 3) {
+    let scale;
+    scale = map(age,50,60,0.25,1.3);
+    drawDecay(decayCanvas,scale);
+    popupCanvas.image(decayCanvas,width/2-370*maxR,height/2+70*maxR,80*maxR,80*maxR);
+  }  
+  popupCanvas.image(brainCanvas,width/2-370*maxR,height/2+70*maxR,80*maxR,80*maxR);
+  
+  popupCanvas.fill(startColor);
+  popupCanvas.textSize(40*maxR);
+  popupCanvas.text('INTELLIGENCE INFO',width/2-275*maxR,height/2+115*maxR);
+  popupCanvas.textSize(18*maxR);
+  popupCanvas.textStyle(NORMAL);
+  popupCanvas.circle(width/2-360*maxR,height/2+180*maxR,7.5*maxR);
+  let line2,line3;
+  if (state == 1) {
+    line2 = `Your Perceptron is ${age.toFixed(2)} years old. It’s growing and getting smarter by the day.`}
+  else if (state == 2) {line2 = `Your Perceptron is ${age.toFixed(2)} years old. It’s stable and it has reached peak performance.`}
+  else if (state == 3) {line2 = `Your Perceptron is ${age.toFixed(2)} years old. It’s decaying and losing its luster.`}
+  if (state == 2) {line3 = 'The Perceptron remains stable for some time before entering the decay phase.'}
+  else {line3 = `Wait until ${new Date(nextStableTimestamp).toLocaleString('en-US')} for your Perceptron to reach its peak performance.`}
+  popupCanvas.text(line2,width/2-350*maxR,height/2+180*maxR);
+  popupCanvas.circle(width/2-360*maxR,height/2+210*maxR,7.5*maxR);
+  popupCanvas.text(line3,width/2-350*maxR,height/2+210*maxR);
+  
+  popupCanvas.textAlign(CENTER,CENTER);
+  popupCanvas.textStyle(BOLD);
+  drawButton(popupCanvas, width/2-225*maxR, width/2+65*maxR, height/2+265*maxR, height/2+305*maxR, 'SELECT ANOTHER IMAGE');
+  drawButton(popupCanvas, width/2+75*maxR, width/2+225*maxR, height/2+265*maxR, height/2+305*maxR, 'CLOSE');
 }
 
 function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
   let wordsArray = word.split(' ');
   let newSize = 75*defaultSize/canvas.textWidth('"'+word+'"');
   let currentWidth = 0, words1 = [], words2 = [], wordsLeft = [], line1 = '', line2 = '';
-  if (newSize >= 45) {
+  if (newSize >= 50) {
     if (newSize > 75) {newSize = 75}
     canvas.textSize(newSize*maxR);
     canvas.text('"'+word+'"',x,y);
   } else {
-    if (newSize < 45) {
-      newSize = 45*defaultPhrase/canvas.textWidth('"'+word+'"');
-      if (newSize > 20) {
-        if (newSize > 45) {newSize = 45}
+    if (newSize < 50) {
+      newSize = 50*defaultPhrase/canvas.textWidth('"'+word+'"');
+      if (newSize > 30) {
+        if (newSize > 50) {newSize = 50}
         [line1,line2] = divideLines(newSize,textBoxWidth,currentWidth,words1,words2,wordsArray,line1,line2,popupCanvas);
         if (words2.length == 0) {
           canvas.textSize(newSize*maxR);
@@ -1065,7 +1144,7 @@ function writePhrase(x,y,textBoxWidth,textBoxHeight,word,canvas) {
           }
         }
       } else {
-        newSize = 20;
+        newSize = 30;
         canvas.textSize(newSize);
         for (let i=0; i<wordsArray.length; i++) {
           currentWidth += canvas.textWidth(' '+wordsArray[i]);
@@ -1118,44 +1197,55 @@ function divideLines(size,textBoxWidth,currentWidth,words1,words2,wordsArray,lin
 }
   
 function drawInfoWindow() {
+  const y0 = 45*maxR;
   infoCanvas.textFont('Tahoma');
   infoCanvas.stroke(patternColor);
   infoCanvas.strokeWeight(2*maxR);
   infoCanvas.fill(paperColor);
-  infoCanvas.rect(width/2,height-87.5*maxR,600*maxR,135*maxR);
+  infoCanvas.rect(width/2,y0/2+height-87.5*maxR,600*maxR,90*maxR);
   infoCanvas.fill(patternColor);
-  infoCanvas.rect(width/2-150*maxR,height-170*maxR,300*maxR,30*maxR);
+  infoCanvas.rect(width/2-150*maxR,y0+height-170*maxR,300*maxR,30*maxR);
   infoCanvas.fill(paperColor);
-  infoCanvas.rect(width/2+150*maxR,height-170*maxR,300*maxR,30*maxR);
+  infoCanvas.rect(width/2+150*maxR,y0+height-170*maxR,300*maxR,30*maxR);
   infoCanvas.noStroke();
   infoCanvas.fill(paperColor);
   
   infoCanvas.textSize(15*maxR);
   infoCanvas.textStyle(BOLD);
-  infoCanvas.text('TECHNICAL INFORMATION',width/2-285*maxR,height-165*maxR);
+  infoCanvas.text('PERCEPTRON INFORMATION',width/2-285*maxR,y0+height-165*maxR);
   infoCanvas.fill(startColor);
-  infoCanvas.text('NAME:',width/2+10*maxR,height-165*maxR);
+  infoCanvas.text('ARTWORK NAME:',width/2+10*maxR,y0+height-165*maxR);
   infoCanvas.textAlign(RIGHT);
   infoCanvas.textStyle(ITALIC);
-  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,height-165*maxR);
-  
+  infoCanvas.text('Perceptron #'+seed,width/2+285*maxR,y0+height-165*maxR);
+
+  const [lifeCycleLength, lifeCycleUnit] = lifeCycle.split(' ');
+  let timeScale;
+  if (lifeCycle === '60 Years') {
+    timeScale = '1 Year';
+  } else if (lifeCycle === '60 Months') {
+    timeScale = '1 Month';
+  } else if (lifeCycle === '60 Weeks') {
+    timeScale = '1 Week';
+  } else if (lifeCycle === '60 Days') {
+    timeScale = '1 Day';
+  } else if (lifeCycle === '12 Hours') {
+    timeScale = '12 Minutes';
+  }
+
   data = [
-    ['AI MODEL:', fitStrToWidth(12*maxR, model_name, 160*maxR)],
+    ['AI MODEL NAME:', fitStrToWidth(12*maxR, model_name, 140*maxR)],
     ['SCALE:', '1:'+scaleRatio],
     ['NUMBER OF CLASSES:', classes_name.length],
-    ['NUMBER OF HIDDEN LAYERS:', layerNum-2],
-    ['MAX NEURONS PER HIDDEN LAYER:', realHiddenLayerMaxNodes],
-    ['NUMBER OF TRAINING EPOCHS:', epochs],
-    ['COLOR PALETTE:', ColorPalette[paletteType][0]],
-    ['PAPER PATTERN:', Pattern[pattern-1][0]],
-    ['NETWORK ARCHITECTURE:', architecture],
-    ['ACTIVATION FUNCTION:', activationFunction],
-    ['DATA SET:', NodeFill[fillMode-1][0]],
-    ['DEEP LEARNING FRAMEWORK:', NodeShape[shape-1][0]],
-    ['HARDWARE ACCELERATION:', HardwareAcceleration[drawSpeed-1][0]],
+    // ['NUMBER OF TRAINING EPOCHS:', epochs],
+    // ['ACTIVATION FUNCTION:', activationFunction],
     ['BIRTH YEAR:', birthYear],
-    ['LIFE CYCLE:', lifeCycle],
+    ['NUMBER OF REBIRTHS:', rebirthCount.toString()],
+    ['AGE:', `${age.toFixed(2)} Perceptron Years`],
+    ['ONE PERCEPTRON YEAR:', `${timeScale}`],
     ['STATE:', liveState[state]],
+    ['ACTIVE NEURONS:', `${round(totNeurons * growth)} / ${totNeurons}`],
+    ['NEXT STATE TIME:', formatDate(new Date(nextStateTimestamp))],
   ];
 
   infoCanvas.fill(startColor);
@@ -1164,7 +1254,7 @@ function drawInfoWindow() {
     const isLeft = i < half;
     const xLabel = isLeft ? width/2-285*maxR : width/2+10*maxR;
     const xValue = isLeft ? width/2-10*maxR : width/2+285*maxR;
-    const y = height-(135-15*(i%half))*maxR;
+    const y = y0+height-(135-15*(i%half))*maxR;
 
     infoCanvas.textStyle(BOLD);
     infoCanvas.textAlign(LEFT);
@@ -1382,4 +1472,56 @@ function makeButton(text, x, y, w, h, onClick) {
 
 function isInputFocused() {
   return (bitcoin != null && bitcoin?.isFocused()) || (address != null && address?.isFocused());
+}
+
+function getIntroText(state, age, name, classes_name) {
+  let text;
+  
+  if (state <= 3) {
+    text = `Hey ${String.fromCodePoint(0x1F44B)}, I'm ${name}, ${age} years old. I can detect ${classes_name.length} NFT collections: `;
+    let totalClassesLength = 0;
+    for(let i = 0; i < classes_name.length; ++i) {
+      const name = classes_name[i];
+      if (totalClassesLength + name.length > 500) {
+        text += ', etc';
+        break;
+      } else {
+        if (i == classes_name.length - 1) {
+          text += ', and ';
+        } else if (i > 0) {
+          text += ', ';
+        }
+        text += name;
+      }
+      totalClassesLength += name.length;
+    }
+    text += '. ';
+    if (age <= 5) { // Baby
+      text += `However, I am only a baby, so my recognition ability is not accurate. I'm in the state of Growing both looks and intelligence.`;
+    } else if (age <= 13) { // Child
+      text += `I am now a child. My recognition ability is becoming better, but still not very accurate. I'm in the state of Growing both looks and intelligence.`;
+    } else if (age <= 25) { // Teen
+      text += `I have grown up to be a teen. My recognition ability almost reaches the peak, but I will still mess up sometimes. I'm in the state of Growing both looks and intelligence.`;
+    } else if (age <= 50) { // Adult
+      text += `I finally reach adulthood. My recognition is fully functional now. I'm in the Stable state, where I am the most intelligent with all neurons activated.`;
+    } else if (age <= 60) { // Old
+      text += `I am now an old Perceptron, so my recognition ability is no longer the best. I'm in the Decaying state, meaning that my neurons are dying, and my intelligence is decreasing over time.`;
+    }
+  } else if (state == 4) { // Dead
+    text = `${name} is Dead. However, this is not the end to its story...`;
+  } else if (state == 5) { // Rebirth
+    text = `${name} is now in the Rebirth state, and is preparing to start a new life.`;
+  }
+
+  return text;
+}
+
+function formatDate(date) {
+  const day = date.getDate();
+  const monthName = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+  const hour = date.getHours();
+  let minute = date.getMinutes().toString();
+  if (minute.length == 1) minute = '0' + minute;
+  return `${ordinal_suffix_of(day)} ${monthName} ${year} | ${hour}:${minute}`;
 }
